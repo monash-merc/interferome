@@ -93,19 +93,19 @@ public class CSVGeneCreator {
             }
             if (StringUtils.equalsIgnoreCase(columnName, GeneField.UNIGENE)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    tpbGene.setUnigeneID(columnValue);
+                    tpbGene.setUnigene(columnValue);
                 }
             }
 
             if (StringUtils.equalsIgnoreCase(columnName, GeneField.GENBANK)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    tpbGene.setGenbankID(columnValue);
+                    tpbGene.setGenbankId(columnValue);
                 }
             }
 
             if (StringUtils.equalsIgnoreCase(columnName, GeneField.ENTREZ)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    tpbGene.setEntrezID(columnValue);
+                    tpbGene.setEntrezId(columnValue);
                 }
             }
         }

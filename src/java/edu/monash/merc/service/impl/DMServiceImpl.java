@@ -121,6 +121,9 @@ public class DMServiceImpl implements DMService {
     @Autowired
     private DataService dataService;
 
+    @Autowired
+    private GeneService geneService;
+
     public void setProfileService(ProfileService profileService) {
         this.profileService = profileService;
     }
@@ -204,6 +207,10 @@ public class DMServiceImpl implements DMService {
 
     public void setIfnTypeService(IFNTypeService ifnTypeService) {
         this.ifnTypeService = ifnTypeService;
+    }
+
+    public void setGeneService(GeneService geneService) {
+        this.geneService = geneService;
     }
 
     @Override
@@ -1188,6 +1195,58 @@ public class DMServiceImpl implements DMService {
         return this.ifnVariationService.getAbnormalFactors();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Gene getGeneById(long id) {
+        return this.geneService.getGeneById(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveGene(Gene gene) {
+        this.geneService.saveGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void mergeGene(Gene gene) {
+        this.geneService.mergeGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateGene(Gene gene) {
+        this.geneService.updateGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteGene(Gene gene) {
+        this.geneService.deleteGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Gene getGeneByEnsgAccession(String ensgAccession) {
+        return this.getGeneByEnsgAccession(ensgAccession);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void importGenes(List<Gene> genes) {
         //TODO

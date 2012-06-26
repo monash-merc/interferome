@@ -96,11 +96,11 @@ public class Gene extends Domain {
 
     @Basic
     @Column(name = "genbank_id")
-    private String genbank_id;
+    private String genbankId;
 
     @Basic
     @Column(name = "entrez_id")
-    private String entrez_id;
+    private String entrezId;
 
     public long getId() {
         return id;
@@ -174,26 +174,35 @@ public class Gene extends Domain {
         this.band = band;
     }
 
-    public String getUnigeneID() {
-         return unigene;
+    public String getRefseq_dna() {
+        return refseq_dna;
     }
-    public void setUnigeneID(String unigene) {
+
+    public void setRefseq_dna(String refseq_dna) {
+        this.refseq_dna = refseq_dna;
+    }
+
+    public String getUnigene() {
+        return unigene;
+    }
+
+    public void setUnigene(String unigene) {
         this.unigene = unigene;
     }
 
-    public String getGenbankID(){
-        return genbank_id;
+    public String getGenbankId() {
+        return genbankId;
     }
 
-    public void setGenbankID(String genbank_id){
-        this.genbank_id = genbank_id;
+    public void setGenbankId(String genbankId) {
+        this.genbankId = genbankId;
     }
 
-    public String getEntrezID(){
-        return entrez_id;
+    public String getEntrezId() {
+        return entrezId;
     }
 
-    public void setEntrezID(String entrez_id){
-        this.entrez_id = entrez_id;
+    public void setEntrezId(String entrezId) {
+        this.entrezId = entrezId;
     }
 }

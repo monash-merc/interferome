@@ -245,5 +245,57 @@ public interface DMService {
 
     public List<String> getAbnormalFactors();
 
+
+    /**
+     * Get a Gene by Gene id
+     *
+     * @param id a Gene id
+     * @return a Gene object
+     */
+    Gene getGeneById(long id);
+
+    /**
+     * Save a Gene
+     *
+     * @param gene a Gene object
+     */
+    void saveGene(Gene gene);
+
+    /**
+     * Merge a Gene object
+     *
+     * @param gene a Gene object
+     */
+    void mergeGene(Gene gene);
+
+    /**
+     * Update a Gene object
+     *
+     * @param gene a Gene object
+     */
+    void updateGene(Gene gene);
+
+    /**
+     * Delete a Gene object
+     *
+     * @param gene a Gene object
+     */
+    void deleteGene(Gene gene);
+
+    /**
+     * Get the Gene by an ensembl accession id
+     *
+     * @param ensgAccession an ensembl accession id
+     * @return a Gene
+     */
+    Gene getGeneByEnsgAccession(String ensgAccession);
+
+    /**
+     * import all genes
+     *
+     * @param genes a list of Genes.
+     */
     void importGenes(List<Gene> genes);
+
+
 }

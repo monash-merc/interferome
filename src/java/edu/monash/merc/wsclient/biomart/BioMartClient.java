@@ -180,10 +180,10 @@ public class BioMartClient {
         bioMartClient.configure(wsUrl, chromosome);
         List<Gene> tpbGeneList = bioMartClient.importGenes();
         System.out.println(" size : " + tpbGeneList.size());
-       for (Gene gene : tpbGeneList) {
-           System.out.println(gene.getEnsgAccession() + " - " + gene.getDescription() + " - " + gene.getChromosome() + " - " + gene.getStartPosition() +
-                    " - " + gene.getEndPosition() + " - " + gene.getStrand() + " - " + gene.getBand() + " - " + gene.getUnigeneID() + " - " +
-                    gene.getEntrezID() + " - " + gene.getGenbankID());
+        for (Gene gene : tpbGeneList) {
+            System.out.println(gene.getEnsgAccession() + " - " + gene.getDescription() + " - " + gene.getChromosome() + " - " + gene.getStartPosition() +
+                    " - " + gene.getEndPosition() + " - " + gene.getStrand() + " - " + gene.getBand() + " - " + gene.getUnigene() + " - " +
+                    gene.getEntrezId() + " - " + gene.getGenbankId());
         }
     }
 }
