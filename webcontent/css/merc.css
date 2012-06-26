@@ -90,14 +90,6 @@ body {
     text-decoration: none
 }
 
-.logo_section_right {
-    position: static;
-    float: right;
-    margin-right: 5px;
-    margin-top: 60px;
-    padding-right: 15px;
-}
-
 .logo_section_right a {
     float: right;
     width: 60px;
@@ -143,10 +135,11 @@ body {
 .navlist li {
     display: block;
     float: left;
-    width: 16%;
+    width: 13.5%;
     margin: 0 auto;
     padding-bottom: 2px;
     padding-right: 2px;
+    padding-left: 2px;
 }
 
 .navlist li a {

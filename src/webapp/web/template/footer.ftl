@@ -12,8 +12,11 @@
 <div class="footer">
     <br/>
     <div class="copyright">
-        Copyright &copy; 2010-2012 Monash University. All Rights Reserved.
-        &nbsp;&nbsp;&nbsp;&nbsp;<b><@s.text name="app.version" /></b>
+            Copyright &copy; 2010-2012 Monash University. All Rights Reserved.
+        &nbsp;&nbsp;&nbsp;&nbsp;<b><@s.text name="app.version" /></b>  <br />
+        <@s.if test="%{#session.authentication_flag == null}">
+            <a href="${base}/user/showLogin.jspx">Login</a> <a href="${base}/user/register_options">Register</a>
+        </@s.if>
     </div>
     <br/>
 </div>

@@ -69,7 +69,6 @@
    </div>
 </div>
 <div class="search_line_space"></div>
-
 <div class="search_data_outer_div">
     <table class="multiple_select_tab">
         <tr>
@@ -81,6 +80,10 @@
             <td width="80" align="center">Cell Line:</td>
             <td><@s.select name="searchBean.cellLines" id="select_cellline" headerKey="-1" headerValue="All"  multiple="true" size="4" list="cellLineMap" cssClass="search_mul_select"  /></td>
         </tr>
+        <tr>
+            <td></td><td></td><td></td>
+            <td colspan="6"><p class="search_hints_inner">Select multiple values using Shift key.</p></td>
+        </tr>
     </table>
 </div>
 
@@ -91,7 +94,7 @@
         <table>
             <tr>
                 <td>
-                    <div class="search_field_title">Normal | Abnormal:</div>
+                    <div class="search_field_title">Sample Types:</div>
                 </td>
                 <td>
                      <@s.radio name="searchBean.variation" list="variationMap" value="searchBean.variation" id="search_normal" title="search by normal or abnormal"/>
