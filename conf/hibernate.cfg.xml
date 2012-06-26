@@ -23,5 +23,10 @@
         <mapping class="edu.monash.merc.domain.ExperimentFactorValue"/>
         <mapping class="edu.monash.merc.domain.Reporter"/>
         <mapping class="edu.monash.merc.domain.Gene"/>
+        <mapping class="edu.monash.merc.domain.GeneOntology"/>
+        <mapping class="edu.monash.merc.domain.Ontology"/>
+        <mapping class="edu.monash.merc.domain.EvidenceCode"/>
+        <mapping class="edu.monash.merc.domain.GoDomain"/>
+
     </session-factory>
 </hibernate-configuration>

@@ -50,7 +50,6 @@ import java.util.List;
  *        Time: 11:03 AM
  */
 @Service
-@Qualifier("infDataProcessor")
 public class INFDataProcessor implements DataProcessor {
 
     @Autowired

@@ -84,10 +84,6 @@
         </property>
     </bean>
 
-    <!-- cron job scheduled task for loading the file from ftp server -->
-    <task:scheduled-tasks>
-        <task:scheduled ref="infDataProcessor" method="process" cron="0 45 10 ? * MON-FRI"/>
-    </task:scheduled-tasks>
 
     <!-- Datasource configuration -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">

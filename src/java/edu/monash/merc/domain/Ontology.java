@@ -43,12 +43,12 @@ import java.util.List;
  *        Time: 1:27 PM
  */
 @Entity
-@Table(name = "Ontology")
+@Table(name = "ontology")
 public class Ontology extends Domain {
 
     @Id
-    @GeneratedValue(generator = "exp_pk_seq")
-    @GenericGenerator(name = "exp_pk_seq", strategy = "seqhilo")
+    @GeneratedValue(generator = "ontology_seq")
+    @GenericGenerator(name = "ontology_seq", strategy = "seqhilo")
     @Column(name = "id", nullable = false)
     private long id;
 
