@@ -36,6 +36,7 @@ import edu.monash.merc.wsclient.biomart.BioMartClient;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,6 +51,7 @@ import java.util.List;
  *        Time: 11:03 AM
  */
 @Service
+@Qualifier("infDataProcessor")
 public class INFDataProcessor implements DataProcessor {
 
     @Autowired
@@ -70,6 +72,7 @@ public class INFDataProcessor implements DataProcessor {
 
     @Override
     public void process() {
+        System.out.println("============= start interferome process .........");
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

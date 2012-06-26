@@ -84,7 +84,14 @@
         </property>
     </bean>
 
+    <!-- interferome backend batch data processor -->
+    <bean id="infDataProcessor" class="edu.monash.merc.system.scheduling.impl.INFDataProcessor"/>
 
+    <!-- cron job scheduled task for loading the file from ftp server -->
+    <task:scheduler id="infScheduler" pool-size="10"/>
+    <task:scheduled-tasks scheduler="infScheduler">
+        <task:scheduled ref="infDataProcessor" method="process" cron="0 15 18 ? * MON-FRI"/>
+    </task:scheduled-tasks>
     <!-- Datasource configuration -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${jdbc.driverClassName}"/>
@@ -109,13 +116,15 @@
         <property name="dataSource" ref="dataSource"/>
 
         <!-- configuration class -->
+        <!--
         <property name="configurationClass">
             <value>org.hibernate.cfg.AnnotationConfiguration</value>
         </property>
-
+            -->
         <!-- configuration file location -->
-        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
-
+        <property name="configLocation">
+            <value>classpath:hibernate.cfg.xml</value>
+        </property>
         <!-- hibernate properties -->
         <property name="hibernateProperties">
             <props>
