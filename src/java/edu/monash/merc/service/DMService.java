@@ -244,4 +244,6 @@ public interface DMService {
     public void saveIFNVariation(IFNVariation ifnVariation);
 
     public List<String> getAbnormalFactors();
+
+    void importGenes(List<Gene> genes);
 }

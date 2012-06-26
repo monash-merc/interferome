@@ -1187,4 +1187,9 @@ public class DMServiceImpl implements DMService {
     public List<String> getAbnormalFactors() {
         return this.ifnVariationService.getAbnormalFactors();
     }
+
+    @Override
+    public void importGenes(List<Gene> genes) {
+        //TODO
+    }
 }

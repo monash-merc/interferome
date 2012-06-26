@@ -139,6 +139,8 @@ public class AppPropSettings {
     //max search record limits to a csv file
     public static String SEARCH_RESULT_TO_CSV_MAX_RECORD = "search.result.to.csv.max.record";
 
+    public  static String BIOMART_RESTFUL_WS_URL = "biomart.restful.ws.url";
+
     //pub med citation url
     public static String PUBMED_CITATION_BASE_URL = "pubmed.citation.base.url";
 
