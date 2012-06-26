@@ -86,7 +86,7 @@ public class BioMartClient {
         GetMethod httpget = null;
         try {
             HttpClient httpclient = new HttpClient();
-            String query = genQueryString(chromosome);
+            String query = genQueryString("hsapiens_gene_ensembl", chromosome);
             String url = wsUrl + URLEncoder.encode(query, "UTF-8");
             httpget = new GetMethod(url);
             int statusCode = httpclient.executeMethod(httpget);
@@ -147,14 +147,13 @@ public class BioMartClient {
         return tpbGenes;
     }
 
-    public String genQueryString(String chromosome) {
+    public String genQueryString(String species, String chromosome) {
 
         StringBuilder query = new StringBuilder();
         query.append("<?xml version='1.0' encoding='UTF-8'?>");
         query.append("<!DOCTYPE Query>");
-        query.append("<Query  virtualSchemaName = 'default' formatter = 'CSV' header = '1' uniqueRows = '0' count = '' >");
-        query.append("<Dataset name = 'hsapiens_gene_ensembl' interface = 'default' >");
-        query.append("<Filter name = 'source' value = 'ensembl'/>");
+        query.append("<Query  virtualSchemaName = 'default' formatter = 'CSV' header = '1' uniqueRows = '1' count = '' >");
+        query.append("<Dataset name = '" + species + "' interface = 'default' >");
         if (StringUtils.isNotBlank(chromosome)) {
             query.append("<Filter name = 'chromosome_name' value = '").append(chromosome).append("'/>");
         }
@@ -165,7 +164,10 @@ public class BioMartClient {
         query.append("<Attribute name = 'end_position' />");
         query.append("<Attribute name = 'strand' />");
         query.append("<Attribute name = 'band' />");
-        query.append("<Attribute name = 'external_gene_id' />");
+        query.append("<Attribute name = 'unigene' />");
+        query.append("<Attribute name = 'protein_id' />");
+        query.append("<Attribute name = 'entrezgene' />");
+
         query.append("</Dataset>").append("</Query>");
         return query.toString();
     }
@@ -178,9 +180,10 @@ public class BioMartClient {
         bioMartClient.configure(wsUrl, chromosome);
         List<Gene> tpbGeneList = bioMartClient.importGenes();
         System.out.println(" size : " + tpbGeneList.size());
-        for (Gene gene : tpbGeneList) {
-            System.out.println(gene.getEnsgAccession() + " - " + gene.getDescription() + " - " + gene.getChromosome() + " - " + gene.getStartPosition() +
-                    " - " + gene.getEndPosition() + " - " + gene.getStrand() + " - " + gene.getBand() + " - " + gene.getGeneName());
+       for (Gene gene : tpbGeneList) {
+           System.out.println(gene.getEnsgAccession() + " - " + gene.getDescription() + " - " + gene.getChromosome() + " - " + gene.getStartPosition() +
+                    " - " + gene.getEndPosition() + " - " + gene.getStrand() + " - " + gene.getBand() + " - " + gene.getUnigeneID() + " - " +
+                    gene.getEntrezID() + " - " + gene.getGenbankID());
         }
     }
 }

@@ -22,5 +22,6 @@
         <mapping class="edu.monash.merc.domain.ExperimentFactor"/>
         <mapping class="edu.monash.merc.domain.ExperimentFactorValue"/>
         <mapping class="edu.monash.merc.domain.Reporter"/>
+        <mapping class="edu.monash.merc.domain.Gene"/>
     </session-factory>
 </hibernate-configuration>

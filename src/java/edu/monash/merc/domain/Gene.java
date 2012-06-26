@@ -86,6 +86,22 @@ public class Gene extends Domain {
     @Column(name = "band")
     private String band;
 
+    @Basic
+    @Column(name = "refseq_dna")
+    private String refseq_dna;
+
+    @Basic
+    @Column(name = "unigene")
+    private String unigene;
+
+    @Basic
+    @Column(name = "genbank_id")
+    private String genbank_id;
+
+    @Basic
+    @Column(name = "entrez_id")
+    private String entrez_id;
+
     public long getId() {
         return id;
     }
@@ -156,5 +172,28 @@ public class Gene extends Domain {
 
     public void setBand(String band) {
         this.band = band;
+    }
+
+    public String getUnigeneID() {
+         return unigene;
+    }
+    public void setUnigeneID(String unigene) {
+        this.unigene = unigene;
+    }
+
+    public String getGenbankID(){
+        return genbank_id;
+    }
+
+    public void setGenbankID(String genbank_id){
+        this.genbank_id = genbank_id;
+    }
+
+    public String getEntrezID(){
+        return entrez_id;
+    }
+
+    public void setEntrezID(String entrez_id){
+        this.entrez_id = entrez_id;
     }
 }
