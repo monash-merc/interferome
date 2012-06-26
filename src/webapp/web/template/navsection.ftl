@@ -17,13 +17,11 @@
 			<li><a href="${base}/data/listExperiments.jspx">Experiments</a></li>
 		</@s.if>
 		<li><a href="${base}/search/showSearch.jspx">Search</a></li>
-		<li><a href="http://vera093.its.monash.edu.au/interferome/expression.php" target="_blank">Tissue Expression</a></li>
-		<li><a href="http://vera093.its.monash.edu.au/interferome/tfbs.php" target="_blank">Regulatory Analysis</a></li>
-		<li><a href="http://vera093.its.monash.edu.au/interferome/download.php" target="_blank">Sequence Download</a></li>
-		<li><a href="${base}/site/dbStat.jspx"">Database Statistics</a></li>
-		<li><a href="${base}/site/showCitation.jspx">Citation</a></li>
-		<li><a href="${base}/site/showHelp.jspx">Help</a></li>
-		<li><a href="${base}/site/showContactUs.jspx">Contact Us</a></li>
+        <li><a href="${base}/site/showHelp.jspx">Help</a></li>
+        <li><a href="${base}/site/dbStat.jspx"">Database Statistics</a></li>
+		<li><a href="${base}/site/showCitation.jspx">How To Cite</a></li>
+        <li><a href="${base}/site/showSubmit.jspx">Submit Data</a></li>
+        <li><a href="${base}/site/showContactUs.jspx">Contact Us</a></li>
         <li><a href="http://vera093.its.monash.edu.au/interferome" target="_blank">Interferome V1.0</a></li>
 		<div style="clear:both"></div> 
 	</ul>

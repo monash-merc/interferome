@@ -15,7 +15,7 @@
     <#include "template/navsection.ftl"/>
     <!-- temp -->
     <div class="trans_temp">
-       Interferome is currently in transition please select <a href="http://vera093.its.monash.edu.au/interferome" target="_blank">Interferome V1.0</a> to access previous version whilst this site is under development.
+       Interferome has recently undergone a major redevelopment. Please select <a href="http://vera093.its.monash.edu.au/interferome" target="_blank">Interferome V1.0</a> to access the previous version.
 	</div>
 
     <!-- end of temp -->
@@ -71,14 +71,14 @@
 	 					The Database of IFN Regulated Genes
 	 				</div>
 			 		<div class="content_div">
-						Type I, II and III IFN regulated genes manually curated from more than 28 publicly available microarray datasets.
+						Type I, II and III IFN regulated genes manually curated from publicly available microarray datasets.
 			 		</div>
 			 		<br/>
 			 		<div class="content_title">
 			 			Introduction
 			 		</div>
 			 		<div class="content_div">
-						IFNs were identified as antiviral proteins more than 50 years ago. However, their involvement in immunomodulation, 
+						IFNs were identified as antiviral proteins more than 50 years ago. However, their involvement in immunomodulation,
 						cell proliferation, inflammation and other homeostatic process has been since identified. These cytokines are used 
 						as therapeutics in many diseases such as chronic viral infections, cancer and multiple sclerosis. These IFNs regulate
 						the transcription of approximately 2000 genes in a IFN subtype, dose, cell type and stimulus dependent manner. 

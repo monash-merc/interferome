@@ -12,7 +12,7 @@
 <div class="footer">
     <br/>
     <div class="copyright">
-        Copyright &copy; 2010-2011 Monash University. All Rights Reserved.
+        Copyright &copy; 2010-2012 Monash University. All Rights Reserved.
         &nbsp;&nbsp;&nbsp;&nbsp;<b><@s.text name="app.version" /></b>
     </div>
     <br/>
