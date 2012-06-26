@@ -56,8 +56,13 @@ public class Ontology extends Domain {
     @Column(name = "go_term_acc")
     private String goTermAccession;
 
+    @Basic
+    @Column(name = "go_term_name")
     private String goTermName;
 
+
+    @Basic
+    @Column(name = "go_term_definition")
     private String goTermDefinition;
 
     @ManyToOne

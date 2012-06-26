@@ -26,11 +26,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.domain;
+package edu.monash.merc.dao.impl;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import edu.monash.merc.dao.HibernateGenericDAO;
+import edu.monash.merc.domain.GeneOntology;
+import edu.monash.merc.repository.IGeneOntologyRepository;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * @author Simon Yu
@@ -39,35 +41,16 @@ import javax.persistence.*;
  * @since 1.0
  *        <p/>
  *        Date: 26/06/12
- *        Time: 4:42 PM
+ *        Time: 11:05 PM
  */
-@Entity
-@Table(name = "evidence_code")
-public class EvidenceCode extends Domain {
-
-    @Id
-    @GeneratedValue(generator = "evidence_code_seq")
-    @GenericGenerator(name = "evidence_code_seq", strategy = "seqhilo")
-    private long id;
-
-    @Basic
-    @Column(name = "code")
-    private String code;
-
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
+public class GeneOntologyDAO extends HibernateGenericDAO<GeneOntology> implements IGeneOntologyRepository {
+    @Override
+    public GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession) {
+        Criteria goCriteria = this.session().createCriteria(this.persistClass);
+        Criteria geneCriteria = goCriteria.createCriteria("gene");
+        Criteria ontCriteria = geneCriteria.createCriteria("ontology");
+        geneCriteria.add(Restrictions.eq("ensgAccession", ensgAccession).ignoreCase());
+        ontCriteria.add(Restrictions.eq("goTermAccession", goTermAccession).ignoreCase());
+        return (GeneOntology) goCriteria.uniqueResult();
     }
 }

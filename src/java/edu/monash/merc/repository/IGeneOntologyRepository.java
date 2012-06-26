@@ -26,11 +26,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.domain;
+package edu.monash.merc.repository;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import edu.monash.merc.domain.GeneOntology;
 
 /**
  * @author Simon Yu
@@ -39,35 +37,9 @@ import javax.persistence.*;
  * @since 1.0
  *        <p/>
  *        Date: 26/06/12
- *        Time: 4:42 PM
+ *        Time: 10:45 PM
  */
-@Entity
-@Table(name = "evidence_code")
-public class EvidenceCode extends Domain {
+public interface IGeneOntologyRepository {
 
-    @Id
-    @GeneratedValue(generator = "evidence_code_seq")
-    @GenericGenerator(name = "evidence_code_seq", strategy = "seqhilo")
-    private long id;
-
-    @Basic
-    @Column(name = "code")
-    private String code;
-
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
+    GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession);
 }

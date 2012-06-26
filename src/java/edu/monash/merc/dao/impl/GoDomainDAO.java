@@ -26,11 +26,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.domain;
+package edu.monash.merc.dao.impl;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import edu.monash.merc.dao.HibernateGenericDAO;
+import edu.monash.merc.domain.GoDomain;
+import edu.monash.merc.repository.IGoDomainRepository;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Simon Yu
@@ -39,35 +43,16 @@ import javax.persistence.*;
  * @since 1.0
  *        <p/>
  *        Date: 26/06/12
- *        Time: 4:42 PM
+ *        Time: 10:48 PM
  */
-@Entity
-@Table(name = "evidence_code")
-public class EvidenceCode extends Domain {
+@Scope("prototype")
+@Repository
+public class GoDomainDAO extends HibernateGenericDAO<GoDomain> implements IGoDomainRepository {
 
-    @Id
-    @GeneratedValue(generator = "evidence_code_seq")
-    @GenericGenerator(name = "evidence_code_seq", strategy = "seqhilo")
-    private long id;
-
-    @Basic
-    @Column(name = "code")
-    private String code;
-
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
+    @Override
+    public GoDomain getGoDomainByNamespace(String namespace) {
+        Criteria qCriteria = this.session().createCriteria(this.persistClass);
+        qCriteria.add(Restrictions.eq("namespace", namespace).ignoreCase());
+        return (GoDomain) qCriteria.uniqueResult();
     }
 }

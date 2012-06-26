@@ -26,11 +26,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.domain;
+package edu.monash.merc.dao.impl;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import edu.monash.merc.dao.HibernateGenericDAO;
+import edu.monash.merc.domain.EvidenceCode;
+import edu.monash.merc.repository.IEvidenceCodeRepository;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Simon Yu
@@ -39,35 +43,15 @@ import javax.persistence.*;
  * @since 1.0
  *        <p/>
  *        Date: 26/06/12
- *        Time: 4:42 PM
+ *        Time: 11:01 PM
  */
-@Entity
-@Table(name = "evidence_code")
-public class EvidenceCode extends Domain {
-
-    @Id
-    @GeneratedValue(generator = "evidence_code_seq")
-    @GenericGenerator(name = "evidence_code_seq", strategy = "seqhilo")
-    private long id;
-
-    @Basic
-    @Column(name = "code")
-    private String code;
-
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
+@Scope("prototype")
+@Repository
+public class EvidenceCodeDAO extends HibernateGenericDAO<EvidenceCode> implements IEvidenceCodeRepository {
+    @Override
+    public EvidenceCode getEvidenceCodeByCode(String code) {
+        Criteria qCriteria = this.session().createCriteria(this.persistClass);
+        qCriteria.add(Restrictions.eq("code", code).ignoreCase());
+        return (EvidenceCode) qCriteria.uniqueResult();
     }
 }
