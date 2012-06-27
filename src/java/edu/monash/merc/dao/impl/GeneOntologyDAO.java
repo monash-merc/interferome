@@ -33,6 +33,8 @@ import edu.monash.merc.domain.GeneOntology;
 import edu.monash.merc.repository.IGeneOntologyRepository;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Simon Yu
@@ -43,6 +45,8 @@ import org.hibernate.criterion.Restrictions;
  *        Date: 26/06/12
  *        Time: 11:05 PM
  */
+@Scope("prototype")
+@Repository
 public class GeneOntologyDAO extends HibernateGenericDAO<GeneOntology> implements IGeneOntologyRepository {
     @Override
     public GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession) {
