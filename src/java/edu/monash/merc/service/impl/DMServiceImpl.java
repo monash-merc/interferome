@@ -1418,4 +1418,269 @@ public class DMServiceImpl implements DMService {
     public Ontology getOntologyByGoTermAccession(String goTermAccession) {
         return this.ontologyService.getOntologyByGoTermAccession(goTermAccession);
     }
+
+    @Override
+    public void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans) {
+        if (geneOntologyBeans != null) {
+            for (GeneOntologyBean geneOntologyBean : geneOntologyBeans) {
+                String ensgAc = geneOntologyBean.getEnsembleGeneId();
+                String goTermAc = geneOntologyBean.getGoTermAccession();
+                String goTermName = geneOntologyBean.getGoTermName();
+                String goTermDefinition = geneOntologyBean.getGoTermDefinition();
+                String goEvCode = geneOntologyBean.getGoTermEvidenceCode();
+                String goDomainNamespace = geneOntologyBean.getGoDomain();
+
+                GoDomain goDomain = this.getGoDomainByNamespace(goDomainNamespace);
+                if (goDomain == null) {
+                    goDomain = new GoDomain();
+                    goDomain.setNamespace(goDomainNamespace);
+                    this.saveGoDomain(goDomain);
+                }
+
+                Ontology ontology = this.getOntologyByGoTermAccession(goTermAc);
+                if (ontology == null) {
+                    ontology = new Ontology();
+                    ontology.setGoTermAccession(goTermAc);
+                    ontology.setGoTermDefinition(geneOntologyBean.getGoTermDefinition());
+                    ontology.setGoTermName(geneOntologyBean.getGoTermName());
+                    ontology.setGoDomain(goDomain);
+                    this.saveOntology(ontology);
+                }
+
+                EvidenceCode evidenceCode = this.getEvidenceCodeByCode(goEvCode);
+                if (evidenceCode == null) {
+                    evidenceCode = genEvidneceCodeEntity(goEvCode);
+                    this.saveEvidenceCode(evidenceCode);
+                }
+
+                Gene gene = this.getGeneByEnsgAccession(ensgAc);
+
+
+                GeneOntology geneOntology = this.getGeneOntologyByGeneAndOntology(ensgAc, goTermAc);
+                if (geneOntology == null) {
+                    geneOntology = new GeneOntology();
+                    geneOntology.setEvidenceCode(evidenceCode);
+                    geneOntology.setGene(gene);
+                    geneOntology.setOntology(ontology);
+                } else {
+                    EvidenceCode fEvidenceCode1 = geneOntology.getEvidenceCode();
+                    int fRank = fEvidenceCode1.getRank();
+                    int currentRank = evidenceCode.getRank();
+
+                    //the smaller rank number should best evidenc
+                    if (currentRank < fRank) {
+                        geneOntology.setEvidenceCode(evidenceCode);
+                        geneOntology.setGene(gene);
+                        geneOntology.setOntology(ontology);
+                        this.mergeGeneOntology(geneOntology);
+                    }
+                }
+            }
+        }
+    }
+
+    private EvidenceCode genEvidneceCodeEntity(String code) {
+        String expCode = "EXP";
+        String expDesc = "Inferred from Experiment";
+        int expRank = 1;
+
+        String idaCode = "IDA";
+        String idaDesc = "Inferred from Direct Assay";
+        int idaRank = 2;
+
+        String ipiCode = "IPI";
+        String ipiDesc = "Inferred from Physical Interaction";
+        int ipiRank = 3;
+
+        String impCode = "IMP";
+        String impDesc = "Inferred from Mutant Phenotype";
+        int impRank = 4;
+
+        String igiCode = "IGI";
+        String igiDesc = "Inferred from Genetic Interaction";
+        int igiRank = 5;
+
+
+        String iepCode = "IEP";
+        String iepDesc = "Inferred from Expression Pattern";
+        int iepRank = 6;
+
+        String issCode = "ISS";
+        String issDesc = "Inferred from Sequence or Structural Similarity";
+        int issRank = 7;
+
+        String isoCode = "ISO";
+        String isoDesc = "Inferred from Sequence Orthology";
+        int isoRank = 8;
+
+        String isaCode = "ISA";
+        String isaDesc = "Inferred from Sequence Alignment";
+        int isaRank = 9;
+
+        String ismCode = "ISM";
+        String ismDesc = "Inferred from Sequence Model";
+        int ismRank = 10;
+
+        String igcCode = "IGC";
+        String igcDesc = "Inferred from Genomic Context";
+        int igcRank = 11;
+
+        String ibaCode = "IBA";
+        String ibaDesc = "Inferred from Biological aspect of Ancestor";
+        int ibaRank = 12;
+
+        String ibdCode = "IBD";
+        String ibdDesc = "Inferred from Biological aspect of Descendant";
+        int ibdRank = 13;
+
+        String ikrCode = "IKR";
+        String ikrDesc = "Inferred from Key Residues";
+        int ikrRank = 14;
+
+        String irdCode = "IRD";
+        String irdDesc = "Inferred from Rapid Divergence";
+        int irdRank = 15;
+
+        String rcaCode = "RCA";
+        String rcaDesc = "inferred from Reviewed Computational Analysis";
+        int rcaRank = 16;
+
+        String tasCode = "TAS";
+        String tasDesc = "Traceable Author Statement";
+        int tasRank = 17;
+
+        String nasCode = "NAS";
+        String nasDesc = "Non-traceable Author Statement";
+        int nasRank = 18;
+
+        String icCode = "IC";
+        String icDesc = "Inferred by Curator";
+        int icRank = 19;
+
+        String ndCode = "ND";
+        String ndDesc = "No biological Data available";
+        int ndRank = 20;
+
+        String ieaCode = "IEA";
+        String ieaDesc = "Inferred from Electronic Annotation";
+        int ieaRank = 21;
+
+        String nrCode = "NR";
+        String nrDesc = "Not Recorded";
+        int nrRank = 22;
+
+        EvidenceCode evidenceCode = new EvidenceCode();
+        if (StringUtils.equals(code, expCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(expDesc);
+            evidenceCode.setRank(expRank);
+        }
+        if (StringUtils.equals(code, idaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(idaDesc);
+            evidenceCode.setRank(idaRank);
+        }
+        if (StringUtils.equals(code, ipiCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ipiDesc);
+            evidenceCode.setRank(ipiRank);
+        }
+        if (StringUtils.equals(code, impCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(impDesc);
+            evidenceCode.setRank(impRank);
+        }
+        if (StringUtils.equals(code, igiCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(igiDesc);
+            evidenceCode.setRank(igiRank);
+        }
+        if (StringUtils.equals(code, iepCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(iepDesc);
+            evidenceCode.setRank(iepRank);
+        }
+        if (StringUtils.equals(code, issCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(issDesc);
+            evidenceCode.setRank(issRank);
+        }
+        if (StringUtils.equals(code, isoCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(isoDesc);
+            evidenceCode.setRank(isoRank);
+        }
+        if (StringUtils.equals(code, isaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(isaDesc);
+            evidenceCode.setRank(isaRank);
+        }
+        if (StringUtils.equals(code, ismCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ismDesc);
+            evidenceCode.setRank(ismRank);
+        }
+        if (StringUtils.equals(code, igcCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(igcDesc);
+            evidenceCode.setRank(igcRank);
+        }
+        if (StringUtils.equals(code, ibaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ibaDesc);
+            evidenceCode.setRank(ibaRank);
+        }
+        if (StringUtils.equals(code, ibdCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ibdDesc);
+            evidenceCode.setRank(ibdRank);
+        }
+        if (StringUtils.equals(code, ikrCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ikrDesc);
+            evidenceCode.setRank(ikrRank);
+        }
+        if (StringUtils.equals(code, irdCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(irdDesc);
+            evidenceCode.setRank(irdRank);
+        }
+        if (StringUtils.equals(code, rcaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(rcaDesc);
+            evidenceCode.setRank(rcaRank);
+        }
+        if (StringUtils.equals(code, tasCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(tasDesc);
+            evidenceCode.setRank(tasRank);
+        }
+        if (StringUtils.equals(code, nasCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(nasDesc);
+            evidenceCode.setRank(nasRank);
+        }
+        if (StringUtils.equals(code, icCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(icDesc);
+            evidenceCode.setRank(icRank);
+        }
+        if (StringUtils.equals(code, ndCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ndDesc);
+            evidenceCode.setRank(ndRank);
+        }
+        if (StringUtils.equals(code, ieaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ieaDesc);
+            evidenceCode.setRank(ieaRank);
+        }
+        if (StringUtils.equals(code, nrCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(nrDesc);
+            evidenceCode.setRank(nrRank);
+        }
+
+        return evidenceCode;
+    }
 }

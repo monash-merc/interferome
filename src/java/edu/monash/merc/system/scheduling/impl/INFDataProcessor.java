@@ -30,6 +30,7 @@ package edu.monash.merc.system.scheduling.impl;
 
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.Gene;
+import edu.monash.merc.dto.GeneOntologyBean;
 import edu.monash.merc.system.scheduling.DataProcessor;
 import edu.monash.merc.service.DMService;
 import edu.monash.merc.wsclient.biomart.BioMartClient;
@@ -60,6 +61,11 @@ public class INFDataProcessor implements DataProcessor {
     @Autowired
     protected AppPropSettings appSetting;
 
+
+    private static String MOUSE = "mmusculus_gene_ensembl";
+
+    private static String HUMAN = "hsapiens_gene_ensembl";
+
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public void setDmService(DMService dmService) {
@@ -74,9 +80,26 @@ public class INFDataProcessor implements DataProcessor {
     public void process() {
         long startTime = System.currentTimeMillis();
         System.out.println("============= start interferome process .........");
-        importEnsemblGenes("hsapiens_gene_ensembl");
+        importEnsemblGenes(HUMAN);
+
+        //
+        importEnsemblGenes(MOUSE);
         long endTime = System.currentTimeMillis();
-        System.out.println("=====> The total process time for hsapiens_gene_ensembl: " + (endTime - startTime) / 1000 + "seconds");
+
+
+        //GeneOntology
+        long goStartTime = System.currentTimeMillis();
+        importGeneOntology(HUMAN);
+
+        //
+        importGeneOntology(MOUSE);
+        long goEndTime = System.currentTimeMillis();
+
+        System.out.println("=====> The total process time for Gene: " + (endTime - startTime) / 1000 + "seconds");
+
+        System.out.println("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
+
+        System.out.println("=====> The total process time gen and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
     }
 
     private void importEnsemblGenes(String species) {
@@ -89,6 +112,22 @@ public class INFDataProcessor implements DataProcessor {
 
             System.out.println("============> total genes size : " + geneList.size());
             this.dmService.importGenes(geneList);
+            System.out.println("======== imported the ensembl genes into database successfully");
+        } catch (Exception ex) {
+            logger.error(ex);
+        }
+    }
+
+    private void importGeneOntology(String species) {
+        try {
+            String wsURL = this.appSetting.getPropValue(AppPropSettings.BIOMART_RESTFUL_WS_URL);
+
+            BioMartClient client = new BioMartClient();
+            client.configure(wsURL, species);
+            List<GeneOntologyBean> geneOntologyBeans = client.importGeneOntology();
+
+            System.out.println("============> total genes size : " + geneOntologyBeans.size());
+            this.dmService.importGeneOntologies(geneOntologyBeans);
             System.out.println("======== imported the ensembl genes into database successfully");
         } catch (Exception ex) {
             logger.error(ex);

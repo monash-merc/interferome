@@ -350,4 +350,6 @@ public interface DMService {
 
     Ontology getOntologyByGoTermAccession(String goTermAccession);
 
+
+    void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
 }
