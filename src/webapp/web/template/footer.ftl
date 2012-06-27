@@ -11,12 +11,14 @@
 <div class="blank_separator"></div>
 <div class="footer">
     <br/>
-    <div class="copyright">
-            Copyright &copy; 2010-2012 Monash University. All Rights Reserved.
-        &nbsp;&nbsp;&nbsp;&nbsp;<b><@s.text name="app.version" /></b>  <br />
+    <div class="login">
         <@s.if test="%{#session.authentication_flag == null}">
             <a href="${base}/user/showLogin.jspx">Login</a> <a href="${base}/user/register_options">Register</a>
         </@s.if>
+    </div>
+    <div class="copyright">
+            Copyright &copy; 2010-2012 Monash University. All Rights Reserved.
+        &nbsp;&nbsp;&nbsp;&nbsp;<b><@s.text name="app.version" /></b>  <br />
     </div>
     <br/>
 </div>

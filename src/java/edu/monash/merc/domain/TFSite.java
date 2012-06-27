@@ -43,8 +43,8 @@ import javax.persistence.*;
  */
 
 @Entity
-@Table(name = "transcript_factor")
-public class TranscriptFactor extends Domain {
+@Table(name = "tf_site")
+public class TFSite extends Domain {
 
     @Id
     @GeneratedValue(generator = "transcript_factor_seq")
