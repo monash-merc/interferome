@@ -1279,9 +1279,10 @@ public class DMServiceImpl implements DMService {
      * {@inheritDoc}
      */
     @Override
-    public void importGenes(List<Gene> genes) {
+    public void importGenes(List<Gene> genes, Date importedTime) {
         if (genes != null) {
             for (Gene gene : genes) {
+                gene.setImportedTime(importedTime);
                 Gene foundGene = this.getGeneByEnsgAccession(gene.getEnsgAccession());
                 if (foundGene != null) {
                     gene.setId(foundGene.getId());

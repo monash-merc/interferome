@@ -40,6 +40,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -80,10 +82,12 @@ public class INFDataProcessor implements DataProcessor {
     public void process() {
         long startTime = System.currentTimeMillis();
         System.out.println("============= start interferome process .........");
-        importEnsemblGenes(HUMAN);
+
+        Date importedTime = GregorianCalendar.getInstance().getTime();
+        importEnsemblGenes(HUMAN, importedTime);
 
         //
-        importEnsemblGenes(MOUSE);
+        importEnsemblGenes(MOUSE, importedTime);
         long endTime = System.currentTimeMillis();
 
 
@@ -102,7 +106,7 @@ public class INFDataProcessor implements DataProcessor {
         System.out.println("=====> The total process time gen and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
     }
 
-    private void importEnsemblGenes(String species) {
+    private void importEnsemblGenes(String species, Date importedTime) {
         try {
             String wsURL = this.appSetting.getPropValue(AppPropSettings.BIOMART_RESTFUL_WS_URL);
 
@@ -111,7 +115,7 @@ public class INFDataProcessor implements DataProcessor {
             List<Gene> geneList = client.importGenes();
 
             System.out.println("============> total genes size : " + geneList.size());
-            this.dmService.importGenes(geneList);
+            this.dmService.importGenes(geneList, importedTime);
             System.out.println("======== imported the ensembl genes into database successfully");
         } catch (Exception ex) {
             logger.error(ex);

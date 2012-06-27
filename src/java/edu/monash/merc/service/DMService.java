@@ -33,6 +33,7 @@ import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.*;
 import edu.monash.merc.util.interferome.dataset.BaseDataset;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -295,7 +296,7 @@ public interface DMService {
      *
      * @param genes a list of Genes.
      */
-    void importGenes(List<Gene> genes);
+    void importGenes(List<Gene> genes, Date importedTime);
 
     //Evidence Code
 

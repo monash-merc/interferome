@@ -64,7 +64,7 @@ public class Gene extends Domain {
     private String ensgAccession;
 
     @Basic
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "longtext")
     private String description;
 
     @Basic
