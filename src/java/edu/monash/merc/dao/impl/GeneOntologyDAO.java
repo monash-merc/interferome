@@ -52,7 +52,7 @@ public class GeneOntologyDAO extends HibernateGenericDAO<GeneOntology> implement
     public GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession) {
         Criteria goCriteria = this.session().createCriteria(this.persistClass);
         Criteria geneCriteria = goCriteria.createCriteria("gene");
-        Criteria ontCriteria = geneCriteria.createCriteria("ontology");
+        Criteria ontCriteria = goCriteria.createCriteria("ontology");
         geneCriteria.add(Restrictions.eq("ensgAccession", ensgAccession).ignoreCase());
         ontCriteria.add(Restrictions.eq("goTermAccession", goTermAccession).ignoreCase());
         return (GeneOntology) goCriteria.uniqueResult();

@@ -52,16 +52,16 @@ public class GeneOntology extends Domain {
     @Column(name = "id", nullable = false)
     private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "gene_id")
+    @ManyToOne(targetEntity = Gene.class)
+    @JoinColumn(referencedColumnName="id", name = "gene_id")
     private Gene gene;
 
-    @ManyToOne
-    @JoinColumn(name = "ontology_id")
+    @ManyToOne(targetEntity = Ontology.class)
+    @JoinColumn(referencedColumnName = "id", name = "ontology_id")
     private Ontology ontology;
 
-    @ManyToOne
-    @JoinColumn(name = "evidence_code_id")
+    @ManyToOne (targetEntity = EvidenceCode.class)
+    @JoinColumn(referencedColumnName = "id", name = "evidence_code_id")
     private EvidenceCode evidenceCode;
 
     public long getId() {

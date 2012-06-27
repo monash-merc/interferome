@@ -84,10 +84,10 @@ public class INFDataProcessor implements DataProcessor {
         System.out.println("============= start interferome process .........");
 
         Date importedTime = GregorianCalendar.getInstance().getTime();
-        importEnsemblGenes(HUMAN, importedTime);
+      //  importEnsemblGenes(HUMAN, importedTime);
 
         //
-        importEnsemblGenes(MOUSE, importedTime);
+       // importEnsemblGenes(MOUSE, importedTime);
         long endTime = System.currentTimeMillis();
 
 
@@ -96,14 +96,14 @@ public class INFDataProcessor implements DataProcessor {
         importGeneOntology(HUMAN);
 
         //
-        importGeneOntology(MOUSE);
+       // importGeneOntology(MOUSE);
         long goEndTime = System.currentTimeMillis();
 
-        System.out.println("=====> The total process time for Gene: " + (endTime - startTime) / 1000 + "seconds");
+        logger.info("=====> The total process time for Gene: " + (endTime - startTime) / 1000 + "seconds");
 
-        System.out.println("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
+        logger.info("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
 
-        System.out.println("=====> The total process time gen and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
+        logger.info("=====> The total process time for gene and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
     }
 
     private void importEnsemblGenes(String species, Date importedTime) {
@@ -114,9 +114,9 @@ public class INFDataProcessor implements DataProcessor {
             client.configure(wsURL, species);
             List<Gene> geneList = client.importGenes();
 
-            System.out.println("============> total genes size : " + geneList.size());
+            logger.info("============> total genes size : " + geneList.size());
             this.dmService.importGenes(geneList, importedTime);
-            System.out.println("======== imported the ensembl genes into database successfully");
+            logger.info("======== imported the ensembl genes into database successfully");
         } catch (Exception ex) {
             logger.error(ex);
         }
@@ -130,9 +130,9 @@ public class INFDataProcessor implements DataProcessor {
             client.configure(wsURL, species);
             List<GeneOntologyBean> geneOntologyBeans = client.importGeneOntology();
 
-            System.out.println("============> total genes size : " + geneOntologyBeans.size());
+            logger.info("============> total geneontology size : " + geneOntologyBeans.size());
             this.dmService.importGeneOntologies(geneOntologyBeans);
-            System.out.println("======== imported the ensembl genes into database successfully");
+            logger.info("======== imported the geneontology into database successfully");
         } catch (Exception ex) {
             logger.error(ex);
         }

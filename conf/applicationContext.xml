@@ -88,9 +88,9 @@
     <bean id="infDataProcessor" class="edu.monash.merc.system.scheduling.impl.INFDataProcessor"/>
 
     <!-- cron job scheduled task for loading the file from ftp server -->
-    <task:scheduler id="infScheduler" pool-size="10"/>
+    <task:scheduler id="infScheduler"/>
     <task:scheduled-tasks scheduler="infScheduler">
-        <task:scheduled ref="infDataProcessor" method="process" cron="0 15 18 ? * MON-FRI"/>
+        <task:scheduled ref="infDataProcessor" method="process" cron="0 5 8 ? * MON-FRI"/>
     </task:scheduled-tasks>
     <!-- Datasource configuration -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
