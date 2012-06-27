@@ -297,5 +297,57 @@ public interface DMService {
      */
     void importGenes(List<Gene> genes);
 
+    //Evidence Code
+
+    EvidenceCode getEvidenceCodeById(long id);
+
+    void saveEvidenceCode(EvidenceCode geneOntology);
+
+    void mergeEvidenceCode(EvidenceCode geneOntology);
+
+    void updateEvidenceCode(EvidenceCode geneOntology);
+
+    void deleteEvidenceCode(EvidenceCode geneOntology);
+
+    EvidenceCode getEvidenceCodeByCode(String code);
+
+    //GeneOntology
+    GeneOntology getGeneOntologyById(long id);
+
+    void saveGeneOntology(GeneOntology geneOntology);
+
+    void mergeGeneOntology(GeneOntology geneOntology);
+
+    void updateGeneOntology(GeneOntology geneOntology);
+
+    void deleteGeneOntology(GeneOntology geneOntology);
+
+    GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession);
+
+    //GoDomain
+    GoDomain getGoDomainById(long id);
+
+    void saveGoDomain(GoDomain goDomain);
+
+    void mergeGoDomain(GoDomain goDomain);
+
+    void updateGoDomain(GoDomain goDomain);
+
+    void deleteGoDomain(GoDomain goDomain);
+
+    GoDomain getGoDomainByNamespace(String namespace);
+
+    //Ontology
+    Ontology getOntologyById(long id);
+
+    void saveOntology(Ontology ontology);
+
+    void mergeOntology(Ontology ontology);
+
+    void updateOntology(Ontology ontology);
+
+    void deleteOntology(Ontology ontology);
+
+    Ontology getOntologyByGoTermAccession(String goTermAccession);
 
 }

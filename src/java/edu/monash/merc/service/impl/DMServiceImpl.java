@@ -124,6 +124,19 @@ public class DMServiceImpl implements DMService {
     @Autowired
     private GeneService geneService;
 
+    @Autowired
+    private EvidenceCodeService evidenceCodeService;
+
+    @Autowired
+    private GeneOntologyService geneOntologyService;
+
+    @Autowired
+    private GoDomainService goDomainService;
+
+    @Autowired
+    private OntologyService ontologyService;
+
+
     public void setProfileService(ProfileService profileService) {
         this.profileService = profileService;
     }
@@ -212,6 +225,23 @@ public class DMServiceImpl implements DMService {
     public void setGeneService(GeneService geneService) {
         this.geneService = geneService;
     }
+
+    public void setEvidenceCodeService(EvidenceCodeService evidenceCodeService) {
+        this.evidenceCodeService = evidenceCodeService;
+    }
+
+    public void setGeneOntologyService(GeneOntologyService geneOntologyService) {
+        this.geneOntologyService = geneOntologyService;
+    }
+
+    public void setGoDomainService(GoDomainService goDomainService) {
+        this.goDomainService = goDomainService;
+    }
+
+    public void setOntologyService(OntologyService ontologyService) {
+        this.ontologyService = ontologyService;
+    }
+
 
     @Override
     public void updateProfile(Profile profile) {
@@ -1249,16 +1279,142 @@ public class DMServiceImpl implements DMService {
      */
     @Override
     public void importGenes(List<Gene> genes) {
-        if(genes != null){
-            for (Gene gene: genes){
+        if (genes != null) {
+            for (Gene gene : genes) {
                 Gene foundGene = this.getGeneByEnsgAccession(gene.getEnsgAccession());
-                if(foundGene != null){
+                if (foundGene != null) {
                     gene.setId(foundGene.getId());
                     this.mergeGene(gene);
-                }else{
+                } else {
                     this.saveGene(gene);
                 }
             }
         }
+    }
+
+    //EvidenceCode
+    @Override
+    public EvidenceCode getEvidenceCodeById(long id) {
+        return this.evidenceCodeService.getEvidenceCodeById(id);
+    }
+
+    @Override
+    public void saveEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.saveEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public void mergeEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.mergeEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public void updateEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.updateEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public void deleteEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.deleteEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public EvidenceCode getEvidenceCodeByCode(String code) {
+        return this.evidenceCodeService.getEvidenceCodeByCode(code);
+    }
+
+
+    //GeneOntology
+    @Override
+    public GeneOntology getGeneOntologyById(long id) {
+        return this.geneOntologyService.getGeneOntologyById(id);
+    }
+
+    @Override
+    public void saveGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.saveGeneOntology(geneOntology);
+    }
+
+    @Override
+    public void mergeGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.mergeGeneOntology(geneOntology);
+    }
+
+    @Override
+    public void updateGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.updateGeneOntology(geneOntology);
+    }
+
+    @Override
+    public void deleteGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.deleteGeneOntology(geneOntology);
+    }
+
+    @Override
+    public GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession) {
+        return this.geneOntologyService.getGeneOntologyByGeneAndOntology(ensgAccession, goTermAccession);
+    }
+
+    //GoDomain
+    @Override
+    public GoDomain getGoDomainById(long id) {
+        return this.goDomainService.getGoDomainById(id);
+    }
+
+    @Override
+    public void saveGoDomain(GoDomain goDomain) {
+        this.goDomainService.saveGoDomain(goDomain);
+    }
+
+    @Override
+    public void mergeGoDomain(GoDomain goDomain) {
+        this.goDomainService.mergeGoDomain(goDomain);
+    }
+
+    @Override
+    public void updateGoDomain(GoDomain goDomain) {
+        this.goDomainService.updateGoDomain(goDomain);
+    }
+
+    @Override
+    public void deleteGoDomain(GoDomain goDomain) {
+        this.goDomainService.deleteGoDomain(goDomain);
+    }
+
+    @Override
+    public GoDomain getGoDomainByNamespace(String namespace) {
+        return this.goDomainService.getGoDomainByNamespace(namespace);
+    }
+
+
+    //Ontology
+    @Override
+    public Ontology getOntologyById(long id) {
+        return this.ontologyService.getOntologyById(id);
+    }
+
+    @Override
+    public void saveOntology(Ontology ontology) {
+        this.ontologyService.saveOntology(ontology);
+    }
+
+    @Override
+    public void mergeOntology(Ontology ontology) {
+        this.ontologyService.mergeOntology(ontology);
+    }
+
+    @Override
+    public void updateOntology(Ontology ontology) {
+        this.ontologyService.updateOntology(ontology);
+    }
+
+    @Override
+    public void deleteOntology(Ontology ontology) {
+        this.ontologyService.deleteOntology(ontology);
+    }
+
+    @Override
+    public Ontology getOntologyByGoTermAccession(String goTermAccession) {
+        return this.ontologyService.getOntologyByGoTermAccession(goTermAccession);
     }
 }
