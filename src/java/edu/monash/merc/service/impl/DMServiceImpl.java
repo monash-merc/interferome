@@ -1441,8 +1441,8 @@ public class DMServiceImpl implements DMService {
                 if (ontology == null) {
                     ontology = new Ontology();
                     ontology.setGoTermAccession(goTermAc);
-                    ontology.setGoTermDefinition(geneOntologyBean.getGoTermDefinition());
-                    ontology.setGoTermName(geneOntologyBean.getGoTermName());
+                    ontology.setGoTermDefinition(goTermDefinition);
+                    ontology.setGoTermName(goTermName);
                     ontology.setGoDomain(goDomain);
                     this.saveOntology(ontology);
                 }
@@ -1454,25 +1454,25 @@ public class DMServiceImpl implements DMService {
                 }
 
                 Gene gene = this.getGeneByEnsgAccession(ensgAc);
-
-
-                GeneOntology geneOntology = this.getGeneOntologyByGeneAndOntology(ensgAc, goTermAc);
-                if (geneOntology == null) {
-                    geneOntology = new GeneOntology();
-                    geneOntology.setEvidenceCode(evidenceCode);
-                    geneOntology.setGene(gene);
-                    geneOntology.setOntology(ontology);
-                } else {
-                    EvidenceCode fEvidenceCode1 = geneOntology.getEvidenceCode();
-                    int fRank = fEvidenceCode1.getRank();
-                    int currentRank = evidenceCode.getRank();
-
-                    //the smaller rank number should best evidenc
-                    if (currentRank < fRank) {
+                if (gene != null) {
+                    GeneOntology geneOntology = this.getGeneOntologyByGeneAndOntology(ensgAc, goTermAc);
+                    if (geneOntology == null) {
+                        geneOntology = new GeneOntology();
                         geneOntology.setEvidenceCode(evidenceCode);
                         geneOntology.setGene(gene);
                         geneOntology.setOntology(ontology);
-                        this.mergeGeneOntology(geneOntology);
+                    } else {
+                        EvidenceCode fEvidenceCode1 = geneOntology.getEvidenceCode();
+                        int fRank = fEvidenceCode1.getRank();
+                        int currentRank = evidenceCode.getRank();
+
+                        //the smaller rank number should best evidenc
+                        if (currentRank < fRank) {
+                            geneOntology.setEvidenceCode(evidenceCode);
+                            geneOntology.setGene(gene);
+                            geneOntology.setOntology(ontology);
+                            this.mergeGeneOntology(geneOntology);
+                        }
                     }
                 }
             }
