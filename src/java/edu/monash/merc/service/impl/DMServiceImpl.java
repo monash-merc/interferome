@@ -1462,6 +1462,7 @@ public class DMServiceImpl implements DMService {
                         geneOntology.setEvidenceCode(evidenceCode);
                         geneOntology.setGene(gene);
                         geneOntology.setOntology(ontology);
+                        this.saveGeneOntology(geneOntology);
                     } else {
                         EvidenceCode fEvidenceCode1 = geneOntology.getEvidenceCode();
                         int fRank = fEvidenceCode1.getRank();
