@@ -84,6 +84,6 @@ public class GeneOntologyServiceImpl implements GeneOntologyService {
 
     @Override
     public GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession) {
-        return this.getGeneOntologyByGeneAndOntology(ensgAccession, goTermAccession);
+        return this.geneOntologyDao.getGeneOntologyByGeneAndOntology(ensgAccession, goTermAccession);
     }
 }
