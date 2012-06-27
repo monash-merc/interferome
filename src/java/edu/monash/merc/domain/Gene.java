@@ -32,6 +32,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author Simon Yu
@@ -101,6 +102,11 @@ public class Gene extends Domain {
     @Basic
     @Column(name = "entrez_id")
     private String entrezId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "imported_time")
+    private Date importedTime;
+
 
     public long getId() {
         return id;
@@ -204,5 +210,13 @@ public class Gene extends Domain {
 
     public void setEntrezId(String entrezId) {
         this.entrezId = entrezId;
+    }
+
+    public Date getImportedTime() {
+        return importedTime;
+    }
+
+    public void setImportedTime(Date importedTime) {
+        this.importedTime = importedTime;
     }
 }

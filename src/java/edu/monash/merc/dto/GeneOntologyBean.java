@@ -26,12 +26,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.domain;
+package edu.monash.merc.dto;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * @author Simon Yu
@@ -39,42 +36,29 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 1:27 PM
+ *        Date: 27/06/12
+ *        Time: 2:20 PM
  */
-@Entity
-@Table(name = "ontology")
-public class Ontology extends Domain {
+public class GeneOntologyBean implements Serializable {
 
-    @Id
-    @GeneratedValue(generator = "ontology_seq")
-    @GenericGenerator(name = "ontology_seq", strategy = "seqhilo")
-    @Column(name = "id", nullable = false)
-    private long id;
+    private String ensembleGeneId;
 
-    @Basic
-    @Column(name = "go_term_acc")
     private String goTermAccession;
 
-    @Basic
-    @Column(name = "go_term_name")
     private String goTermName;
 
-
-    @Basic
-    @Column(name = "go_term_definition", columnDefinition = "longtext")
     private String goTermDefinition;
 
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "id", nullable = false, name = "go_domain_id")
-    private GoDomain goDomain;
+    private String goTermEvidenceCode;
 
-    public long getId() {
-        return id;
+    private String goDomain;
+
+    public String getEnsembleGeneId() {
+        return ensembleGeneId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setEnsembleGeneId(String ensembleGeneId) {
+        this.ensembleGeneId = ensembleGeneId;
     }
 
     public String getGoTermAccession() {
@@ -101,11 +85,19 @@ public class Ontology extends Domain {
         this.goTermDefinition = goTermDefinition;
     }
 
-    public GoDomain getGoDomain() {
+    public String getGoTermEvidenceCode() {
+        return goTermEvidenceCode;
+    }
+
+    public void setGoTermEvidenceCode(String goTermEvidenceCode) {
+        this.goTermEvidenceCode = goTermEvidenceCode;
+    }
+
+    public String getGoDomain() {
         return goDomain;
     }
 
-    public void setGoDomain(GoDomain goDomain) {
+    public void setGoDomain(String goDomain) {
         this.goDomain = goDomain;
     }
 }

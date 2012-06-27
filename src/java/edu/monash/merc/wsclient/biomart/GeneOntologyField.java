@@ -26,12 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.domain;
-
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import java.util.List;
+package edu.monash.merc.wsclient.biomart;
 
 /**
  * @author Simon Yu
@@ -39,73 +34,19 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 1:27 PM
+ *        Date: 27/06/12
+ *        Time: 2:15 PM
  */
-@Entity
-@Table(name = "ontology")
-public class Ontology extends Domain {
+public interface GeneOntologyField {
+    static String ENSEMBL_GENE_ID = "Ensembl Gene ID";
 
-    @Id
-    @GeneratedValue(generator = "ontology_seq")
-    @GenericGenerator(name = "ontology_seq", strategy = "seqhilo")
-    @Column(name = "id", nullable = false)
-    private long id;
+    static String GO_TERM_ACCESSION = "GO Term Accession";
 
-    @Basic
-    @Column(name = "go_term_acc")
-    private String goTermAccession;
+    static String GO_TERM_NAME = "GO Term Name";
 
-    @Basic
-    @Column(name = "go_term_name")
-    private String goTermName;
+    static String GO_TERM_DEFINITION = "GO Term Definition";
 
+    static String GO_TERM_EVIDENCE_CODE = "GO Term Evidence Code";
 
-    @Basic
-    @Column(name = "go_term_definition", columnDefinition = "longtext")
-    private String goTermDefinition;
-
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "id", nullable = false, name = "go_domain_id")
-    private GoDomain goDomain;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getGoTermAccession() {
-        return goTermAccession;
-    }
-
-    public void setGoTermAccession(String goTermAccession) {
-        this.goTermAccession = goTermAccession;
-    }
-
-    public String getGoTermName() {
-        return goTermName;
-    }
-
-    public void setGoTermName(String goTermName) {
-        this.goTermName = goTermName;
-    }
-
-    public String getGoTermDefinition() {
-        return goTermDefinition;
-    }
-
-    public void setGoTermDefinition(String goTermDefinition) {
-        this.goTermDefinition = goTermDefinition;
-    }
-
-    public GoDomain getGoDomain() {
-        return goDomain;
-    }
-
-    public void setGoDomain(GoDomain goDomain) {
-        this.goDomain = goDomain;
-    }
+    static String GO_DOMAIN = "GO domain";
 }

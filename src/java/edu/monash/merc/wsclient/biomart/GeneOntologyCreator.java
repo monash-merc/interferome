@@ -28,7 +28,7 @@
 
 package edu.monash.merc.wsclient.biomart;
 
-import edu.monash.merc.domain.Gene;
+import edu.monash.merc.dto.GeneOntologyBean;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -40,10 +40,11 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 10:23 AM
+ *        Date: 27/06/12
+ *        Time: 2:19 PM
  */
-public class CSVGeneCreator {
+public class GeneOntologyCreator {
+
     private List<CSVColumn> columns = new ArrayList<CSVColumn>();
 
     public List<CSVColumn> getColumns() {
@@ -54,61 +55,48 @@ public class CSVGeneCreator {
         this.columns = columns;
     }
 
-    public Gene createGene() {
-        Gene gene = new Gene();
+    public GeneOntologyBean createGeneOntology() {
+
+        GeneOntologyBean geneOntologyBean = new GeneOntologyBean();
         for (CSVColumn csvColumn : columns) {
             String columnName = csvColumn.getColumnName();
             String columnValue = csvColumn.getColumnValue();
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.ENSG_ACCESSION)) {
-                gene.setEnsgAccession(columnValue);
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.DESCRIPTION)) {
+            if (StringUtils.equalsIgnoreCase(columnName, GeneOntologyField.ENSEMBL_GENE_ID)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    gene.setDescription(columnValue);
-                }
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.CHROMOSOME)) {
-                gene.setChromosome(columnValue);
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.START_POSITION)) {
-                gene.setStartPosition(Long.valueOf(columnValue).longValue());
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.END_POSITION)) {
-                gene.setEndPosition(Long.valueOf(columnValue).longValue());
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.STRAND)) {
-                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    gene.setStrand(columnValue);
-                }
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.BAND)) {
-                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    gene.setBand(columnValue);
-                }
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.GENE_NAME)) {
-                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    gene.setGeneName(columnValue);
-                }
-            }
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.UNIGENE)) {
-                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    gene.setUnigene(columnValue);
+                    geneOntologyBean.setEnsembleGeneId(columnValue);
                 }
             }
 
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.GENBANK)) {
+            if (StringUtils.equalsIgnoreCase(columnName, GeneOntologyField.GO_TERM_ACCESSION)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    gene.setGenbankId(columnValue);
+                    geneOntologyBean.setGoTermAccession(columnValue);
                 }
             }
 
-            if (StringUtils.equalsIgnoreCase(columnName, GeneField.ENTREZ)) {
+            if (StringUtils.equalsIgnoreCase(columnName, GeneOntologyField.GO_TERM_NAME)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    gene.setEntrezId(columnValue);
+                    geneOntologyBean.setGoTermName(columnValue);
+                }
+            }
+
+            if (StringUtils.equalsIgnoreCase(columnName, GeneOntologyField.GO_TERM_DEFINITION)) {
+                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+                    geneOntologyBean.setGoTermDefinition(columnValue);
+                }
+            }
+
+            if (StringUtils.equalsIgnoreCase(columnName, GeneOntologyField.GO_TERM_EVIDENCE_CODE)) {
+                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+                    geneOntologyBean.setGoTermEvidenceCode(columnValue);
+                }
+            }
+
+            if (StringUtils.equalsIgnoreCase(columnName, GeneOntologyField.GO_DOMAIN)) {
+                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+                    geneOntologyBean.setGoDomain(columnValue);
                 }
             }
         }
-        return gene;
+        return geneOntologyBean;
     }
 }

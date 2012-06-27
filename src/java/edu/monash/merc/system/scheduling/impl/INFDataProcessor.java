@@ -72,17 +72,22 @@ public class INFDataProcessor implements DataProcessor {
 
     @Override
     public void process() {
+        long startTime = System.currentTimeMillis();
         System.out.println("============= start interferome process .........");
-        //To change body of implemented methods use File | Settings | File Templates.
+        importEnsemblGenes("hsapiens_gene_ensembl");
+        long endTime = System.currentTimeMillis();
+        System.out.println("=====> The total process time for hsapiens_gene_ensembl: " + (endTime - startTime) / 1000 + "seconds");
     }
 
-    private void importEnsemblGenes() {
+    private void importEnsemblGenes(String species) {
         try {
             String wsURL = this.appSetting.getPropValue(AppPropSettings.BIOMART_RESTFUL_WS_URL);
 
             BioMartClient client = new BioMartClient();
-            client.configure(wsURL, null);
+            client.configure(wsURL, species);
             List<Gene> geneList = client.importGenes();
+
+            System.out.println("============> total genes size : " + geneList.size());
             this.dmService.importGenes(geneList);
             System.out.println("======== imported the ensembl genes into database successfully");
         } catch (Exception ex) {

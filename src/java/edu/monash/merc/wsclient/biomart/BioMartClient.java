@@ -30,13 +30,14 @@ package edu.monash.merc.wsclient.biomart;
 
 import au.com.bytecode.opencsv.CSVReader;
 import edu.monash.merc.domain.Gene;
+import edu.monash.merc.dto.GeneOntologyBean;
 import edu.monash.merc.exception.WSException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -55,9 +56,15 @@ public class BioMartClient {
 
     private String wsUrl = "http://www.biomart.org/biomart/martservice/result?query=";
 
-    private String chromosome = "7";
+    private String species;
 
     private boolean configured;
+
+    private GetMethod httpget = null;
+
+    private static String GENE_TYPE = "gene";
+
+    private static String GENE_ONTOLOGY_TYPE = "geneOntology";
 
     public String getWsUrl() {
         return wsUrl;
@@ -67,43 +74,58 @@ public class BioMartClient {
         this.wsUrl = wsUrl;
     }
 
-    public String getChromosome() {
-        return chromosome;
+    public String getSpecies() {
+        return species;
     }
 
-    public void setChromosome(String chromosome) {
-        this.chromosome = chromosome;
+    public void setSpecies(String species) {
+        this.species = species;
     }
 
-    public boolean configure(String wsUrl, String chromosome) {
+    public boolean configure() {
+        if (StringUtils.isNotBlank(wsUrl) && StringUtils.isNotBlank(species)) {
+            configured = true;
+            return configured;
+        } else {
+            return configured;
+        }
+    }
+
+    public boolean configure(String wsUrl, String species) {
         this.wsUrl = wsUrl;
-        this.chromosome = chromosome;
-        configured = true;
+        this.species = species;
+        this.configured = true;
         return configured;
     }
 
-    private byte[] getWsResponse() {
-        GetMethod httpget = null;
+    private InputStream getWsResponse(String type) {
+
         try {
             HttpClient httpclient = new HttpClient();
-            String query = genQueryString("hsapiens_gene_ensembl", chromosome);
+            String query = null;
+
+            if (StringUtils.equals(GENE_TYPE, type)) {
+                query = geneQueryString(this.species);
+            }
+            if (StringUtils.equals(GENE_ONTOLOGY_TYPE, type)) {
+                query = geneOntologyQueryString(this.species);
+            }
+            if (StringUtils.isBlank(query)) {
+                throw new WSException("The query string is null");
+            }
             String url = wsUrl + URLEncoder.encode(query, "UTF-8");
+            System.out.println("-- url : " + url);
             httpget = new GetMethod(url);
+
             int statusCode = httpclient.executeMethod(httpget);
             if (statusCode != HttpStatus.SC_OK) {
                 throw new WSException("failed to get the gene information");
             } else {
-                return httpget.getResponseBody();
+                return httpget.getResponseBodyAsStream();
             }
         } catch (Exception ex) {
             throw new WSException(ex);
-        } finally {
-
-            if (httpget != null) {
-                httpget.releaseConnection();
-            }
         }
-
     }
 
 
@@ -113,26 +135,29 @@ public class BioMartClient {
         }
 
         CSVReader csvReader = null;
-        List<Gene> tpbGenes = new ArrayList<Gene>();
+        List<Gene> genes = new ArrayList<Gene>();
         try {
-            BioMartClient bioMartClient = new BioMartClient();
-            byte[] response = bioMartClient.getWsResponse();
-            csvReader = new CSVReader(new InputStreamReader(new ByteArrayInputStream(response)));
+            InputStream responseIns = getWsResponse(GENE_TYPE);
+            csvReader = new CSVReader(new InputStreamReader(responseIns));
             String[] columnsLines = csvReader.readNext();
 
             String[] columnValuesLines;
             while ((columnValuesLines = csvReader.readNext()) != null) {
                 CSVGeneCreator geneCreator = new CSVGeneCreator();
                 for (int i = 0; i < columnsLines.length; i++) {
-
+                    // System.out.println("==========> " + columnsLines[i]+  "=" + columnValuesLines[i]);
                     geneCreator.getColumns().add(new CSVColumn(columnsLines[i], columnValuesLines[i]));
                 }
-                Gene tpbGene = geneCreator.createGene();
 
-                if (StringUtils.isNotBlank(tpbGene.getEnsgAccession())) {
-                    tpbGenes.add(tpbGene);
+                Gene gene = geneCreator.createGene();
+                if (StringUtils.isNotBlank(gene.getEnsgAccession())) {
+                    genes.add(gene);
                 }
             }
+
+            //TODO:
+            //Check the gene list size, if size is zero,
+            //then check the response whether it contains Query ERROR:
         } catch (Exception ex) {
             throw new WSException(ex);
         } finally {
@@ -143,20 +168,71 @@ public class BioMartClient {
             } catch (Exception x) {
                 //ignore whatever caught
             }
+
+//            //release httpclient connection
+//            if (httpget != null) {
+//                httpget.releaseConnection();
+//                httpget = null;
+//            }
         }
-        return tpbGenes;
+        return genes;
     }
 
-    public String genQueryString(String species, String chromosome) {
+    public List<GeneOntologyBean> importGeneOntology() {
+        if (!configured) {
+            throw new WSException("The configure method must be called first.");
+        }
 
+        CSVReader csvReader = null;
+        List<GeneOntologyBean> geneOntologyBeans = new ArrayList<GeneOntologyBean>();
+        try {
+            InputStream responseIns = getWsResponse(GENE_ONTOLOGY_TYPE);
+            csvReader = new CSVReader(new InputStreamReader(responseIns));
+            String[] columnsLines = csvReader.readNext();
+
+            String[] columnValuesLines;
+            while ((columnValuesLines = csvReader.readNext()) != null) {
+                GeneOntologyCreator geneOntologyCreator = new GeneOntologyCreator();
+                for (int i = 0; i < columnsLines.length; i++) {
+                    // System.out.println("==========> " + columnsLines[i]+  "=" + columnValuesLines[i]);
+                    geneOntologyCreator.getColumns().add(new CSVColumn(columnsLines[i], columnValuesLines[i]));
+                }
+
+                GeneOntologyBean geneOntologyBean = geneOntologyCreator.createGeneOntology();
+                if (StringUtils.isNotBlank(geneOntologyBean.getEnsembleGeneId()) && StringUtils.isNotBlank(geneOntologyBean.getGoTermAccession())
+                        && StringUtils.isNotBlank(geneOntologyBean.getGoTermEvidenceCode()) && StringUtils.isNotBlank(geneOntologyBean.getGoDomain())) {
+                    geneOntologyBeans.add(geneOntologyBean);
+                }
+            }
+
+            //TODO:
+            //Check the geneOntologyBeans list size, if size is zero,
+            //then check the response whether it contains Query ERROR:
+        } catch (Exception ex) {
+            throw new WSException(ex);
+        } finally {
+            try {
+                if (csvReader != null) {
+                    csvReader.close();
+                }
+            } catch (Exception x) {
+                //ignore whatever caught
+            }
+            //release httpclient connection
+//            if (httpget != null) {
+//                httpget.releaseConnection();
+//                httpget = null;
+//            }
+        }
+        return geneOntologyBeans;
+    }
+
+    public String geneQueryString(String species) {
         StringBuilder query = new StringBuilder();
         query.append("<?xml version='1.0' encoding='UTF-8'?>");
         query.append("<!DOCTYPE Query>");
         query.append("<Query  virtualSchemaName = 'default' formatter = 'CSV' header = '1' uniqueRows = '1' count = '' >");
-        query.append("<Dataset name = '" + species + "' interface = 'default' >");
-        if (StringUtils.isNotBlank(chromosome)) {
-            query.append("<Filter name = 'chromosome_name' value = '").append(chromosome).append("'/>");
-        }
+        query.append("<Dataset name = '").append(species).append("' interface = 'default' >");
         query.append("<Attribute name = 'ensembl_gene_id' />");
         query.append("<Attribute name = 'description' />");
         query.append("<Attribute name = 'chromosome_name' />");
@@ -167,17 +243,36 @@ public class BioMartClient {
         query.append("<Attribute name = 'unigene' />");
         query.append("<Attribute name = 'protein_id' />");
         query.append("<Attribute name = 'entrezgene' />");
-
         query.append("</Dataset>").append("</Query>");
         return query.toString();
     }
 
+    public String geneOntologyQueryString(String species) {
+        StringBuilder query = new StringBuilder();
+        query.append("<?xml version='1.0' encoding='UTF-8'?>");
+        query.append("<!DOCTYPE Query>");
+        query.append("<Query  virtualSchemaName = 'default' formatter = 'CSV' header = '1' uniqueRows = '1' count = '' >");
+        query.append("<Dataset name = '").append(species).append("' interface = 'default' >");
+        query.append("<Attribute name = 'ensembl_gene_id' />");
+        query.append("<Attribute name = 'go_id' />");
+        query.append("<Attribute name = 'name_1006' />");
+        query.append("<Attribute name = 'definition_1006' />");
+        query.append("<Attribute name = 'go_linkage_type' />");
+        query.append("<Attribute name = 'namespace_1003' />");
+        query.append("</Dataset>").append("</Query>");
+        return query.toString();
+    }
+
+
     public static void main(String[] args) throws Exception {
         String wsUrl = "http://www.biomart.org/biomart/martservice/result?query=";
-        String chromosome = "";
+        String species = "hsapiens_gene_ensembl";
 
         BioMartClient bioMartClient = new BioMartClient();
-        bioMartClient.configure(wsUrl, chromosome);
+        bioMartClient.configure(wsUrl, species);
+
+        long startTime = System.currentTimeMillis();
+
         List<Gene> tpbGeneList = bioMartClient.importGenes();
         System.out.println(" size : " + tpbGeneList.size());
         for (Gene gene : tpbGeneList) {
@@ -185,5 +280,18 @@ public class BioMartClient {
                     " - " + gene.getEndPosition() + " - " + gene.getStrand() + " - " + gene.getBand() + " - " + gene.getUnigene() + " - " +
                     gene.getEntrezId() + " - " + gene.getGenbankId());
         }
+        long endTime = System.currentTimeMillis();
+        System.out.println("=====> The total gene process time: " + (endTime - startTime) / 1000 + "seconds");
+
+        long goStartTime = System.currentTimeMillis();
+        List<GeneOntologyBean> geneOntologyBeans = bioMartClient.importGeneOntology();
+        System.out.println(" GeneOntology size : " + geneOntologyBeans.size());
+        for (GeneOntologyBean go : geneOntologyBeans) {
+            System.out.println(go.getEnsembleGeneId() + " - " + go.getGoTermAccession() + " - " + go.getGoTermName() + " - " + go.getGoTermDefinition() +
+                    " - " + go.getGoTermEvidenceCode() + " - " + go.getGoDomain());
+        }
+        long goEndTime = System.currentTimeMillis();
+
+        System.out.println("=====> The total GeneOntology process time: " + (goEndTime - goStartTime) / 1000 + "seconds");
     }
 }

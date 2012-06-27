@@ -1241,7 +1241,7 @@ public class DMServiceImpl implements DMService {
      */
     @Override
     public Gene getGeneByEnsgAccession(String ensgAccession) {
-        return this.getGeneByEnsgAccession(ensgAccession);
+        return this.geneService.getGeneByEnsgAccession(ensgAccession);
     }
 
     /**
@@ -1249,6 +1249,16 @@ public class DMServiceImpl implements DMService {
      */
     @Override
     public void importGenes(List<Gene> genes) {
-        //TODO
+        if(genes != null){
+            for (Gene gene: genes){
+                Gene foundGene = this.getGeneByEnsgAccession(gene.getEnsgAccession());
+                if(foundGene != null){
+                    gene.setId(foundGene.getId());
+                    this.mergeGene(gene);
+                }else{
+                    this.saveGene(gene);
+                }
+            }
+        }
     }
 }

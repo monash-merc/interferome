@@ -54,6 +54,13 @@ public class EvidenceCode extends Domain {
     @Column(name = "code")
     private String code;
 
+    @Basic
+    @Column(name = "description")
+    private String description;
+
+    @Basic
+    @Column(name = "rank")
+    private int rank;
 
     public long getId() {
         return id;
@@ -69,5 +76,21 @@ public class EvidenceCode extends Domain {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 }
