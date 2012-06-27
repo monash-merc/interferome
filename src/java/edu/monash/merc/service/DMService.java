@@ -301,13 +301,13 @@ public interface DMService {
 
     EvidenceCode getEvidenceCodeById(long id);
 
-    void saveEvidenceCode(EvidenceCode geneOntology);
+    void saveEvidenceCode(EvidenceCode evidenceCode);
 
-    void mergeEvidenceCode(EvidenceCode geneOntology);
+    void mergeEvidenceCode(EvidenceCode evidenceCode);
 
-    void updateEvidenceCode(EvidenceCode geneOntology);
+    void updateEvidenceCode(EvidenceCode evidenceCode);
 
-    void deleteEvidenceCode(EvidenceCode geneOntology);
+    void deleteEvidenceCode(EvidenceCode evidenceCode);
 
     EvidenceCode getEvidenceCodeByCode(String code);
 

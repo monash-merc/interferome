@@ -1225,6 +1225,7 @@ public class DMServiceImpl implements DMService {
         return this.ifnVariationService.getAbnormalFactors();
     }
 
+    //Gene
 
     /**
      * {@inheritDoc}
