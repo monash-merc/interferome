@@ -663,6 +663,19 @@
             <result name="success">/web/site/contact_us.ftl</result>
         </action>
 
+        <!-- show data submit us -->
+        <action name="showSubmitData" class="site.submitDataAction" method="showSubmitData">
+            <result name="error">/web/common/action_error.ftl</result>
+            <result name="success">/web/site/submit_data.ftl</result>
+        </action>
+
+        <!-- data submit us -->
+        <action name="submitData" class="site.submitDataAction" method="submitData">
+            <result name="input">/web/site/submit_data.ftl</result>
+            <result name="error">/web/common/action_error.ftl</result>
+            <result name="success">/web/site/submit_data.ftl</result>
+        </action>
+
     </package>
 
     <!-- Security code -->

@@ -38,7 +38,7 @@ import edu.monash.merc.exception.DCException;
 import edu.monash.merc.util.MercUtil;
 import edu.monash.merc.util.csv.CSVTFSiteGenerator;
 import edu.monash.merc.util.tfsite.TFSiteManager;
-import edu.monash.merc.util.tfsite.TFSiteColumn;
+import edu.monash.merc.util.csv.TFSiteColumn;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
@@ -65,6 +65,8 @@ public class ImportTFSiteAction extends DMBaseAction {
     private String uploadContentType;
 
     private String uploadFileName;
+
+    private boolean sendMailRequired;
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -108,14 +110,15 @@ public class ImportTFSiteAction extends DMBaseAction {
             fis = new FileInputStream(upload);
             //get all tf site from the file
             List<TFSite> tfSites = generateTFSites(fis);
-            System.out.println("Retrieved " + tfSites.size() + " from file");
-            System.out.println(tfSites.get(0).getFactor());
             //create tf site bean
             TFSiteBean tfSiteBean = createTFSiteBean(user, tfSites);
             //call the import tf site service
             this.dmService.importTFSite(tfSiteBean);
             //set the success message
             String successMsg = getText("tfsite.import.start.success.msg");
+            if (sendMailRequired) {
+                successMsg = getText("experiment.annotation.import.start.success.with.mail.msg");
+            }
             setSuccessActMsg(successMsg);
         } catch (Exception ex) {
             logger.error(ex);

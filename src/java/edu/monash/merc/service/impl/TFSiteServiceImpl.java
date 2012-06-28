@@ -101,9 +101,7 @@ public class TFSiteServiceImpl implements TFSiteService {
 
     @Override
     public TFSite getTFSite(TFSite tfSite){
-            //TODO: Add matching logic
-                    //Gene gene, String factor, String start, String end
-            return null;
+        return this.tfSiteDao.getTFSite(tfSite.getGene(), tfSite.getFactor(), tfSite.getStart(), tfSite.getEnd());
     }
 
 }

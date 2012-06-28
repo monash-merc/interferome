@@ -31,8 +31,6 @@ package edu.monash.merc.util.csv;
 import java.util.ArrayList;
 import java.util.List;
 import edu.monash.merc.domain.TFSite;
-import edu.monash.merc.util.tfsite.TFField;
-import edu.monash.merc.util.tfsite.TFSiteColumn;
 
 
 /**
@@ -52,7 +50,6 @@ public class CSVTFSiteGenerator {
     public void setColumns(List<TFSiteColumn> columns) {
         this.columns = columns;
     }
-    //TODO: Check error catching
     public TFSite genReport() {
         TFSite tfSite = new TFSite();
         for (TFSiteColumn tfSiteColumncolumn : columns) {
@@ -74,7 +71,7 @@ public class CSVTFSiteGenerator {
                tfSite.setCoreMatch(Double.parseDouble(columnValue));
             }
             if (columnName.equalsIgnoreCase(TFField.MATRIXMATCH)) {
-               tfSite.setMatrixMatch(Double.parseDouble(columnValue));
+                tfSite.setMatrixMatch(Double.parseDouble(columnValue));
             }
         }
         return tfSite;

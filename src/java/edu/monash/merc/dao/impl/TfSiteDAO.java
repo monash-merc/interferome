@@ -32,6 +32,7 @@ import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.TFSite;
+import edu.monash.merc.domain.Gene;
 import edu.monash.merc.repository.ITFSiteRepository;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -90,11 +91,13 @@ public class TfSiteDAO extends HibernateGenericDAO<TFSite> implements ITFSiteRep
     }
 
     @Override
-    public TFSite getTFSiteByGeneID(String geneID) {
+    public TFSite getTFSite(Gene gene, String factor, int start, int end) {
         Criteria criteria = this.session().createCriteria(this.persistClass);
-        criteria.add(Restrictions.eq("probeId", geneID));
-        TFSite result = (TFSite) criteria.uniqueResult();
-        this.session().evict(result);
-        return result;
+        criteria.add(Restrictions.eq("start", start));
+        criteria.add(Restrictions.eq("end", end));
+        criteria.add(Restrictions.eq("factor", factor));
+        Criteria geneCriteria = criteria.createCriteria("gene");
+        geneCriteria.add(Restrictions.eq("id", gene.getId()));
+        return (TFSite) criteria.uniqueResult();
     }
 }

@@ -94,7 +94,7 @@ public class ImportTFSiteThread implements Runnable {
                         eventMsg = genEventMsg(tfSiteCounter);
                     }
                 } catch (Exception ex) {
-                    System.out.println("Failed to Import");
+                    ex.printStackTrace();
                     logger.error("Failed to importing the transcription factor site, " + ex);
                     eventMsg = "Failed to importing the transcription factor site, " + ex.getMessage();
                 } finally {
@@ -162,6 +162,6 @@ public class ImportTFSiteThread implements Runnable {
         templateMap.put("ImportingMsg", msg);
         templateMap.put("SiteName", serverName);
         templateMap.put("AppName", appName);
-        //this.dmService.sendMail(fromMail, toMail, MAIL_SUBJECT, templateMap, MAIL_TEMPLATE_FILE, true);
+        this.dmService.sendMail(fromMail, toMail, MAIL_SUBJECT, templateMap, MAIL_TEMPLATE_FILE, true);
     }
 }

@@ -40,6 +40,9 @@
                         </div>
                     </td>
                 </tr>
+                <tr>
+                    <td><@s.checkbox name="sendMailRequired" /> Required an email notification after the annotation importing finished</td>
+                </tr>
             </table>
             <div class="blank_separator"></div>
             <div style="clear:both"></div>

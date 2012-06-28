@@ -76,6 +76,7 @@ public class TFSite extends Domain {
     @Column(name = "factor")
     private String factor;
 
+    @Transient
     private String ensemblID;
 
     public long getId() {

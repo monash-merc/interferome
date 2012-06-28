@@ -31,6 +31,7 @@ package edu.monash.merc.repository;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.TFSite;
+import edu.monash.merc.domain.Gene;
 
 /**
  * IReporterRepository DAO Interface
@@ -42,6 +43,6 @@ public interface ITFSiteRepository {
 
     public Pagination<TFSite> getTFSite(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
 
-    public TFSite getTFSiteByGeneID(String geneID);
+    public TFSite getTFSite(Gene gene, String factor, int start, int end);
 
 }
