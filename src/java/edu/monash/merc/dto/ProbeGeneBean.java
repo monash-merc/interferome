@@ -26,11 +26,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.repository;
+package edu.monash.merc.dto;
 
-import edu.monash.merc.domain.Gene;
-
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * @author Simon Yu
@@ -38,12 +36,48 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 6:32 PM
+ *        Date: 28/06/12
+ *        Time: 4:21 PM
  */
-public interface IGeneRepository {
+public class ProbeGeneBean implements Serializable {
 
-    Gene getGeneByEnsgAccession(String ensgAccession);
+    private String ensgAccession;
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    private String probeId;
+
+    private String platform;
+
+    private String probeType;
+
+    public String getEnsgAccession() {
+        return ensgAccession;
+    }
+
+    public void setEnsgAccession(String ensgAccession) {
+        this.ensgAccession = ensgAccession;
+    }
+
+    public String getProbeId() {
+        return probeId;
+    }
+
+    public void setProbeId(String probeId) {
+        this.probeId = probeId;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public String getProbeType() {
+        return probeType;
+    }
+
+    public void setProbeType(String probeType) {
+        this.probeType = probeType;
+    }
 }

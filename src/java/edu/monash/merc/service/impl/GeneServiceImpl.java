@@ -36,6 +36,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author Simon Yu
  * @version 1.0
@@ -110,5 +112,10 @@ public class GeneServiceImpl implements GeneService {
     @Override
     public Gene getGeneByEnsgAccession(String ensgAccession) {
         return this.geneDao.getGeneByEnsgAccession(ensgAccession);
+    }
+
+    @Override
+    public List<Gene> getGenesByProbesetId(String probeId) {
+        return this.geneDao.getGenesByProbesetId(probeId);
     }
 }

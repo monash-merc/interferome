@@ -28,7 +28,7 @@
 
 package edu.monash.merc.repository;
 
-import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Probe;
 
 import java.util.List;
 
@@ -38,12 +38,14 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 6:32 PM
+ *        Date: 28/06/12
+ *        Time: 2:35 PM
  */
-public interface IGeneRepository {
+public interface IProbeRepository {
 
-    Gene getGeneByEnsgAccession(String ensgAccession);
+    Probe getProbeByProbeId(String probesetId);
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    List<Probe> getProbesByGeneAccession(String geneAccession);
+
+    List<Probe> getProbesByGeneId(long geneId);
 }

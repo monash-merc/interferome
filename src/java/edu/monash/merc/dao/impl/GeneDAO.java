@@ -36,6 +36,8 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author Simon Yu
  * @version 1.0
@@ -56,5 +58,15 @@ public class GeneDAO extends HibernateGenericDAO<Gene> implements IGeneRepositor
         Criteria gCriteria = this.session().createCriteria(this.persistClass);
         gCriteria.add(Restrictions.eq("ensgAccession", ensgAccession).ignoreCase());
         return (Gene) gCriteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Gene> getGenesByProbesetId(String probeId) {
+        Criteria criteria = this.session().createCriteria(this.persistClass);
+        // create the alias for genes
+        Criteria geneCrit = criteria.createAlias("probes", "probes");
+        geneCrit.add(Restrictions.eq("probes.probeId", probeId));
+        return criteria.list();
     }
 }

@@ -27,8 +27,7 @@
         <mapping class="edu.monash.merc.domain.Ontology"/>
         <mapping class="edu.monash.merc.domain.EvidenceCode"/>
         <mapping class="edu.monash.merc.domain.GoDomain"/>
+        <mapping class="edu.monash.merc.domain.Probe"/>
         <mapping class="edu.monash.merc.domain.TFSite"/>
-
-
     </session-factory>
 </hibernate-configuration>

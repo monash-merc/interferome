@@ -140,6 +140,8 @@ public class DMServiceImpl implements DMService {
     @Autowired
     private OntologyService ontologyService;
 
+    @Autowired
+    private ProbeService probeService;
 
     public void setProfileService(ProfileService profileService) {
         this.profileService = profileService;
@@ -246,6 +248,9 @@ public class DMServiceImpl implements DMService {
         this.ontologyService = ontologyService;
     }
 
+    public void setProbeService(ProbeService probeService) {
+        this.probeService = probeService;
+    }
 
     @Override
     public void updateProfile(Profile profile) {
@@ -1001,7 +1006,6 @@ public class DMServiceImpl implements DMService {
     }
 
 
-
     @Override
     public void importReporters(ReporterBean reporterBean) {
         ImportReporterThread reporterThread = new ImportReporterThread(this, reporterBean);
@@ -1040,28 +1044,27 @@ public class DMServiceImpl implements DMService {
 
         for (TFSite tfSite : tfSites) {
             Gene gene = this.getGeneByEnsgAccession(tfSite.getEnsemblID());
-            if(gene != null){
-            tfSite.setGene(gene);
-            if (StringUtils.isNotBlank(tfSite.getFactor())) {
-                TFSite existedTFSite = this.getTFSite(tfSite);
-                if (existedTFSite != null) {
-                    tfSite.setId(existedTFSite.getId());
-                    // this.mergeReporter(reporter);
-                    this.updateTFSite(tfSite);
-                    //count how many reporters have been updated
-                    countUpdated++;
-                } else {
-                    this.saveTFSite(tfSite);
-                    //count how many reporters are new
-                    countNew++;
+            if (gene != null) {
+                tfSite.setGene(gene);
+                if (StringUtils.isNotBlank(tfSite.getFactor())) {
+                    TFSite existedTFSite = this.getTFSite(tfSite);
+                    if (existedTFSite != null) {
+                        tfSite.setId(existedTFSite.getId());
+                        // this.mergeReporter(reporter);
+                        this.updateTFSite(tfSite);
+                        //count how many reporters have been updated
+                        countUpdated++;
+                    } else {
+                        this.saveTFSite(tfSite);
+                        //count how many reporters are new
+                        countNew++;
+                    }
                 }
-            }
             }
         }
         counter.setTotalUpdated(countUpdated);
         counter.setTotalNew(countNew);
         return counter;
-
 
 
     }
@@ -1344,6 +1347,11 @@ public class DMServiceImpl implements DMService {
     @Override
     public Gene getGeneByEnsgAccession(String ensgAccession) {
         return this.geneService.getGeneByEnsgAccession(ensgAccession);
+    }
+
+    @Override
+    public List<Gene> getGenesByProbesetId(String probeId) {
+        return this.geneService.getGenesByProbesetId(probeId);
     }
 
     /**
@@ -1755,5 +1763,86 @@ public class DMServiceImpl implements DMService {
         }
 
         return evidenceCode;
+    }
+
+    @Override
+    public Probe getProbeById(long id) {
+        return this.probeService.getProbeById(id);
+    }
+
+    @Override
+    public void saveProbe(Probe probe) {
+        this.probeService.saveProbe(probe);
+    }
+
+    @Override
+    public void mergeProbe(Probe probe) {
+        this.probeService.mergeProbe(probe);
+    }
+
+    @Override
+    public void updateProbe(Probe probe) {
+        this.probeService.updateProbe(probe);
+    }
+
+    @Override
+    public void deleteProbe(Probe probe) {
+        this.probeService.deleteProbe(probe);
+    }
+
+    @Override
+    public Probe getProbeByProbeId(String probesetId) {
+        return this.probeService.getProbeByProbeId(probesetId);
+    }
+
+    @Override
+    public List<Probe> getProbesByGeneAccession(String geneAccession) {
+        return this.probeService.getProbesByGeneAccession(geneAccession);
+    }
+
+    @Override
+    public List<Probe> getProbesByGeneId(long geneId) {
+        return this.probeService.getProbesByGeneId(geneId);
+    }
+
+    @Override
+    public void importProbes(List<ProbeGeneBean> probeGeneBeans) {
+
+        if (probeGeneBeans != null) {
+            for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
+                String ensgAc = probeGeneBean.getEnsgAccession();
+                String probeId = probeGeneBean.getProbeId();
+                String platform = probeGeneBean.getPlatform();
+                String probeType = probeGeneBean.getProbeType();
+                Gene gene = this.getGeneByEnsgAccession(ensgAc);
+                if (gene != null) {
+                    Probe probe = this.getProbeByProbeId(probeId);
+                    if (probe == null) {
+                        probe = new Probe();
+                        probe.setProbeId(probeId);
+                        probe.setPlatform(platform);
+                        probe.setSpecies(probeType);
+                    }
+
+                    List<Gene> geneList = this.getGenesByProbesetId(probe.getProbeId());
+                    if (geneList != null) {
+                        if (!geneList.contains(gene)) {
+                            geneList.add(gene);
+                        }
+                    } else {
+                        geneList = new ArrayList<Gene>();
+                        geneList.add(gene);
+                    }
+                    probe.setGenes(geneList);
+                    //check if primary key id is zero which means new entity,
+                    if (probe.getId() == 0) {
+                        this.saveProbe(probe);
+                    } else {
+                        this.mergeProbe(probe);
+                    }
+                }
+            }
+
+        }
     }
 }

@@ -33,6 +33,7 @@ import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Simon Yu
@@ -107,6 +108,8 @@ public class Gene extends Domain {
     @Column(name = "imported_time")
     private Date importedTime;
 
+    @ManyToMany(mappedBy = "genes")
+    private List<Probe> probes;
 
     public long getId() {
         return id;
@@ -218,5 +221,13 @@ public class Gene extends Domain {
 
     public void setImportedTime(Date importedTime) {
         this.importedTime = importedTime;
+    }
+
+    public List<Probe> getProbes() {
+        return probes;
+    }
+
+    public void setProbes(List<Probe> probes) {
+        this.probes = probes;
     }
 }

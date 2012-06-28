@@ -26,11 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.repository;
-
-import edu.monash.merc.domain.Gene;
-
-import java.util.List;
+package edu.monash.merc.wsclient.biomart;
 
 /**
  * @author Simon Yu
@@ -38,12 +34,15 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 6:32 PM
+ *        Date: 28/06/12
+ *        Time: 4:36 PM
  */
-public interface IGeneRepository {
+public interface ProbeGeneField {
 
-    Gene getGeneByEnsgAccession(String ensgAccession);
+    static final String ENSG_ACCESSION = "Ensembl Gene ID";
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    static final String PLATFORM = "Platform Name";
+
+    static final String SPECIES = "Species";
+
 }

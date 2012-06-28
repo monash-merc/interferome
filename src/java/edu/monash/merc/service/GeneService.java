@@ -30,6 +30,8 @@ package edu.monash.merc.service;
 
 import edu.monash.merc.domain.Gene;
 
+import java.util.List;
+
 /**
  * @author Simon Yu
  * @version 1.0
@@ -84,4 +86,6 @@ public interface GeneService {
      * @return a Gene
      */
     Gene getGeneByEnsgAccession(String ensgAccession);
+
+    List<Gene> getGenesByProbesetId(String probeId);
 }

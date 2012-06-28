@@ -31,6 +31,7 @@ package edu.monash.merc.wsclient.biomart;
 import au.com.bytecode.opencsv.CSVReader;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.dto.GeneOntologyBean;
+import edu.monash.merc.dto.ProbeGeneBean;
 import edu.monash.merc.exception.WSException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -58,29 +59,17 @@ public class BioMartClient {
 
     private String species;
 
+    //only used by probe ws call
+    private String platform;
+
     private boolean configured;
 
     private GetMethod httpget = null;
 
-    private static String GENE_TYPE = "gene";
+    private static final String GENE_TYPE = "gene";
 
-    private static String GENE_ONTOLOGY_TYPE = "geneOntology";
+    private static final String GENE_ONTOLOGY_TYPE = "geneOntology";
 
-    public String getWsUrl() {
-        return wsUrl;
-    }
-
-    public void setWsUrl(String wsUrl) {
-        this.wsUrl = wsUrl;
-    }
-
-    public String getSpecies() {
-        return species;
-    }
-
-    public void setSpecies(String species) {
-        this.species = species;
-    }
 
     public boolean configure() {
         if (StringUtils.isNotBlank(wsUrl) && StringUtils.isNotBlank(species)) {
@@ -91,15 +80,17 @@ public class BioMartClient {
         }
     }
 
-    public boolean configure(String wsUrl, String species) {
+    public boolean configure(String wsUrl, String species, String platform) {
         this.wsUrl = wsUrl;
         this.species = species;
+        if (StringUtils.isNotBlank(platform)) {
+            this.platform = platform;
+        }
         this.configured = true;
         return configured;
     }
 
     private InputStream getWsResponse(String type) {
-
         try {
             HttpClient httpclient = new HttpClient();
             String query = null;
@@ -129,6 +120,30 @@ public class BioMartClient {
     }
 
 
+    private InputStream getWSProbeResponse(String platform) {
+        try {
+            HttpClient httpclient = new HttpClient();
+
+            String query = probeQueryString(this.species, this.platform);
+
+            if (StringUtils.isBlank(query)) {
+                throw new WSException("The query string is null");
+            }
+            String url = wsUrl + URLEncoder.encode(query, "UTF-8");
+            System.out.println("-- url : " + url);
+            httpget = new GetMethod(url);
+
+            int statusCode = httpclient.executeMethod(httpget);
+            if (statusCode != HttpStatus.SC_OK) {
+                throw new WSException("failed to get the gene information");
+            } else {
+                return httpget.getResponseBodyAsStream();
+            }
+        } catch (Exception ex) {
+            throw new WSException(ex);
+        }
+    }
+
     public List<Gene> importGenes() {
         if (!configured) {
             throw new WSException("The configure method must be called first.");
@@ -145,7 +160,6 @@ public class BioMartClient {
             while ((columnValuesLines = csvReader.readNext()) != null) {
                 CSVGeneCreator geneCreator = new CSVGeneCreator();
                 for (int i = 0; i < columnsLines.length; i++) {
-                    // System.out.println("==========> " + columnsLines[i]+  "=" + columnValuesLines[i]);
                     geneCreator.getColumns().add(new CSVColumn(columnsLines[i], columnValuesLines[i]));
                 }
 
@@ -168,12 +182,6 @@ public class BioMartClient {
             } catch (Exception x) {
                 //ignore whatever caught
             }
-
-//            //release httpclient connection
-//            if (httpget != null) {
-//                httpget.releaseConnection();
-//                httpget = null;
-//            }
         }
         return genes;
     }
@@ -218,13 +226,55 @@ public class BioMartClient {
             } catch (Exception x) {
                 //ignore whatever caught
             }
-            //release httpclient connection
-//            if (httpget != null) {
-//                httpget.releaseConnection();
-//                httpget = null;
-//            }
         }
         return geneOntologyBeans;
+    }
+
+    public List<ProbeGeneBean> importProbes(String probeType) {
+        if (!configured) {
+            throw new WSException("The configure method must be called first.");
+        }
+
+        CSVReader csvReader = null;
+        List<ProbeGeneBean> probeGeneBeans = new ArrayList<ProbeGeneBean>();
+        try {
+            InputStream responseIns = getWSProbeResponse(this.platform);
+            csvReader = new CSVReader(new InputStreamReader(responseIns));
+            String[] columnsLines = csvReader.readNext();
+
+            String[] columnValuesLines;
+            while ((columnValuesLines = csvReader.readNext()) != null) {
+                ProbeGeneBeanCreator probeGeneBeanCreator = new ProbeGeneBeanCreator();
+                for (int i = 0; i < columnsLines.length; i++) {
+                    probeGeneBeanCreator.getColumns().add(new CSVColumn(columnsLines[i], columnValuesLines[i]));
+                }
+                String platformColumnName = ProbeGeneField.PLATFORM;
+                String platformColumnValue = columnsLines[1];
+                String probeSpeciesColumnName = ProbeGeneField.SPECIES;
+                String probeSpeciesColumnValue = probeType;
+
+                probeGeneBeanCreator.getColumns().add(new CSVColumn(platformColumnName, platformColumnValue));
+                probeGeneBeanCreator.getColumns().add(new CSVColumn(probeSpeciesColumnName, probeSpeciesColumnValue));
+                ProbeGeneBean probeGeneBean = probeGeneBeanCreator.createProbeGeneBean();
+                if (StringUtils.isNotBlank(probeGeneBean.getEnsgAccession()) && StringUtils.isNotBlank(probeGeneBean.getProbeId())) {
+                    probeGeneBeans.add(probeGeneBean);
+                }
+            }
+            //TODO:
+            //Check the probeGeneBeans list size, if size is zero,
+            //then check the response whether it contains Query ERROR:
+        } catch (Exception ex) {
+            throw new WSException(ex);
+        } finally {
+            try {
+                if (csvReader != null) {
+                    csvReader.close();
+                }
+            } catch (Exception x) {
+                //ignore whatever caught
+            }
+        }
+        return probeGeneBeans;
     }
 
     public String geneQueryString(String species) {
@@ -267,35 +317,90 @@ public class BioMartClient {
         return query.toString();
     }
 
+    public String probeQueryString(String species, String platform) {
+        StringBuilder query = new StringBuilder();
+        query.append("<?xml version='1.0' encoding='UTF-8'?>");
+        query.append("<!DOCTYPE Query>");
+        query.append("<Query  virtualSchemaName = 'default' formatter = 'CSV' header = '1' uniqueRows = '1' count = '' >");
+        query.append("<Dataset name = '").append(species).append("' interface = 'default' >");
+        query.append("<Filter name = 'with_").append(platform).append("' excluded = '0' />");
+        query.append("<Attribute name = 'ensembl_gene_id' />");
+        query.append("<Attribute name = '").append(platform).append("'  />");
+        query.append("</Dataset>").append("</Query>");
+        return query.toString();
+    }
+
+    public void releaseConnection() {
+        // release httpclient connection
+        if (httpget != null) {
+            httpget.releaseConnection();
+            httpget = null;
+        }
+    }
+
+    public String getWsUrl() {
+        return wsUrl;
+    }
+
+    public void setWsUrl(String wsUrl) {
+        this.wsUrl = wsUrl;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
 
     public static void main(String[] args) throws Exception {
         String wsUrl = "http://www.biomart.org/biomart/martservice/result?query=";
         String species = "hsapiens_gene_ensembl";
 
         BioMartClient bioMartClient = new BioMartClient();
-        bioMartClient.configure(wsUrl, species);
 
-        long startTime = System.currentTimeMillis();
 
-        List<Gene> tpbGeneList = bioMartClient.importGenes();
-        System.out.println(" size : " + tpbGeneList.size());
-        for (Gene gene : tpbGeneList) {
-            System.out.println(gene.getEnsgAccession() + " - " + gene.getDescription() + " - " + gene.getChromosome() + " - " + gene.getStartPosition() +
-                    " - " + gene.getEndPosition() + " - " + gene.getStrand() + " - " + gene.getBand() + " - " + gene.getUnigene() + " - " +
-                    gene.getEntrezId() + " - " + gene.getGenbankId());
+//        bioMartClient.configure(wsUrl, species, null);
+//
+//        long startTime = System.currentTimeMillis();
+//
+//        List<Gene> tpbGeneList = bioMartClient.importGenes();
+//        System.out.println(" size : " + tpbGeneList.size());
+//        for (Gene gene : tpbGeneList) {
+//            System.out.println(gene.getEnsgAccession() + " - " + gene.getDescription() + " - " + gene.getChromosome() + " - " + gene.getStartPosition() +
+//                    " - " + gene.getEndPosition() + " - " + gene.getStrand() + " - " + gene.getBand() + " - " + gene.getUnigene() + " - " +
+//                    gene.getEntrezId() + " - " + gene.getGenbankId());
+//        }
+//        long endTime = System.currentTimeMillis();
+//        System.out.println("=====> The total gene process time: " + (endTime - startTime) / 1000 + "seconds");
+//
+//        long goStartTime = System.currentTimeMillis();
+//        List<GeneOntologyBean> geneOntologyBeans = bioMartClient.importGeneOntology();
+//        System.out.println(" GeneOntology size : " + geneOntologyBeans.size());
+//        for (GeneOntologyBean go : geneOntologyBeans) {
+//            System.out.println(go.getEnsembleGeneId() + " - " + go.getGoTermAccession() + " - " + go.getGoTermName() + " - " + go.getGoTermDefinition() +
+//                    " - " + go.getGoTermEvidenceCode() + " - " + go.getGoDomain());
+//        }
+//        long goEndTime = System.currentTimeMillis();
+//
+//        System.out.println("=====> The total GeneOntology process time: " + (goEndTime - goStartTime) / 1000 + "seconds");
+
+
+        bioMartClient.configure(wsUrl, species, "efg_agilent_wholegenome_4x44k_v1");
+        List<ProbeGeneBean> probeGeneBeans = bioMartClient.importProbes("Human");
+
+        for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
+            System.out.println(probeGeneBean.getEnsgAccession() + " - " + probeGeneBean.getProbeId() + " - " + probeGeneBean.getPlatform() + " - " + probeGeneBean.getProbeType());
+
         }
-        long endTime = System.currentTimeMillis();
-        System.out.println("=====> The total gene process time: " + (endTime - startTime) / 1000 + "seconds");
-
-        long goStartTime = System.currentTimeMillis();
-        List<GeneOntologyBean> geneOntologyBeans = bioMartClient.importGeneOntology();
-        System.out.println(" GeneOntology size : " + geneOntologyBeans.size());
-        for (GeneOntologyBean go : geneOntologyBeans) {
-            System.out.println(go.getEnsembleGeneId() + " - " + go.getGoTermAccession() + " - " + go.getGoTermName() + " - " + go.getGoTermDefinition() +
-                    " - " + go.getGoTermEvidenceCode() + " - " + go.getGoDomain());
-        }
-        long goEndTime = System.currentTimeMillis();
-
-        System.out.println("=====> The total GeneOntology process time: " + (goEndTime - goStartTime) / 1000 + "seconds");
     }
 }

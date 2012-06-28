@@ -26,9 +26,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.repository;
+package edu.monash.merc.dao.impl;
 
-import edu.monash.merc.domain.Gene;
+import edu.monash.merc.dao.HibernateGenericDAO;
+import edu.monash.merc.domain.Probe;
+import edu.monash.merc.repository.IProbeRepository;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -38,12 +44,37 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 6:32 PM
+ *        Date: 28/06/12
+ *        Time: 2:37 PM
  */
-public interface IGeneRepository {
+@Scope("prototype")
+@Repository
+public class ProbeDAO extends HibernateGenericDAO<Probe> implements IProbeRepository {
 
-    Gene getGeneByEnsgAccession(String ensgAccession);
+    @Override
+    public Probe getProbeByProbeId(String probesetId) {
+        Criteria gCriteria = this.session().createCriteria(this.persistClass);
+        gCriteria.add(Restrictions.eq("probeId", probesetId).ignoreCase());
+        return (Probe) gCriteria.uniqueResult();
+    }
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Probe> getProbesByGeneAccession(String geneAccession) {
+        Criteria criteria = this.session().createCriteria(this.persistClass);
+        // create the alias for genes
+        Criteria geneCrit = criteria.createAlias("genes", "genes");
+        geneCrit.add(Restrictions.eq("genes.ensgAccession", geneAccession));
+        return criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Probe> getProbesByGeneId(long geneId) {
+        Criteria criteria = this.session().createCriteria(this.persistClass);
+        // create the alias for genes
+        Criteria geneCrit = criteria.createAlias("genes", "genes");
+        geneCrit.add(Restrictions.eq("genes.id", geneId));
+        return criteria.list();
+    }
 }

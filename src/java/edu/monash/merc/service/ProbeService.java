@@ -26,9 +26,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.repository;
+package edu.monash.merc.service;
 
-import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Probe;
 
 import java.util.List;
 
@@ -38,12 +38,24 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 6:32 PM
+ *        Date: 28/06/12
+ *        Time: 2:51 PM
  */
-public interface IGeneRepository {
+public interface ProbeService {
 
-    Gene getGeneByEnsgAccession(String ensgAccession);
+    Probe getProbeById(long id);
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    void saveProbe(Probe probe);
+
+    void mergeProbe(Probe probe);
+
+    void updateProbe(Probe probe);
+
+    void deleteProbe(Probe probe);
+
+    Probe getProbeByProbeId(String probesetId);
+
+    List<Probe> getProbesByGeneAccession(String geneAccession);
+
+    List<Probe> getProbesByGeneId(long geneId);
 }

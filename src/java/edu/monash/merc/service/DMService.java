@@ -303,6 +303,8 @@ public interface DMService {
      */
     Gene getGeneByEnsgAccession(String ensgAccession);
 
+    List<Gene> getGenesByProbesetId(String probeId);
+
     /**
      * import all genes
      *
@@ -363,6 +365,24 @@ public interface DMService {
 
     Ontology getOntologyByGoTermAccession(String goTermAccession);
 
-
     void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
+
+    //Probe
+    Probe getProbeById(long id);
+
+    void saveProbe(Probe probe);
+
+    void mergeProbe(Probe probe);
+
+    void updateProbe(Probe probe);
+
+    void deleteProbe(Probe probe);
+
+    Probe getProbeByProbeId(String probesetId);
+
+    List<Probe> getProbesByGeneAccession(String geneAccession);
+
+    List<Probe> getProbesByGeneId(long geneId);
+
+    void importProbes(List<ProbeGeneBean> probeGeneBeans);
 }

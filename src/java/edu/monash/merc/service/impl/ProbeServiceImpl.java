@@ -26,9 +26,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.repository;
+package edu.monash.merc.service.impl;
 
-import edu.monash.merc.domain.Gene;
+import edu.monash.merc.dao.impl.ProbeDAO;
+import edu.monash.merc.domain.Probe;
+import edu.monash.merc.service.ProbeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,12 +44,59 @@ import java.util.List;
  * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 26/06/12
- *        Time: 6:32 PM
+ *        Date: 28/06/12
+ *        Time: 2:53 PM
  */
-public interface IGeneRepository {
 
-    Gene getGeneByEnsgAccession(String ensgAccession);
+@Scope("prototype")
+@Service
+@Transactional
+public class ProbeServiceImpl implements ProbeService {
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    @Autowired
+    private ProbeDAO probeDao;
+
+    public void setProbeDao(ProbeDAO probeDao) {
+        this.probeDao = probeDao;
+    }
+
+    @Override
+    public Probe getProbeById(long id) {
+        return this.probeDao.get(id);
+    }
+
+    @Override
+    public void saveProbe(Probe probe) {
+        this.probeDao.add(probe);
+    }
+
+    @Override
+    public void mergeProbe(Probe probe) {
+        this.probeDao.merge(probe);
+    }
+
+    @Override
+    public void updateProbe(Probe probe) {
+        this.probeDao.update(probe);
+    }
+
+    @Override
+    public void deleteProbe(Probe probe) {
+        this.probeDao.remove(probe);
+    }
+
+    @Override
+    public Probe getProbeByProbeId(String probesetId) {
+        return this.probeDao.getProbeByProbeId(probesetId);
+    }
+
+    @Override
+    public List<Probe> getProbesByGeneAccession(String geneAccession) {
+        return this.probeDao.getProbesByGeneAccession(geneAccession);
+    }
+
+    @Override
+    public List<Probe> getProbesByGeneId(long geneId) {
+        return this.probeDao.getProbesByGeneId(geneId);
+    }
 }
