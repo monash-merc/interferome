@@ -76,6 +76,8 @@ public class TFSite extends Domain {
     @Column(name = "factor")
     private String factor;
 
+    private String ensemblID;
+
     public long getId() {
         return id;
     }
@@ -131,4 +133,15 @@ public class TFSite extends Domain {
     public void setFactor(String factor) {
         this.factor = factor;
     }
+
+    public String getEnsemblID(){
+        return ensemblID;
+    }
+
+    public void setEnsemblID(String ensemblID){
+        this.ensemblID = ensemblID;
+    }
+
+
+
 }

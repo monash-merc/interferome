@@ -42,6 +42,7 @@ import edu.monash.merc.util.interferome.dataset.ExpFactor;
 import edu.monash.merc.util.interferome.dataset.IFNTypeFactor;
 import edu.monash.merc.util.interferome.dataset.VarFactor;
 import edu.monash.merc.util.reporter.ImportReporterThread;
+import edu.monash.merc.util.tfsite.ImportTFSiteThread;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -102,6 +103,9 @@ public class DMServiceImpl implements DMService {
 
     @Autowired
     private ReporterService reporterService;
+
+    @Autowired
+    private TFSiteService tfSiteService;
 
     @Autowired
     private FactorService factorService;
@@ -996,10 +1000,77 @@ public class DMServiceImpl implements DMService {
         return counter;
     }
 
+
+
     @Override
     public void importReporters(ReporterBean reporterBean) {
         ImportReporterThread reporterThread = new ImportReporterThread(this, reporterBean);
         reporterThread.importReporter();
+    }
+
+
+    //TFSite
+
+    @Override
+    public void saveTFSite(TFSite tfSite) {
+        this.tfSiteService.saveTFSite(tfSite);
+    }
+
+    @Override
+    public void mergeTFSite(TFSite tfSite) {
+        this.tfSiteService.mergeTFSite(tfSite);
+    }
+
+    @Override
+    public void updateTFSite(TFSite tfSite) {
+        this.tfSiteService.updateTFSite(tfSite);
+    }
+
+    @Override
+    public TFSite getTFSite(TFSite tfSite) {
+        return this.tfSiteService.getTFSite(tfSite);
+    }
+
+    @Override
+    public TfSiteCounter importAllTFSites(List<TFSite> tfSites) {
+        int countUpdated = 0;
+        int countNew = 0;
+        //reporters counter
+        TfSiteCounter counter = new TfSiteCounter();
+
+        for (TFSite tfSite : tfSites) {
+            Gene gene = this.getGeneByEnsgAccession(tfSite.getEnsemblID());
+            if(gene != null){
+            tfSite.setGene(gene);
+            if (StringUtils.isNotBlank(tfSite.getFactor())) {
+                TFSite existedTFSite = this.getTFSite(tfSite);
+                if (existedTFSite != null) {
+                    tfSite.setId(existedTFSite.getId());
+                    // this.mergeReporter(reporter);
+                    this.updateTFSite(tfSite);
+                    //count how many reporters have been updated
+                    countUpdated++;
+                } else {
+                    this.saveTFSite(tfSite);
+                    //count how many reporters are new
+                    countNew++;
+                }
+            }
+            }
+        }
+        counter.setTotalUpdated(countUpdated);
+        counter.setTotalNew(countNew);
+        return counter;
+
+
+
+    }
+
+
+    @Override
+    public void importTFSite(TFSiteBean tfSiteBean) {
+        ImportTFSiteThread tfSiteThread = new ImportTFSiteThread(this, tfSiteBean);
+        tfSiteThread.importTFSite();
     }
 
     @Override

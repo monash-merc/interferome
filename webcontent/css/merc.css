@@ -1953,6 +1953,14 @@ body {
 /** end of pagination **/
 
 /** footer section **/
+
+.login {
+    text-align:center;
+    font-weight: normal;
+    font-size: 10px;
+
+}
+
 .footer {
     margin: 0 auto;
     width: 1024px;

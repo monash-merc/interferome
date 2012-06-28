@@ -202,6 +202,18 @@ public interface DMService {
 
     public void importReporters(ReporterBean reporterBean);
 
+    public void saveTFSite(TFSite tfSite);
+
+    public void mergeTFSite(TFSite tfSite);
+
+    public void updateTFSite(TFSite tfSite);
+
+    public void importTFSite(TFSiteBean tfSiteBean);
+
+    public TfSiteCounter importAllTFSites(List<TFSite> tfSites);
+
+    public TFSite getTFSite(TFSite tfSite);
+
     public void saveDataset(Dataset dataset);
 
     public Dataset getDataset(long dsId);
