@@ -452,6 +452,20 @@
             <result name="success">/web/data/import_reporter_finished.ftl</result>
         </action>
 
+        <!-- show the TF Site page -->
+        <action name="showImportTFSite" class="data.importTFSiteAction" method="showImportTFSite">
+            <result name="input">/web/data/import_tfsite.ftl</result>
+            <result name="error">/web/data/import_tfsite.ftl</result>
+            <result name="success">/web/data/import_tfsite.ftl</result>
+        </action>
+
+        <!-- tf site importing -->
+        <action name="importTFSite" class="data.importTFSiteAction" method="importTFSite">
+            <result name="input">/web/data/import_tfSite.ftl</result>
+            <result name="error">/web/data/import_tfSite.ftl</result>
+            <result name="success">/web/data/import_tfSite_finished.ftl</result>
+        </action>
+
         <!-- capture the dataset, ajax version for dataset import -->
         <action name="importDataset" class="data.importDatasetAction" method="importDataset">
             <result name="success" type="json">
