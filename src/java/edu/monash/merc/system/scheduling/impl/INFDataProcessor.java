@@ -84,10 +84,10 @@ public class INFDataProcessor implements DataProcessor {
         System.out.println("============= start interferome process .........");
 
         Date importedTime = GregorianCalendar.getInstance().getTime();
-      //  importEnsemblGenes(HUMAN, importedTime);
+        importEnsemblGenes(HUMAN, importedTime);
 
         //
-       // importEnsemblGenes(MOUSE, importedTime);
+        importEnsemblGenes(MOUSE, importedTime);
         long endTime = System.currentTimeMillis();
 
 
@@ -96,7 +96,7 @@ public class INFDataProcessor implements DataProcessor {
         importGeneOntology(HUMAN);
 
         //
-       // importGeneOntology(MOUSE);
+        importGeneOntology(MOUSE);
         long goEndTime = System.currentTimeMillis();
 
         logger.info("=====> The total process time for Gene: " + (endTime - startTime) / 1000 + "seconds");

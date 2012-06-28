@@ -59,4 +59,6 @@ public interface GeneField {
     static final String GENBANK = "Protein (Genbank) ID";
 
     static final String ENTREZ = "EntrezGene ID";
+
+    static final String REFSEQ_DNA = "RefSeq DNA ID";
 }

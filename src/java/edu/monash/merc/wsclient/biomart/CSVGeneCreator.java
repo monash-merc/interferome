@@ -103,6 +103,12 @@ public class CSVGeneCreator {
                 }
             }
 
+            if (StringUtils.equalsIgnoreCase(columnName, GeneField.REFSEQ_DNA)) {
+                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+                    gene.setRefseq_dna(columnValue);
+                }
+            }
+
             if (StringUtils.equalsIgnoreCase(columnName, GeneField.ENTREZ)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
                     gene.setEntrezId(columnValue);

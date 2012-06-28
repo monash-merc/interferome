@@ -45,6 +45,8 @@ import java.util.List;
  */
 public class GeneOntologyCreator {
 
+    private static String FIELD_ENCLOSER = "$FIELD_ENCLOSER";
+
     private List<CSVColumn> columns = new ArrayList<CSVColumn>();
 
     public List<CSVColumn> getColumns() {
@@ -81,6 +83,7 @@ public class GeneOntologyCreator {
 
             if (StringUtils.equalsIgnoreCase(columnName, GeneOntologyField.GO_TERM_DEFINITION)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+                    StringUtils.remove(columnValue, FIELD_ENCLOSER);
                     geneOntologyBean.setGoTermDefinition(columnValue);
                 }
             }
@@ -98,5 +101,12 @@ public class GeneOntologyCreator {
             }
         }
         return geneOntologyBean;
+    }
+
+
+    public static void main(String[] args) {
+        String badstr = "$FIELD_ENCLOSERDouble layer of lipid molecules that encloses all cells, and, in eukaryotes, many organelles; may be a single or double lipid bilayer; also includes associated proteins.$FIELD_ENCLOSER [GOC:mah, ISBN:0815316194]";
+        String goodone = StringUtils.remove(badstr, FIELD_ENCLOSER);
+        System.out.print(goodone);
     }
 }

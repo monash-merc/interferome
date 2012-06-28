@@ -234,6 +234,7 @@ public class BioMartClient {
         query.append("<Query  virtualSchemaName = 'default' formatter = 'CSV' header = '1' uniqueRows = '1' count = '' >");
         query.append("<Dataset name = '").append(species).append("' interface = 'default' >");
         query.append("<Attribute name = 'ensembl_gene_id' />");
+        query.append("<Attribute name = 'external_gene_id' />");
         query.append("<Attribute name = 'description' />");
         query.append("<Attribute name = 'chromosome_name' />");
         query.append("<Attribute name = 'start_position' />");
@@ -246,6 +247,9 @@ public class BioMartClient {
         query.append("</Dataset>").append("</Query>");
         return query.toString();
     }
+
+    //TODO:
+    //add another ws call method to get  refseq_dna and ensembl_gene_id
 
     public String geneOntologyQueryString(String species) {
         StringBuilder query = new StringBuilder();
