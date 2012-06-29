@@ -31,6 +31,7 @@ package edu.monash.merc.repository;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Gene;
 import edu.monash.merc.dto.SearchBean;
 
 /**
@@ -41,5 +42,9 @@ import edu.monash.merc.dto.SearchBean;
  */
 public interface ISearchDataRepository {
 
-    public Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 }

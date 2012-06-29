@@ -31,10 +31,7 @@ package edu.monash.merc.struts2.action;
 import au.com.bytecode.opencsv.CSVWriter;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.config.AppPropSettings;
-import edu.monash.merc.domain.Data;
-import edu.monash.merc.domain.Dataset;
-import edu.monash.merc.domain.IFNType;
-import edu.monash.merc.domain.Reporter;
+import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -194,6 +191,11 @@ public class SearchAction extends DMBaseAction {
      * csv file maximum records
      */
     private int maxRecords;
+
+    /**
+     * search result gene
+     */
+    private Pagination<Gene> genePagination;
 
     /**
      * Logger
@@ -386,6 +388,41 @@ public class SearchAction extends DMBaseAction {
             }
             //query the data by pagination
             dataPagination = this.searchDataService.search(searchBean, pageNo, pageSize, orderBy, orderByType);
+            //set the searched flag as true
+            searched = true;
+            //sub type post process
+            subTypePostProcess();
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.data.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    public String searchGenes() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+            //query the data by pagination
+            genePagination = this.searchDataService.searchGenes(searchBean, pageNo,pageSize , null, null);
+            List<Gene> geneList = genePagination.getPageResults();
+            System.out.println("=============> get all gene list size: " + geneList.size());
+            for (Gene g : geneList) {
+                System.out.println("================= gene: " + g.getEnsgAccession() + " - name: " + g.getGeneName());
+            }
             //set the searched flag as true
             searched = true;
             //sub type post process

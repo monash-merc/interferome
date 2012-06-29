@@ -42,6 +42,7 @@
             <@s.submit value=" Search " cssClass="input_button" />  &nbsp; <@s.reset value="Clear" cssClass="input_button" />
         </div>
         </@s.form>
+        <a href="${base}/search/searchGene.jspx">Search Genes</a>
         <#include "../search/search_result.ftl" />
     </div>
 
