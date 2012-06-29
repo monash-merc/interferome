@@ -301,7 +301,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
             System.out.println("================= found total genes size: " + total);
 
-            String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g." + orderBy + " " + sortBy;
             Query geneQuery = this.session().createQuery(geneHQL);
             geneQuery.setParameterList(("probes"), probes);
 

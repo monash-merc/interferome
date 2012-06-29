@@ -50,6 +50,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,11 +199,33 @@ public class SearchAction extends DMBaseAction {
     private Pagination<Gene> genePagination;
 
     /**
+     * Search Type: 1. gene,  2. data, 3. geneOntology, 4. chromosome, 5. transcript, 6. subtype
+     */
+    private String searchType;
+
+    //check result flag
+    private int resultSize = 0;
+
+    protected Map<String, String> dataOrderByMap = new HashMap<String, String>();
+
+    /**
      * Logger
      */
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private static String SEMICOLON = ";";
+    private static final String SEMICOLON = ";";
+
+    private static final String GENE_TYPE = "gene";
+
+    private static final String DATA_TYPE = "data";
+
+    private static final String GO_TYPE = "geneontoloty";
+
+    private static final String CHROM_TYPE = "chromosome";
+
+    private static final String TRANS_TYPE = "transcript";
+
+    private static final String SUBTYPE_TYPE = "subtype";
 
     public void setSearchDataService(SearchDataService searchDataService) {
         this.searchDataService = searchDataService;
@@ -228,11 +251,11 @@ public class SearchAction extends DMBaseAction {
         //pre-define the up or down option
         populateUpDown();
 
-        //for pagination
-        initDataPagination();
+        //init pageSizeMap
+        initPageSizeMap();
 
-        //set the default search pagination params
-        setDefaultPageParams();
+        //init OrderByMap
+        initOrderByMap();
 
         try {
             //maximum search records to a csv file
@@ -371,7 +394,7 @@ public class SearchAction extends DMBaseAction {
 
 
     @SuppressWarnings("unchecked")
-    public String search() {
+    public String searchData() {
         try {
             //get the logged in user if existed
             user = getCurrentUser();
@@ -386,13 +409,21 @@ public class SearchAction extends DMBaseAction {
                 subTypePostProcess();
                 return ERROR;
             }
+            //set the data pagination parameters
+            setDataPageParams();
             //query the data by pagination
             dataPagination = this.searchDataService.search(searchBean, pageNo, pageSize, orderBy, orderByType);
             //set the searched flag as true
             searched = true;
+            searchType = DATA_TYPE;
+            List<Data> dataList = dataPagination.getPageResults();
+            if (dataList != null) {
+                resultSize = dataList.size();
+            }
             //sub type post process
             subTypePostProcess();
             storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
         } catch (Exception ex) {
             logger.error(ex);
             addActionError(getText("data.search.data.failed"));
@@ -416,18 +447,25 @@ public class SearchAction extends DMBaseAction {
                 subTypePostProcess();
                 return ERROR;
             }
+            //set gene pagination parameters
+            setGenePageParams();
+
             //query the data by pagination
-            genePagination = this.searchDataService.searchGenes(searchBean, pageNo,pageSize , null, null);
+            genePagination = this.searchDataService.searchGenes(searchBean, pageNo, pageSize, orderBy, orderByType);
             List<Gene> geneList = genePagination.getPageResults();
-            System.out.println("=============> get all gene list size: " + geneList.size());
-            for (Gene g : geneList) {
-                System.out.println("================= gene: " + g.getEnsgAccession() + " - name: " + g.getGeneName());
+            if (geneList != null) {
+                resultSize = geneList.size();
+                System.out.println("=============> get all gene list size: " + resultSize);
             }
             //set the searched flag as true
             searched = true;
+            searchType = GENE_TYPE;
             //sub type post process
+
+
             subTypePostProcess();
             storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
         } catch (Exception ex) {
             logger.error(ex);
             addActionError(getText("data.search.data.failed"));
@@ -805,8 +843,7 @@ public class SearchAction extends DMBaseAction {
         }
     }
 
-    //initialize the pagination parameters
-    protected void initDataPagination() {
+    protected void initPageSizeMap() {
         // page size per page values
         pageSizeMap.put(20, 20);
         pageSizeMap.put(30, 30);
@@ -814,8 +851,18 @@ public class SearchAction extends DMBaseAction {
         pageSizeMap.put(100, 100);
         pageSizeMap.put(150, 150);
         pageSizeMap.put(200, 200);
+    }
 
+    protected void initOrderByMap() {
+        // orderby type values
+        orderByTypeMap.put("ASC", "asc");
+        orderByTypeMap.put("DESC", "desc");
+    }
+
+    //initialize the pagination parameters
+    protected void initDataPagination() {
         // orderby values
+        orderByMap.clear();
         orderByMap.put("dataset", "dataset");
         orderByMap.put("foldchange", "fold change");
         orderByMap.put("ifntype", "interferon type");
@@ -824,18 +871,43 @@ public class SearchAction extends DMBaseAction {
         orderByMap.put("genbank", "genbank id");
         orderByMap.put("ensemblid", "ensembl id");
         orderByMap.put("probeid", "probe id");
-
-        // orderby type values
-        orderByTypeMap.put("ASC", "asc");
-        orderByTypeMap.put("DESC", "desc");
     }
 
+    //initialize the pagination parameters
+    protected void initGenePagination() {
+        // orderby values
+        orderByMap.clear();
+        orderByMap.put("geneName", "gene symbol");
+        orderByMap.put("ensgAccession", "ensembl id");
+    }
+
+
     //set the default pagination parameters
-    protected void setDefaultPageParams() {
-        pageLink = "search/search.jspx";
+    protected void setDataPageParams() {
+        initDataPagination();
+        pageLink = "search/searchData.jspx";
         pageSuffix = ActionConts.PAGINATION_SUFFUX;
         if (StringUtils.isBlank(orderBy)) {
             orderBy = "dataset";
+        }
+        if (StringUtils.isBlank(orderByType)) {
+            orderByType = ActionConts.DESC_SORT_TYPE;
+        }
+        if (pageNo == 0) {
+            pageNo = 1;
+        }
+        if (pageSize == 0) {
+            pageSize = 30;
+        }
+    }
+
+    //set the default pagination parameters
+    protected void setGenePageParams() {
+        initGenePagination();
+        pageLink = "search/searchGene.jspx";
+        pageSuffix = ActionConts.PAGINATION_SUFFUX;
+        if (StringUtils.isBlank(orderBy)) {
+            orderBy = "geneName";
         }
         if (StringUtils.isBlank(orderByType)) {
             orderByType = ActionConts.DESC_SORT_TYPE;
@@ -1058,5 +1130,37 @@ public class SearchAction extends DMBaseAction {
 
     public void setMaxRecords(int maxRecords) {
         this.maxRecords = maxRecords;
+    }
+
+    public String getSearchType() {
+        return searchType;
+    }
+
+    public void setSearchType(String searchType) {
+        this.searchType = searchType;
+    }
+
+    public Map<String, String> getDataOrderByMap() {
+        return dataOrderByMap;
+    }
+
+    public void setDataOrderByMap(Map<String, String> dataOrderByMap) {
+        this.dataOrderByMap = dataOrderByMap;
+    }
+
+    public Pagination<Gene> getGenePagination() {
+        return genePagination;
+    }
+
+    public void setGenePagination(Pagination<Gene> genePagination) {
+        this.genePagination = genePagination;
+    }
+
+    public int getResultSize() {
+        return resultSize;
+    }
+
+    public void setResultSize(int resultSize) {
+        this.resultSize = resultSize;
     }
 }

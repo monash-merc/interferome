@@ -321,6 +321,22 @@ body {
     text-align: center;
 }
 
+.input_button_big {
+    background: none repeat scroll 0 0 #eff2f7;
+    border-left: solid 1px #E1E8F0;
+    border-top: solid 1px #E1E8F0;
+    border-right: solid 1px #C2C9D7;
+    border-bottom: solid 1px #C2C9D7;
+    text-decoration: none;
+    color: #3a4c66;
+    width: 90px;
+    height: 20px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    font-weight: normal;
+    text-align: center;
+}
+
 .linkbutton {
     margin: 0 auto;
     display: block;

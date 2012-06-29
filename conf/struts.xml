@@ -598,7 +598,7 @@
             <result name="success">/web/search/search.ftl</result>
         </action>
 
-        <action name="search" class="search.searchAction" method="search">
+        <action name="searchData" class="search.searchAction" method="searchData">
             <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
             <result name="success">/web/search/search.ftl</result>
