@@ -445,7 +445,6 @@ body {
     padding-right: 10px;
 }
 
-
 .result_title_div {
     color: #858585;
     border: 1px solid #E9E9E9;
@@ -1689,7 +1688,8 @@ body {
     display: inline;
     color: #858585;
 }
-.dose_range_div a{
+
+.dose_range_div a {
     text-decoration: none;
 }
 
@@ -1760,6 +1760,59 @@ body {
     color: #003766;
 }
 
+.expand_collapse {
+    background: none repeat scroll 0 0 #F0F0F0;
+    border: 1px solid #E9E9E9;
+    color: #858585;
+    margin: 5px 10px;
+    text-align: left;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 100px;
+    cursor: pointer;
+}
+
+.search_sub_menue {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 1px solid #E9E9E9;
+}
+
+.search_menu_link {
+    display: inline;
+    float: left;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    padding: 2px;
+}
+
+.search_menu_link a {
+    background: none repeat scroll 0 0 #F0F0F0;
+    color: #3A4C66;
+    margin: 0 auto;
+    padding: 2px 2px;
+    display: block;
+    width: 110px;
+    height: 16px;
+    line-height: 16px;
+    border: 1px solid #E9E9E9;
+    font-size: 12px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.search_menu_link a:hover {
+    color: #ffffff;
+    background: #90BADE;
+    border-color: #90BADE;
+}
+
 .s_ds_link a {
     color: #003766;
 }
@@ -1818,7 +1871,7 @@ body {
     text-align: justify;
 }
 
-.help_faq{
+.help_faq {
 
 }
 
@@ -1847,7 +1900,7 @@ body {
     padding-right: 10px;
 }
 
-.db_stat_div p{
+.db_stat_div p {
     text-align: justify;
 }
 
@@ -1857,7 +1910,6 @@ body {
     color: #3A4C66;
     font-size: 11px;
 }
-
 
 .contactus_data_title {
     padding-top: 2px;
@@ -1896,6 +1948,7 @@ body {
     /** background-image: url('../images/help_bg.png'); **/
     background-repeat: repeat;
 }
+
 .help_row_div {
     margin-left: 10px;
     margin-right: 10px;
@@ -1971,7 +2024,7 @@ body {
 /** footer section **/
 
 .login {
-    text-align:center;
+    text-align: center;
     font-weight: normal;
     font-size: 10px;
 

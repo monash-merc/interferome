@@ -2,7 +2,7 @@
     Search Results
 </div>
 <div class="data_header_div">
-    <span class="name_title">Found a total of <font color="green"> ${genePagination.totalRecords} </font> Data</span>
+    <span class="name_title">Found a total of <font color="green"> ${genePagination.totalRecords} </font> Gene(s)</span>
 
 <@s.if test="%{genePagination.totalRecords >0 }">
     <div class="export_div">

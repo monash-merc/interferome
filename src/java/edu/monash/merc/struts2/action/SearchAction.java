@@ -203,9 +203,6 @@ public class SearchAction extends DMBaseAction {
      */
     private String searchType;
 
-    //check result flag
-    private int resultSize = 0;
-
     protected Map<String, String> dataOrderByMap = new HashMap<String, String>();
 
     /**
@@ -417,9 +414,7 @@ public class SearchAction extends DMBaseAction {
             searched = true;
             searchType = DATA_TYPE;
             List<Data> dataList = dataPagination.getPageResults();
-            if (dataList != null) {
-                resultSize = dataList.size();
-            }
+
             //sub type post process
             subTypePostProcess();
             storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
@@ -453,10 +448,7 @@ public class SearchAction extends DMBaseAction {
             //query the data by pagination
             genePagination = this.searchDataService.searchGenes(searchBean, pageNo, pageSize, orderBy, orderByType);
             List<Gene> geneList = genePagination.getPageResults();
-            if (geneList != null) {
-                resultSize = geneList.size();
-                System.out.println("=============> get all gene list size: " + resultSize);
-            }
+
             //set the searched flag as true
             searched = true;
             searchType = GENE_TYPE;
@@ -1154,13 +1146,5 @@ public class SearchAction extends DMBaseAction {
 
     public void setGenePagination(Pagination<Gene> genePagination) {
         this.genePagination = genePagination;
-    }
-
-    public int getResultSize() {
-        return resultSize;
-    }
-
-    public void setResultSize(int resultSize) {
-        this.resultSize = resultSize;
     }
 }

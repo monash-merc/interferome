@@ -21,15 +21,6 @@
                 content:'<h4>Save The Search Results To A CSV File</h4><p>(Maximum records are up to ${maxRecords})</p>'
             });
         });
-
-        $("input.input_button_big").live('click', function (event) {
-            event.preventDefault();
-            alert("submit button clicked");
-            targetForm = document.forms[0];
-            targetForm.action = "searchData.jspx";
-            targetForm.submit();
-        });
-
     </script>
 
 </head>
@@ -41,47 +32,90 @@
 <div style="clear:both"></div>
 <div class="main_container">
 <#include "../template/action_errors.ftl">
+
     <div class="container_inner_left">
+        <!-- search conditions -->
+        <!-- expand and collapse section, to see the search conditions are collapsed or opened -->
+        <!-- if it is seached -->
+    <@s.if test="%{searched == true}">
+        <!-- and the search type is not a gene search, it's always collapsed  -->
+        <@s.if test="%{searchType != 'gene'}">
+        <div class="hide_search_cond" id="search_close" style="display: none;">
+        </@s.if>
+        <@s.else>
+            <!-- it's a gene search, and result is greater than zero, then we collapse the search conditions-->
+            <@s.if test="%{genePagination != null && genePagination.totalRecords >0 }">
+            <div class="hide_search_cond" id="search_close" style="display: none;">
+            </@s.if>
+            <@s.else>  <!-- otherwise we keep the search condition open -->
+                <div class="hide_search_cond" id="search_open"">
+            </@s.else>
+        </@s.else>
+    </@s.if>
+    <@s.else>
+        <!-- if it's not searched, we keep the search conditions open -->
+    <div class="hide_search_cond" id="search_open">
+    </@s.else>
+        <!-- end of expand and collapse section -->
+
         <div class="search_hints_outer_div">
             Please select the following search condition(s):
         </div>
     <@s.form action="searchGene.jspx" namespace="/search" method="post">
         <#include "../search/search_con.ftl">
         <div class="data_header_div">
-        <@s.if test="%{resultSize == 0 }">
             <@s.submit value=" Search " cssClass="input_button" />
             &nbsp; <@s.reset value="Clear" cssClass="input_button" />
-
-        </@s.if>
-        <@s.else>
-            <div class="blank_separator"></div>
-            <@s.submit value=" Data " cssClass="input_button_big" /> &nbsp; <@s.submit value=" Ontology " cssClass="input_button_big" /> &nbsp;<@s.submit value=" Transcript " cssClass="input_button_big" /> &nbsp;<@s.submit value=" Chromosome " cssClass="input_button_big" /> &nbsp;<@s.submit value=" IFN Subtype " cssClass="input_button_big" /> &nbsp;
-            <div class="blank_separator"></div>
-        </@s.else>
         </div>
     </@s.form>
+    </div>
+        <!-- end of search condition section -->
 
+        <!-- search sub menu -->
+    <@s.if test="%{searched == true}">
+        <@s.if test="%{searchType != 'gene'}">
+            <div class="search_menu_div">
+                <#include "../search/search_sub_menu.ftl"/>
+            </div>
+        </@s.if>
+        <@s.else>
+            <@s.if test="%{genePagination != null && genePagination.totalRecords >0 }">
+                <div class="search_menu_div">
+                    <#include "../search/search_sub_menu.ftl"/>
+                </div>
+            </@s.if>
+        </@s.else>
+    </@s.if>
+        <!-- end of search sub menu -->
+
+        <!-- search results -->
     <@s.if test="%{searched == true}">
         <@s.if test="%{searchType == 'gene'}">
-           <@s.if test="%{genePagination != null}">
-                <#include "../search/search_gene_result.ftl" />
+            <@s.if test="%{genePagination != null}">
+                <div class="search_results_div" id='gene'>
+                    <#include "../search/search_gene_result.ftl" />
+                </div>
             </@s.if>
         </@s.if>
         <@s.if test="%{searchType == 'data'}">
             <@s.if test="%{dataPagination != null}">
-                <#include "../search/search_data_result.ftl" />
+                <div class="search_results_div" id='data'>
+                    <#include "../search/search_data_result.ftl" />
+                </div>
             </@s.if>
         </@s.if>
     </@s.if>
 
     </div>
-<@s.if test="%{#session.authentication_flag =='authenticated'}">
-    <div class="container_inner_right">
-        <#include "../template/user_nav.ftl">
+
+
+    <@s.if test="%{#session.authentication_flag =='authenticated'}">
+        <div class="container_inner_right">
+            <#include "../template/user_nav.ftl">
+        </div>
+    </@s.if>
+        <div style="clear:both"></div>
     </div>
-</@s.if>
-    <div style="clear:both"></div>
-</div>
-<#include "../template/footer.ftl"/>
+    <#include "../template/footer.ftl"/>
 </body>
 </html>
