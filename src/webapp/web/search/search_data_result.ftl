@@ -51,7 +51,7 @@
             <td>
                 <@s.if test="%{#dataResult.reporter.genBankAccession != '---'}">
                     <div class="s_ds_link">
-                        <a href="${genBankLink}${dataResult.reporter.genBankAccession}"
+                        <a href="${geneBankLink}${dataResult.reporter.genBankAccession}"
                            target="_blank"><@s.property value="#dataResult.reporter.genBankAccession" /></a>
                     </div>
                 </@s.if>

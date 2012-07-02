@@ -1813,6 +1813,14 @@ body {
     border-color: #90BADE;
 }
 
+.search_result_link a {
+    color: #003766;
+}
+
+.search_result_link a:hover {
+    text-decoration: underline;
+}
+
 .s_ds_link a {
     color: #003766;
 }
@@ -2023,11 +2031,37 @@ body {
 
 /** footer section **/
 
-.login {
+.login_section {
     text-align: center;
     font-weight: normal;
     font-size: 10px;
 
+}
+
+.login {
+    display: inline-block;
+    margin: 5px;
+}
+
+.login a {
+    background: none repeat scroll 0 0 #F0F0F0;
+    color: #3A4C66;
+    margin: 0 auto;
+    padding: 2px 2px;
+    display: block;
+    width: 80px;
+    height: 16px;
+    line-height: 16px;
+    border: 1px solid #DDDDDD;
+    font-size: 12px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.login a:hover {
+    color: #ffffff;
+    background: #90BADE;
+    border-color: #90BADE;
 }
 
 .footer {

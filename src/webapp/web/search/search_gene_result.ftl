@@ -35,11 +35,44 @@
         <tbody>
         <@s.iterator status="geneStat" value="genePagination.pageResults" id="geneResult" >
         <tr>
-            <td align="center"><@s.property value='#geneResult.ensgAccession' /></td>
+            <td align="center">
+                <div class="search_result_link">
+                    <@s.if test="%{#geneResult.ensgAccession != null}">
+                        <a href="${ensemblLink}${geneResult.ensgAccession}" target="_blank">
+                            <@s.property value='#geneResult.ensgAccession' />
+                        </a>
+                    </@s.if>
+                    <@s.else>
+                        <@s.property value='#geneResult.ensgAccession' />
+                    </@s.else>
+                </div>
+            </td>
             <td align="center"><@s.property value="#geneResult.geneName" /></td>
             <td align="center"><@s.property value="#geneResult.description" /></td>
-            <td align="center"><@s.property value="#geneResult.entrezId" /></td>
-            <td align="center"><@s.property value="#geneResult.genbankId" /></td>
+            <td align="center">
+                <div class="search_result_link">
+                    <@s.if test="%{#geneResult.entrezId != null}">
+                        <a href="${entrezIdLink}${geneResult.entrezId}" target="_blank">
+                            <@s.property value='#geneResult.entrezId' />
+                        </a>
+                    </@s.if>
+                    <@s.else>
+                        <@s.property value='#geneResult.entrezId' />
+                    </@s.else>
+                </div>
+            </td>
+            <td align="center">
+                <div class="search_result_link">
+                    <@s.if test="%{#geneResult.genbankId != null}">
+                        <a href="${geneBankLink}${geneResult.genbankId}" target="_blank">
+                            <@s.property value='#geneResult.genbankId' />
+                        </a>
+                    </@s.if>
+                    <@s.else>
+                        <@s.property value="#geneResult.genbankId" />
+                    </@s.else>
+                </div>
+            </td>
             <td align="center"><@s.property value="#geneResult.unigene" /></td>
         </tr>
         </@s.iterator>

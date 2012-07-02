@@ -161,12 +161,22 @@ public class SearchAction extends DMBaseAction {
     /**
      * genbank link
      */
-    private String genBankLink;
+    private String geneBankLink;
 
     /**
      * ensembl link
      */
     private String ensemblLink;
+
+    /**
+     * Entrez Id link
+     */
+    private String entrezIdLink;
+
+    /**
+     * Refseq Id link
+     */
+    private String refseqIdLink;
 
 
     // For searching result csv file exporting
@@ -279,7 +289,9 @@ public class SearchAction extends DMBaseAction {
 
     private void loadResourceLinks() {
         this.ensemblLink = this.appSetting.getPropValue(AppPropSettings.ENSEMBL_SUMMARY_LINK);
-        this.genBankLink = this.appSetting.getPropValue(AppPropSettings.GENBANK_SUMMARY_LINK);
+        this.geneBankLink = this.appSetting.getPropValue(AppPropSettings.GENBANK_SUMMARY_LINK);
+        this.entrezIdLink = this.appSetting.getPropValue(AppPropSettings.ENTREZ_ID_LINK);
+        this.refseqIdLink = this.appSetting.getPropValue(AppPropSettings.REFSEQ_ID_LINK);
     }
 
     private void populateINFTypes() {
@@ -1068,12 +1080,12 @@ public class SearchAction extends DMBaseAction {
         this.conditionLoaded = conditionLoaded;
     }
 
-    public String getGenBankLink() {
-        return genBankLink;
+    public String getGeneBankLink() {
+        return geneBankLink;
     }
 
-    public void setGenBankLink(String genBankLink) {
-        this.genBankLink = genBankLink;
+    public void setGeneBankLink(String geneBankLink) {
+        this.geneBankLink = geneBankLink;
     }
 
     public String getEnsemblLink() {
@@ -1082,6 +1094,22 @@ public class SearchAction extends DMBaseAction {
 
     public void setEnsemblLink(String ensemblLink) {
         this.ensemblLink = ensemblLink;
+    }
+
+    public String getEntrezIdLink() {
+        return entrezIdLink;
+    }
+
+    public void setEntrezIdLink(String entrezIdLink) {
+        this.entrezIdLink = entrezIdLink;
+    }
+
+    public String getRefseqIdLink() {
+        return refseqIdLink;
+    }
+
+    public void setRefseqIdLink(String refseqIdLink) {
+        this.refseqIdLink = refseqIdLink;
     }
 
     public String getContentType() {
