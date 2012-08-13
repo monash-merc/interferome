@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011, Monash e-Research Centre
  * (Monash University, Australia)
  * All rights reserved.
- *
+ *                                                       S
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright
@@ -50,10 +50,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -178,6 +175,11 @@ public class SearchAction extends DMBaseAction {
      */
     private String refseqIdLink;
 
+    /**
+     * GO link
+     */
+    private String goLink;
+
 
     // For searching result csv file exporting
     private String contentType;
@@ -209,6 +211,30 @@ public class SearchAction extends DMBaseAction {
     private Pagination<Gene> genePagination;
 
     /**
+     * TFSite Search Results
+     */
+
+    private HashMap<String, List<TFSite>> tfSiteList;
+
+    /**
+     *
+     */
+
+    private List<List<Object[]>> ontologyList;
+
+    /**
+     *
+     */
+
+    private List<Object[]> chromosomeList;
+
+    /**
+     *
+     */
+
+    private Object[] subtypeList;
+
+    /**
      * Search Type: 1. gene,  2. data, 3. geneOntology, 4. chromosome, 5. transcript, 6. subtype
      */
     private String searchType;
@@ -226,7 +252,7 @@ public class SearchAction extends DMBaseAction {
 
     private static final String DATA_TYPE = "data";
 
-    private static final String GO_TYPE = "geneontoloty";
+    private static final String GO_TYPE = "geneontology";
 
     private static final String CHROM_TYPE = "chromosome";
 
@@ -292,6 +318,7 @@ public class SearchAction extends DMBaseAction {
         this.geneBankLink = this.appSetting.getPropValue(AppPropSettings.GENBANK_SUMMARY_LINK);
         this.entrezIdLink = this.appSetting.getPropValue(AppPropSettings.ENTREZ_ID_LINK);
         this.refseqIdLink = this.appSetting.getPropValue(AppPropSettings.REFSEQ_ID_LINK);
+        this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
     }
 
     private void populateINFTypes() {
@@ -478,6 +505,167 @@ public class SearchAction extends DMBaseAction {
         return SUCCESS;
     }
 
+    public String searchOntology() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data by pagination
+            ontologyList = this.searchDataService.searchOntology(searchBean, pageNo, pageSize, orderBy, orderByType);
+
+            //set the searched flag as true
+            searched = true;
+            searchType = GO_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.data.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    public String searchTFSite() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data
+            List<Object[]> results = this.searchDataService.searchTFSite(searchBean, pageNo, pageSize, orderBy, orderByType);
+
+            //Convert results into Hash of object[x][4] with gene as hash and
+            //start, end, core match, matrix match ad
+
+            tfSiteList = new HashMap<String, List<TFSite>>();
+
+            for (Object[] row : results) {
+                String geneName = ((Gene)row[0]).getGeneName();
+                if(tfSiteList.containsKey(geneName)){
+                    List<TFSite> existingResults = tfSiteList.get(geneName);
+                    existingResults.add((TFSite)row[1]);
+                }
+                else{
+                    List<TFSite> newTFSiteList = new ArrayList<TFSite>();
+                    newTFSiteList.add((TFSite)row[1]);
+                    tfSiteList.put(geneName, newTFSiteList);
+                }
+            }
+
+            System.out.println("TF Site Size: " + tfSiteList.size());
+
+            //set the searched flag as true
+            searched = true;
+            searchType = TRANS_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.data.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    @SuppressWarnings("unchecked")
+    public String searchChromosome() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data by pagination
+            chromosomeList = this.searchDataService.searchChromosome(searchBean, pageNo, pageSize, orderBy, orderByType);
+            System.out.println("Chromosome List Size: " + chromosomeList.size());
+
+
+
+            //set the searched flag as true
+            searched = true;
+            searchType = CHROM_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.data.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    @SuppressWarnings("unchecked")
+    public String searchSubtypes() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data by pagination
+            //subtypeList = this.searchDataService.searchSubtypes(searchBean, pageNo, pageSize, orderBy, orderByType);
+            //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
+            subtypeList = new Object[7];
+            subtypeList[0] = 1;
+            subtypeList[1] = 2;
+            subtypeList[2] = 3;
+            subtypeList[3] = 1;
+            subtypeList[4] = 1;
+            subtypeList[5] = 1;
+            subtypeList[6] = 10;
+
+            //set the searched flag as true
+            searched = true;
+            searchType = SUBTYPE_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.data.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
 
     public String exportCsvFile() {
         try {
@@ -1112,6 +1300,14 @@ public class SearchAction extends DMBaseAction {
         this.refseqIdLink = refseqIdLink;
     }
 
+    public String getGoLink() {
+        return goLink;
+    }
+
+    public void setGoLink(String goLink) {
+        this.goLink = goLink;
+    }
+
     public String getContentType() {
         return contentType;
     }
@@ -1174,5 +1370,37 @@ public class SearchAction extends DMBaseAction {
 
     public void setGenePagination(Pagination<Gene> genePagination) {
         this.genePagination = genePagination;
+    }
+
+    public List<List<Object[]>> getOntologyList() {
+        return ontologyList;
+    }
+
+    public void setOntologyList(List<List<Object[]>> ontologyList) {
+        this.ontologyList = ontologyList;
+    }
+
+    public HashMap<String, List<TFSite>> getTfSiteList() {
+        return tfSiteList;
+    }
+
+    public void setTfSiteList(HashMap<String, List<TFSite>> tfSiteList) {
+        this.tfSiteList = tfSiteList;
+    }
+
+    public List<Object[]> getChromosomeList() {
+        return chromosomeList;
+    }
+
+    public void setChromosomeList(List<Object[]> chromosomeList) {
+        this.chromosomeList = chromosomeList;
+    }
+
+    public Object[] getSubtypeList() {
+        return subtypeList;
+    }
+
+    public void setSubtypeList(Object[] subtypeList) {
+        this.subtypeList = subtypeList;
     }
 }

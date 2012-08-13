@@ -17,6 +17,7 @@
 <script type="text/javascript" src="${base}/js/popup_box.js"></script> 
 <script type="text/javascript" src="${base}/js/coin-slider.min.js"></script>
 
+
 <!-- google analytics -->
 <script type="text/javascript">
 

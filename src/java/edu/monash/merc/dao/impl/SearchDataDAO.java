@@ -45,8 +45,7 @@ import org.hibernate.Query;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
@@ -318,6 +317,110 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             return new Pagination<Gene>(startPageNo, recordPerPage, 0);
         }
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+//        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+//
+//        List<String> probes = uniqueProbesPages.getPageResults();
+        //just for testing
+        List<String> probes = new ArrayList<String>();
+        probes.add("A_33_P3277674");
+        probes.add("A_33_P3818959");
+        probes.add("A_23_P105923");
+        probes.add("A_23_P105923");
+
+        if (probes.size() > 0) {
+            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) GROUP BY g.chromosome ORDER BY g.chromosome";
+            Query chrQuery = this.session().createQuery(chrHQL);
+            chrQuery.setParameterList(("probes"), probes);
+
+
+            List<Object[]> chromosomeList = chrQuery.list();
+            return chromosomeList;
+        } else {
+            return new ArrayList<Object[]>();
+        }
+    }
+
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+//        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+//
+//        List<String> probes = uniqueProbesPages.getPageResults();
+        //just for testing
+        List<String> probes = new ArrayList<String>();
+        probes.add("A_33_P3277674");
+        probes.add("A_33_P3818959");
+        probes.add("A_23_P105923");
+        probes.add("A_23_P105923");
+
+       ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
+        if (probes.size() > 0) {
+
+            //Search Cellular
+            String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id";
+            Query goCellularQuery = this.session().createQuery(goCellularHQL);
+            goCellularQuery.setParameterList(("probes"), probes);
+            List<Object[]> goCellularList = goCellularQuery.list();
+            if(goCellularList.size() > 0){
+                goHash.add(goCellularList);
+            }
+
+            //Search Molecular
+            String goMolecularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'molecular_function' GROUP BY o.id";
+            Query goMolecularQuery = this.session().createQuery(goMolecularHQL);
+            goMolecularQuery.setParameterList(("probes"), probes);
+            List<Object[]> goMolecularList = goMolecularQuery.list();
+            if(goMolecularList.size() > 0){
+                goHash.add(goMolecularList);
+            }
+            //Search Biological
+            String goBiologicalHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'biological_process' GROUP BY o.id";
+            Query goBiologicalQuery = this.session().createQuery(goBiologicalHQL);
+            goBiologicalQuery.setParameterList(("probes"), probes);
+            List<Object[]> goBiologicalList = goBiologicalQuery.list();
+            if(goBiologicalList.size() > 0){
+                goHash.add(goBiologicalList);
+            }
+            return goHash;
+        } else {
+            return new ArrayList<List<Object[]>>();
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+//        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+//
+//        List<String> probes = uniqueProbesPages.getPageResults();
+        //just for testing
+        List<String> probes = new ArrayList<String>();
+        probes.add("A_33_P3277674");
+        probes.add("A_33_P3818959");
+        probes.add("A_23_P105923");
+        probes.add("A_23_P105923");
+
+        if (probes.size() > 0) {
+
+            //Search Cellular
+            String goTFHQL = "SELECT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            Query goTFQuery = this.session().createQuery(goTFHQL);
+            goTFQuery.setParameterList(("probes"), probes);
+            List<Object[]> goTFList = goTFQuery.list();
+            return goTFList;
+        } else {
+            return new ArrayList<Object[]>();
+        }
+    }
+
+
 
     @Override
     public Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {

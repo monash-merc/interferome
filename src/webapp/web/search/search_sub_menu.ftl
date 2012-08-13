@@ -4,19 +4,22 @@
         <a class="expand_collapse" href="">Search Conditions</a>
     </div>
     <div class="search_menu_link">
-        <a href="${base}/search/searchData.jspx">Data</a>
+        <a href="${base}/search/searchGene.jspx">Gene Summary</a>
     </div>
     <div class="search_menu_link">
-        <a href="">Ontology</a>
+        <a href="${base}/search/searchData.jspx">Experiment Data</a>
     </div>
     <div class="search_menu_link">
-        <a href="">Transcript</a>
+        <a href="${base}/search/searchOntology.jspx">Ontology Analysis</a>
     </div>
     <div class="search_menu_link">
-        <a href="">Chromosome</a>
+        <a href="${base}/search/searchTFSite.jspx">TF Anaylsis</a>
     </div>
     <div class="search_menu_link">
-        <a href="">IFN Subtype</a>
+        <a href="${base}/search/searchChromosome.jspx">Chromosome</a>
+    </div>
+    <div class="search_menu_link">
+        <a href="${base}/search/searchSubtype.jspx">IFN Subtype</a>
     </div>
     <div style="clear:both"></div>
 </div>

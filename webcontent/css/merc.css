@@ -1677,6 +1677,27 @@ body {
     color: #003766;
 }
 
+.chromosome_result_tab {
+    width: 40%;
+    border: solid 1px #E9E9E9;
+    border-collapse: collapse;
+    color: #212121;
+    font-size: 11px;
+}
+
+.chromosome_result_tab td {
+    border-bottom: solid 1px #E9E9E9;
+    border-right: solid 1px #E9E9E9;
+    padding: 4px;
+}
+
+.chromosome_result_header td {
+    background: none repeat scroll 0 0 #F0F0F0;
+    height: 15px;
+    line-height: 15px;
+    color: #003766;
+}
+
 .remove_td {
     width: 50px;
     text-align: center;
@@ -2080,3 +2101,12 @@ body {
     line-height: 22px;
     text-align: center;
 }
+
+
+
+#tooltip{
+    position : absolute;
+    border : 1px solid gray;
+    background-color : blue;
+    padding : 3px;
+}​

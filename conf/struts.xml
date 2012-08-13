@@ -610,6 +610,30 @@
             <result name="success">/web/search/search.ftl</result>
         </action>
 
+        <action name="searchChromosome" class="search.searchAction" method="searchChromosome">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchOntology" class="search.searchAction" method="searchOntology">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchTFSite" class="search.searchAction" method="searchTFSite">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchSubtype" class="search.searchAction" method="searchSubtypes">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
         <!-- AJAX call to retrieve the subtypes based on which type is selected -->
         <action name="findSubType" class="search.searchAction" method="findSubType">
             <result name="success" type="json">

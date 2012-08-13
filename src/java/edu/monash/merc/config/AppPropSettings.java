@@ -146,6 +146,8 @@ public class AppPropSettings {
 
     public static String ENSEMBL_SUMMARY_LINK = "ensembl.summay.link";
 
+    public static String GO_LINK = "reference.go.link";
+
     public static String GENBANK_SUMMARY_LINK = "genbank.summary.link";
 
     //experiment reference links

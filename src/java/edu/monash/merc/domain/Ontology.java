@@ -60,10 +60,13 @@ public class Ontology extends Domain {
     @Column(name = "go_term_name")
     private String goTermName;
 
-
     @Basic
     @Column(name = "go_term_definition", columnDefinition = "longtext")
     private String goTermDefinition;
+
+    @Basic
+    @Column(name = "go_count", columnDefinition = "int")
+    private String goCount;
 
     @ManyToOne
     @JoinColumn(referencedColumnName = "id", nullable = false, name = "go_domain_id")
@@ -107,5 +110,13 @@ public class Ontology extends Domain {
 
     public void setGoDomain(GoDomain goDomain) {
         this.goDomain = goDomain;
+    }
+
+    public String getGoCount() {
+        return goCount;
+    }
+
+    public void setGoCount(String goCount) {
+        this.goCount = goCount;
     }
 }

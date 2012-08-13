@@ -104,6 +104,34 @@
                 </div>
             </@s.if>
         </@s.if>
+        <@s.if test="%{searchType == 'transcript'}">
+            <@s.if test="%{tfSiteList != null}">
+                <div class="search_results_div" id='data'>
+                    <#include "../search/search_tfsite_result.ftl" />
+                </div>
+            </@s.if>
+        </@s.if>
+        <@s.if test="%{searchType == 'geneontology'}">
+            <@s.if test="%{ontologyList != null}">
+                <div class="search_results_div" id='data'>
+                    <#include "../search/search_ontology_result.ftl" />
+                </div>
+            </@s.if>
+        </@s.if>
+        <@s.if test="%{searchType == 'chromosome'}">
+            <@s.if test="%{chromosomeList != null}">
+                <div class="search_results_div" id='data'>
+                    <#include "../search/search_chromosome_result.ftl" />
+                </div>
+            </@s.if>
+        </@s.if>
+        <@s.if test="%{searchType == 'subtype'}">
+            <@s.if test="%{subtypeList != null}">
+                <div class="search_results_div" id='data'>
+                    <#include "../search/search_subtype_result.ftl" />
+                </div>
+            </@s.if>
+        </@s.if>
     </@s.if>
 
     </div>

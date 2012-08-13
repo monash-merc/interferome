@@ -39,6 +39,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * SearchDataService Service Implementation class
  *
@@ -71,4 +74,20 @@ public class SearchDataServiceImpl implements SearchDataService {
     public Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         return this.searchDataDao.searchGenes(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
     }
+
+    @Override
+    public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchChromosome(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchTFSite(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchOntology(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
 }
