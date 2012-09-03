@@ -8,7 +8,7 @@
 
 function PromoterImage(){
     //This is the background
-    paper = new Raphael(document.getElementById('canvas_container'), 1000, 300);
+    paper = new Raphael(document.getElementById('promoter_container'), 1000, 300);
     //
 
     var scale = paper.path("M 30 25 l 700 0");
@@ -43,6 +43,9 @@ function PromoterImage(){
         }
 
     })
+
+    document.getElementById("tf_table").style.visibility="hidden";
+
 }
 
 

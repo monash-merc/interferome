@@ -2,7 +2,7 @@
     Search Results
 </div>
 <div class="search_table_div">
-    <div id="canvas_container"></div>
+    <div id="promoter_container"></div>
     <div id="tf_table">
         <table id="tfsites">
                         <tr>

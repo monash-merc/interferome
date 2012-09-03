@@ -26,42 +26,51 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.service;
+package edu.monash.merc.domain;
 
-import edu.monash.merc.common.page.Pagination;
-import edu.monash.merc.domain.Data;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.dto.SearchBean;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 /**
- * SearchDataService Service Interface
- *
- * @author Simon Yu - Xiaoming.Yu@monash.edu
- * @version 2.0
+ * @author Simon Yu
+ * @version 1.0
+ * @email Xiaoming.Yu@monash.edu
+ * @since 1.0
+ *        <p/>
+ *        Date: 26/06/12
+ *        Time: 10:24 AM
  */
-public interface SearchDataService {
-    Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+@Entity
+@Table(name = "Tissue")
+public class Tissue extends Domain {
+    @Id
+    @GeneratedValue(generator = "tissue_pk_seq")
+    @GenericGenerator(name = "tissue_pk_seq", strategy = "seqhilo")
+    @Column(name = "id", nullable = false)
+    private long id;
 
-    Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    @Basic
+    @Column(name = "display_name")
+    private String tissue;
 
-    Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    public String getTissue() {
+        return tissue;
+    }
 
-    List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    public void setTissue(String tissue) {
+        this.tissue = tissue;
+    }
 
-    List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    public long getId() {
+        return id;
+    }
 
-    List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
-    Object[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    public void setId(long id) {
+        this.id = id;
+    }
 
 }

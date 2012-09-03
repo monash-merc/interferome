@@ -30,11 +30,7 @@ package edu.monash.merc.dao.impl;
 
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
-import edu.monash.merc.domain.Data;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.GeneOntology;
-import edu.monash.merc.domain.Ontology;
-import edu.monash.merc.domain.GoDomain;
+import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -272,15 +268,16 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-//        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-//
-//        List<String> probes = uniqueProbesPages.getPageResults();
         //just for testing
-         List<String> probes = new ArrayList<String>();
+        List<String> probes = new ArrayList<String>();
         probes.add("A_33_P3277674");
         probes.add("A_33_P3818959");
         probes.add("A_23_P105923");
         probes.add("A_23_P105923");
+
+        //Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        //List<String> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             //  String geneBaseHQL = "SELECT g FROM gene g INNER JOIN probe_gene pb ON g.id = pb.gene_id  INNER JOIN probe p on p.id = pb.probe_id " +
@@ -318,18 +315,37 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
     }
 
+
     @SuppressWarnings("unchecked")
     @Override
-    public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-//        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-//
-//        List<String> probes = uniqueProbesPages.getPageResults();
-        //just for testing
+    public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        //Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        //List<String> probes = uniqueProbesPages.getPageResults();
+
         List<String> probes = new ArrayList<String>();
         probes.add("A_33_P3277674");
         probes.add("A_33_P3818959");
         probes.add("A_23_P105923");
         probes.add("A_23_P105923");
+
+        ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
+        if (probes.size() > 0) {
+                String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g, te";
+                Query teQuery = this.session().createQuery(teHQL);
+                teQuery.setParameterList(("probes"), probes);
+                return teQuery.list();
+        } else {
+            return new ArrayList<TissueExpression>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) GROUP BY g.chromosome ORDER BY g.chromosome";
@@ -344,20 +360,96 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Integer[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        List<String> probes = uniqueProbesPages.getPageResults();
+        //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
+        Integer[] types = {0, 0, 0, 0, 0, 0, 0};
+        if (probes.size() > 0) {
+            //Get Type 1
+            String t1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p INNER JOIN IFNType i WHERE p.probeId IN (:probes) AND i.typeName = 'I' GROUP BY g.ensgAccession";
+            Query t1Query = this.session().createQuery(t1);
+            t1Query.setParameterList(("probes"), probes);
+            List<Gene> t1GeneList = t1Query.list();
+
+            //Get Type 2
+            String t2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p INNER JOIN IFNType i WHERE p.probeId IN (:probes) AND i.typeName = 'II' GROUP BY g.ensgAccession";
+            Query t2Query = this.session().createQuery(t2);
+            t2Query.setParameterList(("probes"), probes);
+            List<Gene> t2GeneList = t2Query.list();
+
+
+            //Get Type 3
+            String t3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p INNER JOIN IFNType i WHERE p.probeId IN (:probes) AND i.typeName = 'III' GROUP BY g.ensgAccession";
+            Query t3Query = this.session().createQuery(t3);
+            t3Query.setParameterList(("probes"), probes);
+            List<Gene> t3GeneList = t3Query.list();
+
+
+            //Count Unique members of each list
+            //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
+            //T1T2T3
+            types[6] = overlapping(overlapping(t1GeneList, t2GeneList), t3GeneList).size();
+            //T2T3
+            types[5] = overlapping(t2GeneList, t3GeneList).size() - types[6];
+            //T1T3
+            types[4] = overlapping(t1GeneList, t3GeneList).size() - types[6];
+            //T1T2
+            types[3] = overlapping(t1GeneList, t2GeneList).size() - types[6];
+            //T3   -> - T123 - T13 - T23
+            types[2] = t3GeneList.size() - types[6] - types[4] - types[5];
+            //T2  -> - T123 - T12 - T23
+            types[1] = t2GeneList.size() - types[6] - types[3] - types[5];
+            //T1  -> - T123 - T12 - T13
+            types[0] = t1GeneList.size() - types[6] - types[3] - types[4];
+        }
+        return types;
+
+
+    }
+
+
+    //Convenience method for returning count of values overlapping from two lists.
+    private List<Gene> overlapping(List<Gene> g1, List<Gene> g2){
+        ArrayList<Gene> overlapList = new ArrayList<Gene>();
+        for (Gene g : g1) {
+            if(g2.contains(g)){
+                overlapList.add(g);
+            }
+        }
+        return overlapList;
+    }
 
 
     @SuppressWarnings("unchecked")
     @Override
+    public List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
+
+        if (probes.size() > 0) {
+            String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) GROUP BY g.chromosome ORDER BY g.chromosome";
+            Query chrQuery = this.session().createQuery(chrHQL);
+            chrQuery.setParameterList(("probes"), probes);
+
+
+            List<Gene> chromosomeGeneList = chrQuery.list();
+            return chromosomeGeneList;
+        } else {
+            return new ArrayList<Gene>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-//        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-//
-//        List<String> probes = uniqueProbesPages.getPageResults();
-        //just for testing
-        List<String> probes = new ArrayList<String>();
-        probes.add("A_33_P3277674");
-        probes.add("A_33_P3818959");
-        probes.add("A_23_P105923");
-        probes.add("A_23_P105923");
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
 
        ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
         if (probes.size() > 0) {
@@ -397,15 +489,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-//        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-//
-//        List<String> probes = uniqueProbesPages.getPageResults();
-        //just for testing
-        List<String> probes = new ArrayList<String>();
-        probes.add("A_33_P3277674");
-        probes.add("A_33_P3818959");
-        probes.add("A_23_P105923");
-        probes.add("A_23_P105923");
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
 
         if (probes.size() > 0) {
 

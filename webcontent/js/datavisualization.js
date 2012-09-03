@@ -1,7 +1,12 @@
 window.onload = function() {
-    if(document.getElementById('canvas_container')){
+    if(document.getElementById('promoter_container')){
         var pi = new PromoterImage();
     }
+
+    if(document.getElementById('chromosome_container')){
+        var ci = new ChromosomeImage();
+    }
+
 
     if(document.getElementById('venn')){
         drawVenn();

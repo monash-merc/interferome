@@ -132,6 +132,11 @@
                 </div>
             </@s.if>
         </@s.if>
+        <@s.if test="%{searchType == 'tissueexp'}">
+                <div class="search_results_div" id='data'>
+                    <#include "../search/search_tissue.ftl" />
+                </div>
+        </@s.if>
     </@s.if>
 
     </div>

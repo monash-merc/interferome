@@ -32,6 +32,7 @@ import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.impl.SearchDataDAO;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.service.SearchDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,6 +83,18 @@ public class SearchDataServiceImpl implements SearchDataService {
     }
 
     @Override
+    public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchTissueExpression(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchChromosomeGeneList(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+
+
+    @Override
     public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         return this.searchDataDao.searchTFSite(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
     }
@@ -88,6 +102,12 @@ public class SearchDataServiceImpl implements SearchDataService {
     @Override
     public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         return this.searchDataDao.searchOntology(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+
+    @Override
+    public Object[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchSubtypes(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
     }
 
 }

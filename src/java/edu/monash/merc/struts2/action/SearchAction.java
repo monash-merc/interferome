@@ -232,6 +232,18 @@ public class SearchAction extends DMBaseAction {
      *
      */
 
+    private List<Gene> chromosomeGeneList;
+
+    /**
+     *
+     */
+
+    private List<TissueExpression> tissueExpressionList;
+
+    /**
+     *
+     */
+
     private Object[] subtypeList;
 
     /**
@@ -259,6 +271,8 @@ public class SearchAction extends DMBaseAction {
     private static final String TRANS_TYPE = "transcript";
 
     private static final String SUBTYPE_TYPE = "subtype";
+
+    private static final String TISSUE_EXP_TYPE = "tissueexp";
 
     public void setSearchDataService(SearchDataService searchDataService) {
         this.searchDataService = searchDataService;
@@ -590,7 +604,7 @@ public class SearchAction extends DMBaseAction {
     }
 
     @SuppressWarnings("unchecked")
-    public String searchChromosome() {
+     public String searchChromosome() {
         try {
             //get the logged in user if existed
             user = getCurrentUser();
@@ -606,7 +620,7 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             chromosomeList = this.searchDataService.searchChromosome(searchBean, pageNo, pageSize, orderBy, orderByType);
-            System.out.println("Chromosome List Size: " + chromosomeList.size());
+            chromosomeGeneList = this.searchDataService.searchChromosomeGeneList(searchBean, pageNo, pageSize, orderBy, orderByType);
 
 
 
@@ -625,6 +639,43 @@ public class SearchAction extends DMBaseAction {
         return SUCCESS;
     }
 
+    public String searchTissueExpression() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data by pagination
+            List<TissueExpression> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
+            Iterator i = te.iterator();
+            while(i.hasNext()){
+
+            }
+
+            //set the searched flag as true
+            searched = true;
+            searchType = TISSUE_EXP_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.data.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+
     @SuppressWarnings("unchecked")
     public String searchSubtypes() {
         try {
@@ -641,16 +692,8 @@ public class SearchAction extends DMBaseAction {
             }
 
             //query the data by pagination
-            //subtypeList = this.searchDataService.searchSubtypes(searchBean, pageNo, pageSize, orderBy, orderByType);
             //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
-            subtypeList = new Object[7];
-            subtypeList[0] = 1;
-            subtypeList[1] = 2;
-            subtypeList[2] = 3;
-            subtypeList[3] = 1;
-            subtypeList[4] = 1;
-            subtypeList[5] = 1;
-            subtypeList[6] = 10;
+            subtypeList = this.searchDataService.searchSubtypes(searchBean, pageNo, pageSize, orderBy, orderByType);
 
             //set the searched flag as true
             searched = true;
@@ -1396,11 +1439,27 @@ public class SearchAction extends DMBaseAction {
         this.chromosomeList = chromosomeList;
     }
 
+    public List<Gene> getChromosomeGeneList() {
+        return chromosomeGeneList;
+    }
+
+    public void setChromosomeGeneList(List<Gene> chromosomeGeneList) {
+        this.chromosomeGeneList = chromosomeGeneList;
+    }
+
     public Object[] getSubtypeList() {
         return subtypeList;
     }
 
     public void setSubtypeList(Object[] subtypeList) {
         this.subtypeList = subtypeList;
+    }
+
+    public List<TissueExpression> getTissueExpressionList() {
+        return tissueExpressionList;
+    }
+
+    public void setTissueExpressionList(List<TissueExpression> tissueExpressioList) {
+        this.tissueExpressionList = tissueExpressioList;
     }
 }

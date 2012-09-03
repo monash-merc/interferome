@@ -21,6 +21,9 @@
     <div class="search_menu_link">
         <a href="${base}/search/searchSubtype.jspx">IFN Subtype</a>
     </div>
+    <div class="search_menu_link">
+        <a href="${base}/search/searchTissueExpression.jspx">Basal Expression</a>
+    </div>
     <div style="clear:both"></div>
 </div>
 <br/>
