@@ -45,7 +45,7 @@ import java.util.List;
  *        Time: 10:24 AM
  */
 @Entity
-@Table(name = "Tissue")
+@Table(name = "tissue")
 public class Tissue extends Domain {
     @Id
     @GeneratedValue(generator = "tissue_pk_seq")
