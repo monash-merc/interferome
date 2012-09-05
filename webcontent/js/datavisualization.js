@@ -7,6 +7,10 @@ window.onload = function() {
         var ci = new ChromosomeImage();
     }
 
+    if(document.getElementById('tissueexp_container')){
+        new HeatMap();
+    }
+
 
     if(document.getElementById('venn')){
         drawVenn();

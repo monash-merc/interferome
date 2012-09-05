@@ -33,6 +33,7 @@ import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.TissueExpression;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.SearchBean;
 
 import java.util.ArrayList;

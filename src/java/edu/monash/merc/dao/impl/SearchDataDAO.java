@@ -269,15 +269,15 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @Override
     public Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         //just for testing
-        List<String> probes = new ArrayList<String>();
-        probes.add("A_33_P3277674");
-        probes.add("A_33_P3818959");
-        probes.add("A_23_P105923");
-        probes.add("A_23_P105923");
+        //List<String> probes = new ArrayList<String>();
+        //probes.add("A_33_P3277674");
+        //probes.add("A_33_P3818959");
+        //probes.add("A_23_P105923");
+        //probes.add("A_23_P105923");
 
-        //Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        //List<String> probes = uniqueProbesPages.getPageResults();
+        List<String> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             //  String geneBaseHQL = "SELECT g FROM gene g INNER JOIN probe_gene pb ON g.id = pb.gene_id  INNER JOIN probe p on p.id = pb.probe_id " +
@@ -319,15 +319,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        //Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        //List<String> probes = uniqueProbesPages.getPageResults();
-
-        List<String> probes = new ArrayList<String>();
-        probes.add("A_33_P3277674");
-        probes.add("A_33_P3818959");
-        probes.add("A_23_P105923");
-        probes.add("A_23_P105923");
+        List<String> probes = uniqueProbesPages.getPageResults();
 
         ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {

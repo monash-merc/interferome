@@ -32,6 +32,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.*;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -238,7 +239,7 @@ public class SearchAction extends DMBaseAction {
      *
      */
 
-    private List<TissueExpression> tissueExpressionList;
+    private List<GeneExpressionRecord> tissueExpressionList;
 
     /**
      *
@@ -653,11 +654,21 @@ public class SearchAction extends DMBaseAction {
                 return ERROR;
             }
 
-            //query the data by pagination
+            //Get the Tissue Expression
             List<TissueExpression> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
+            this.tissueExpressionList = new ArrayList<GeneExpressionRecord>();
             Iterator i = te.iterator();
+            HashMap<String, Integer> genes = new HashMap<String, Integer>();
             while(i.hasNext()){
-
+                   TissueExpression t = (TissueExpression)i.next();
+                   System.out.println(t.getGene().getEnsgAccession());
+                   if(genes.containsKey(t.getGene().getEnsgAccession())){
+                        this.tissueExpressionList.get(genes.get(t.getGene().getEnsgAccession())).addTissueExpression(t);
+                   }
+                   else{
+                       this.tissueExpressionList.add(new GeneExpressionRecord(t));
+                       genes.put(t.getGene().getEnsgAccession(), this.tissueExpressionList.size()-1);
+                   }
             }
 
             //set the searched flag as true
@@ -1455,11 +1466,11 @@ public class SearchAction extends DMBaseAction {
         this.subtypeList = subtypeList;
     }
 
-    public List<TissueExpression> getTissueExpressionList() {
+    public List<GeneExpressionRecord> getTissueExpressionList() {
         return tissueExpressionList;
     }
 
-    public void setTissueExpressionList(List<TissueExpression> tissueExpressioList) {
+    public void setTissueExpressionList(List<GeneExpressionRecord> tissueExpressioList) {
         this.tissueExpressionList = tissueExpressioList;
     }
 }
