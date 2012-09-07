@@ -8,7 +8,8 @@
 
 function PromoterImage(){
     //This is the background
-    paper = new Raphael(document.getElementById('promoter_container'), 1000, 300);
+    var rowCount = countRows()
+    paper = new Raphael(document.getElementById('promoter_container'), 1000, 50+(87.5*rowCount));
     //
 
     var scale = paper.path("M 30 25 l 700 0");
@@ -44,8 +45,18 @@ function PromoterImage(){
 
     })
 
-    document.getElementById("tf_table").style.visibility="hidden";
+    document.getElementById("tf_table").style.display="none";
 
+}
+
+function countRows(){
+    var count = 0;
+    $('#tfsites tr').each(function() {
+
+        count++;
+
+    })
+    return count;
 }
 
 

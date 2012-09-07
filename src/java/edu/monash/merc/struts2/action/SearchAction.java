@@ -490,6 +490,8 @@ public class SearchAction extends DMBaseAction {
             } else {
                 viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
             }
+            orderBy = "geneName";
+            orderByType = ActionConts.ASC_SORT_TYPE;
             //validation failed
             if (!validConds()) {
                 //sub type post process

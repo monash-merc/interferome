@@ -35,6 +35,7 @@ import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
 import edu.monash.merc.repository.ISearchDataRepository;
+import edu.monash.merc.service.ProbeService;
 import edu.monash.merc.util.MercUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -342,7 +343,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         List<String> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
-            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) GROUP BY g.chromosome ORDER BY g.chromosome";
+            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
             Query chrQuery = this.session().createQuery(chrHQL);
             chrQuery.setParameterList(("probes"), probes);
 
@@ -362,24 +363,42 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
         Integer[] types = {0, 0, 0, 0, 0, 0, 0};
         if (probes.size() > 0) {
-            //Get Type 1
-            String t1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p INNER JOIN IFNType i WHERE p.probeId IN (:probes) AND i.typeName = 'I' GROUP BY g.ensgAccession";
-            Query t1Query = this.session().createQuery(t1);
-            t1Query.setParameterList(("probes"), probes);
-            List<Gene> t1GeneList = t1Query.list();
+            //Get Type 1 Probes
+            String tp1 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE r.probeId IN (:probes) AND i.typeName = 'I'";
+            Query tp1Query = this.session().createQuery(tp1);
+            tp1Query.setParameterList(("probes"), probes);
+            List<Integer> t1ProbeList = tp1Query.list();
+            //Get Gene
+            String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes WHERE p.probeId IN (:t1ProbeList) GROUP BY g";
+            Query tg1Query = this.session().createQuery(tg1);
+            tg1Query.setParameterList(("probes"), probes);
+            List<Gene> t1GeneList = tg1Query.list();
 
-            //Get Type 2
-            String t2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p INNER JOIN IFNType i WHERE p.probeId IN (:probes) AND i.typeName = 'II' GROUP BY g.ensgAccession";
-            Query t2Query = this.session().createQuery(t2);
-            t2Query.setParameterList(("probes"), probes);
-            List<Gene> t2GeneList = t2Query.list();
+            //Get Type 2 Probes
+            String tp2 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE r.probeId IN (:probes) AND i.typeName = 'II'";
+            Query tp2Query = this.session().createQuery(tp1);
+            tp1Query.setParameterList(("probes"), probes);
+            List<Integer> t2ProbeList = tp1Query.list();
+            //Get Gene
+            String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes WHERE p.probeId IN (:t2ProbeList) GROUP BY g";
+            Query tg2Query = this.session().createQuery(tg1);
+            tg1Query.setParameterList(("probes"), probes);
+            List<Gene> t2GeneList = tg1Query.list();
 
 
-            //Get Type 3
-            String t3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p INNER JOIN IFNType i WHERE p.probeId IN (:probes) AND i.typeName = 'III' GROUP BY g.ensgAccession";
-            Query t3Query = this.session().createQuery(t3);
-            t3Query.setParameterList(("probes"), probes);
-            List<Gene> t3GeneList = t3Query.list();
+            //Get Type III Probes
+            String tp3 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE r.probeId IN (:probes) AND i.typeName = 'III'";
+            Query tp3Query = this.session().createQuery(tp1);
+            tp1Query.setParameterList(("probes"), probes);
+            List<Integer> t3ProbeList = tp1Query.list();
+            //Get Gene
+            String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes WHERE p.probeId IN (:t3ProbeList) GROUP BY g";
+            Query tg3Query = this.session().createQuery(tg1);
+            tg1Query.setParameterList(("probes"), probes);
+            List<Gene> t3GeneList = tg1Query.list();
 
 
             //Count Unique members of each list
@@ -426,7 +445,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
 
         if (probes.size() > 0) {
-            String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) GROUP BY g.chromosome ORDER BY g.chromosome";
+            String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g.chromosome";
             Query chrQuery = this.session().createQuery(chrHQL);
             chrQuery.setParameterList(("probes"), probes);
 
@@ -990,9 +1009,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //create all or conditions
         List<String> orConds = createOrCondsWithDs(threeIdQuery, upDownQuery, dsIdQuery);
 
+
         //count data query
         StringBuilder countQL = new StringBuilder();
-        String countBaseHQL = "SELECT count(distinct(rep.probeId)) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        String countBaseHQL = "SELECT count(distinct rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
         countQL.append(countBaseHQL);
 
         //probe pagination query
@@ -1217,7 +1237,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count report DISTINCT query
         StringBuilder countQL = new StringBuilder();
-        String countBase = "SELECT count(distinct(rep.probeId)) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        String countBase = "SELECT count(distinct rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
         countQL.append(countBase);
 
         //probe pagination query

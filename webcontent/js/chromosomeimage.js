@@ -27,7 +27,7 @@ function ChromosomeImage(){
 
 
     //Human Chromosome
-    var msChrom = new Object(); // or just {}
+    var hsChrom = new Object(); // or just {}
     hsChrom['1'] = new Array(121, 246);
     hsChrom['2'] = new Array(92, 244);
     hsChrom['3'] = new Array(90, 200);
@@ -55,28 +55,28 @@ function ChromosomeImage(){
 
 
     //Mouse Chromosome
-    var hsChrom = new Object(); // or just {}
-    msChrom['1'] = new Array(198, 198);
-    msChrom['2'] = new Array(182, 182);
-    msChrom['3'] = new Array(160, 160);
-    msChrom['4'] = new Array(153, 153);
-    msChrom['5'] = new Array(153, 153);
-    msChrom['6'] = new Array(150, 150);
-    msChrom['7'] = new Array(153, 153);
-    msChrom['8'] = new Array(132, 132);
-    msChrom['9'] = new Array(125, 125);
-    msChrom['10'] = new Array(130, 130);
-    msChrom['11'] = new Array(122, 122);
-    msChrom['12'] = new Array(122, 122);
-    msChrom['13'] = new Array(121, 121);
-    msChrom['14'] = new Array(126, 126);
-    msChrom['15'] = new Array(104, 104);
-    msChrom['16'] = new Array(99, 99);
-    msChrom['17'] = new Array(96, 96);
-    msChrom['18'] = new Array(91, 91);
-    msChrom['19'] = new Array(62, 62);
-    msChrom['X'] = new Array(167, 167);
-    msChrom['Y'] = new Array(16, 16);
+    var mmChrom = new Object(); // or just {}
+    mmChrom['1'] = new Array(198, 198);
+    mmChrom['2'] = new Array(182, 182);
+    mmChrom['3'] = new Array(160, 160);
+    mmChrom['4'] = new Array(153, 153);
+    mmChrom['5'] = new Array(153, 153);
+    mmChrom['6'] = new Array(150, 150);
+    mmChrom['7'] = new Array(153, 153);
+    mmChrom['8'] = new Array(132, 132);
+    mmChrom['9'] = new Array(125, 125);
+    mmChrom['10'] = new Array(130, 130);
+    mmChrom['11'] = new Array(122, 122);
+    mmChrom['12'] = new Array(122, 122);
+    mmChrom['13'] = new Array(121, 121);
+    mmChrom['14'] = new Array(126, 126);
+    mmChrom['15'] = new Array(104, 104);
+    mmChrom['16'] = new Array(99, 99);
+    mmChrom['17'] = new Array(96, 96);
+    mmChrom['18'] = new Array(91, 91);
+    mmChrom['19'] = new Array(62, 62);
+    mmChrom['X'] = new Array(167, 167);
+    mmChrom['Y'] = new Array(16, 16);
 
 
 
@@ -163,7 +163,9 @@ function ChromosomeImage(){
 
                         if (c==4){
                             var link = cell_val;
-                            if (chrome_name==chromosome && start != null){
+                            //Only Draws Human Chromosomes
+
+                            if (chrome_name==chromosome && start != null && link.indexOf("ENSG") != -1 ){
 
                                 var line_height = 300 - start;
                                 var gd = paper.path("M "+spacer+" "+line_height+" l 10 0");
@@ -196,7 +198,7 @@ function ChromosomeImage(){
     }
 
     //Successful Drawing of Chromosomes hide data table
-    document.getElementById("gene_table").style.visibility="hidden";
+    document.getElementById("gene_table").style.display="none";
 }
 
 function linkOnClick(gene_name){
