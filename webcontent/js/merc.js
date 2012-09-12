@@ -624,8 +624,8 @@ function createUpRange() {
     var upInput = "<table>" +
         "<tr>" +
         "<td width='50'>Up: <input id='upProvided' type='hidden' value='true' name='searchBean.upProvided'></td>" +
-        "<td><input id='upValue' class='search_input' type='text' value='1.0' name='searchBean.upValue'></td>" +
-        "<td class='search_unit'>(value &gt;= 1.0)</td>" +
+        "<td><input id='upValue' class='search_input' type='text' value='2.0' name='searchBean.upValue'></td>" +
+        "<td class='search_unit'>(value &gt;= 2.0)</td>" +
         "<td><img src='../images/delete.png' id='remove_up' class='remove_image' /></td>" +
         "</tr>" +
         "</table>";
@@ -637,8 +637,8 @@ function createDownRange() {
     var downInput = "<table>" +
         "<tr>" +
         "<td width='50'>Down: <input id='downProvided' type='hidden' value='true' name='searchBean.downProvided'></td>" +
-        "<td><input id='downValue' class='search_input' type='text' value='1.0' name='searchBean.downValue'></td>" +
-        "<td class='search_unit'>(value &gt;= 1.0)</td>" +
+        "<td><input id='downValue' class='search_input' type='text' value='2.0' name='searchBean.downValue'></td>" +
+        "<td class='search_unit'>(value &gt;= 2.0)</td>" +
         "<td><img id='remove_down' class='remove_image' src='../images/delete.png'></td>" +
         "</tr>" +
         "</table>";

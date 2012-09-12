@@ -144,7 +144,7 @@
                             <tr>
                                 <td width="50">Up: <@s.hidden name="searchBean.upProvided" id="upProvided"/></td>
                                 <td><@s.textfield name="searchBean.upValue" id="upValue" cssClass="search_input"/></td>
-                                <td class="search_unit">(value >= 1.0)</td>
+                                <td class="search_unit">(value >= 2.0)</td>
                                 <td><img src="${base}/images/delete.png" id="remove_up" class="remove_image" /></td>
                             </tr>
                         </table>
@@ -161,7 +161,7 @@
                             <tr>
                                 <td width="50">Down: <@s.hidden name="searchBean.downProvided" id="downProvided" /></td>
                                 <td><@s.textfield name="searchBean.downValue" id="downValue" cssClass="search_input"/></td>
-                                <td class="search_unit">(value >= 1.0)</td>
+                                <td class="search_unit">(value >= 2.0)</td>
                                 <td><img src="${base}/images/delete.png" id="remove_down" class="remove_image" /></td>
                             </tr>
                         </table>
