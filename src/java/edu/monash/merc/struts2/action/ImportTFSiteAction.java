@@ -95,7 +95,6 @@ public class ImportTFSiteAction extends DMBaseAction {
         try {
             //get the current user, only the admins who can import the report into system
             user = getCurrentUser();
-            System.out.println("Import TF Site");
 
             if ((user.getUserType() != UserType.ADMIN.code()) && (user.getUserType() != UserType.SUPERADMIN.code())) {
                 addActionError(getText("tfsite.import.permission.denied"));
