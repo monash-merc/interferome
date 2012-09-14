@@ -296,7 +296,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 return new Pagination<Gene>(startPageNo, recordPerPage, total);
             }
 
-            System.out.println("================= found total genes size: " + total);
+            // System.out.println("================= found total genes size: " + total);
 
             String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g." + orderBy + " " + sortBy;
             Query geneQuery = this.session().createQuery(geneHQL);
@@ -308,7 +308,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
 
             List<Gene> geneList = geneQuery.list();
-            System.out.println("================= found total genes list size: " + total);
+            //System.out.println("================= found total genes list size: " + total);
             genePagination.setPageResults(geneList);
             return genePagination;
         } else {
@@ -326,10 +326,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {
-                String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g, te";
-                Query teQuery = this.session().createQuery(teHQL);
-                teQuery.setParameterList(("probes"), probes);
-                return teQuery.list();
+            String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g, te";
+            Query teQuery = this.session().createQuery(teHQL);
+            teQuery.setParameterList(("probes"), probes);
+            return teQuery.list();
         } else {
             return new ArrayList<TissueExpression>();
         }
@@ -368,67 +368,127 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                     "WHERE r.probeId IN (:probes) AND i.typeName = 'I'";
             Query tp1Query = this.session().createQuery(tp1);
             tp1Query.setParameterList(("probes"), probes);
-            List<Integer> t1ProbeList = tp1Query.list();
+            List<String> t1ProbeList = tp1Query.list();
+
             //Get Gene
-            String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes WHERE p.probeId IN (:t1ProbeList) GROUP BY g";
-            Query tg1Query = this.session().createQuery(tg1);
-            tg1Query.setParameterList(("probes"), probes);
-            List<Gene> t1GeneList = tg1Query.list();
+            //sam version
+            // String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:t1ProbeList) GROUP BY g";
+
+            //simon version, remove the 'GROUP BY', the 'GROUP BY' only used for counting
+            //if T1 probe list is empty. we don't need to query the genes
+            List<Gene> t1GeneList = new ArrayList<Gene>();
+            if (t1ProbeList != null && t1ProbeList.size() > 0) {
+                String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t1ProbeList) ";
+                Query tg1Query = this.session().createQuery(tg1);
+                tg1Query.setParameterList("t1ProbeList", t1ProbeList);
+                t1GeneList = tg1Query.list();
+            }
 
             //Get Type 2 Probes
             String tp2 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
                     "WHERE r.probeId IN (:probes) AND i.typeName = 'II'";
-            Query tp2Query = this.session().createQuery(tp1);
-            tp1Query.setParameterList(("probes"), probes);
-            List<Integer> t2ProbeList = tp1Query.list();
-            //Get Gene
-            String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes WHERE p.probeId IN (:t2ProbeList) GROUP BY g";
-            Query tg2Query = this.session().createQuery(tg1);
-            tg1Query.setParameterList(("probes"), probes);
-            List<Gene> t2GeneList = tg1Query.list();
+            Query tp2Query = this.session().createQuery(tp2);
+            tp2Query.setParameterList(("probes"), probes);
+            List<String> t2ProbeList = tp2Query.list();
 
+            //Get Gene
+            //sam version
+            //String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:t2ProbeList) GROUP BY g";
+
+            //simon version, remove the 'GROUP BY', the 'GROUP BY' only used for counting
+            //if T2 probe list is empty we don't need to query the genes
+            List<Gene> t2GeneList = new ArrayList<Gene>();
+            if (t2ProbeList != null && t2ProbeList.size() > 0) {
+                String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t2ProbeList) ";
+                Query tg2Query = this.session().createQuery(tg2);
+                tg2Query.setParameterList("t2ProbeList", t2ProbeList);
+                t2GeneList = tg2Query.list();
+            }
 
             //Get Type III Probes
             String tp3 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
                     "WHERE r.probeId IN (:probes) AND i.typeName = 'III'";
-            Query tp3Query = this.session().createQuery(tp1);
-            tp1Query.setParameterList(("probes"), probes);
-            List<Integer> t3ProbeList = tp1Query.list();
-            //Get Gene
-            String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes WHERE p.probeId IN (:t3ProbeList) GROUP BY g";
-            Query tg3Query = this.session().createQuery(tg1);
-            tg1Query.setParameterList(("probes"), probes);
-            List<Gene> t3GeneList = tg1Query.list();
+            Query tp3Query = this.session().createQuery(tp3);
+            tp3Query.setParameterList(("probes"), probes);
+            List<String> t3ProbeList = tp3Query.list();
 
+            //Get Gene
+            //sam version
+            // String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:t3ProbeList) GROUP BY g";
+
+            //simon version, remove the 'GROUP BY', the 'GROUP BY' only used for counting
+            //if the T3 probe list is empty. we don't need to query the genes
+            List<Gene> t3GeneList = new ArrayList<Gene>();
+            if (t3ProbeList != null && t3ProbeList.size() > 0) {
+                String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t3ProbeList) ";
+                Query tg3Query = this.session().createQuery(tg3);
+                tg3Query.setParameterList(("t3ProbeList"), t3ProbeList);
+                t3GeneList = tg3Query.list();
+            }
+            //TODO: for sam, please figure out the logic How to count the unique member of each list. I just fixed the query syntax.
 
             //Count Unique members of each list
             //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
             //T1T2T3
-            types[6] = overlapping(overlapping(t1GeneList, t2GeneList), t3GeneList).size();
+            types[6] = findUniqueGene(findUniqueGene(t1GeneList, t2GeneList), t3GeneList).size();
             //T2T3
-            types[5] = overlapping(t2GeneList, t3GeneList).size() - types[6];
+            types[5] = findUniqueGene(t2GeneList, t3GeneList).size() - types[6];
             //T1T3
-            types[4] = overlapping(t1GeneList, t3GeneList).size() - types[6];
+            types[4] = findUniqueGene(t1GeneList, t3GeneList).size() - types[6];
             //T1T2
-            types[3] = overlapping(t1GeneList, t2GeneList).size() - types[6];
+            types[3] = findUniqueGene(t1GeneList, t2GeneList).size() - types[6];
             //T3   -> - T123 - T13 - T23
-            types[2] = t3GeneList.size() - types[6] - types[4] - types[5];
+            if (t3GeneList.size() == 0) {
+                types[2] = 0;
+            } else {
+                types[2] = t3GeneList.size() - types[6] - types[4] - types[5];
+            }
             //T2  -> - T123 - T12 - T23
-            types[1] = t2GeneList.size() - types[6] - types[3] - types[5];
+            if (t2GeneList.size() == 0) {
+                types[1] = 0;
+            } else {
+                types[1] = t2GeneList.size() - types[6] - types[3] - types[5];
+            }
             //T1  -> - T123 - T12 - T13
-            types[0] = t1GeneList.size() - types[6] - types[3] - types[4];
+            if (t1GeneList.size() == 0) {
+                types[0] = 0;
+            } else {
+                types[0] = t1GeneList.size() - types[6] - types[3] - types[4];
+            }
         }
         return types;
-
-
     }
 
+    //simon version
+    private List<Gene> findUniqueGene(List<Gene> geneList1, List<Gene> geneList2) {
+        List<Gene> uniqueGenes = new ArrayList<Gene>();
+        //genelist1 is empty. but genelist2 is not empty
+        if (geneList1 != null && geneList1.size() == 0) {
+            if (geneList2 != null && geneList2.size() > 0) {
+                return geneList2;
+            }
+        }
+        if (geneList2 != null && geneList2.size() == 0) {
+            if (geneList1 != null && geneList1.size() > 0) {
+                return geneList1;
+            }
+        }
+        if (geneList1 != null && geneList1.size() > 0 && geneList2 != null && geneList2.size() > 0) {
+            for (Gene g : geneList1) {
+                if (geneList2.contains(g)) {
+                    uniqueGenes.add(g);
+                }
+            }
+        }
+        return uniqueGenes;
+    }
 
+    //sam version
     //Convenience method for returning count of values overlapping from two lists.
-    private List<Gene> overlapping(List<Gene> g1, List<Gene> g2){
+    private List<Gene> overlapping(List<Gene> g1, List<Gene> g2) {
         ArrayList<Gene> overlapList = new ArrayList<Gene>();
         for (Gene g : g1) {
-            if(g2.contains(g)){
+            if (g2.contains(g)) {
                 overlapList.add(g);
             }
         }
@@ -443,13 +503,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         List<String> probes = uniqueProbesPages.getPageResults();
 
-
         if (probes.size() > 0) {
             String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g.chromosome";
             Query chrQuery = this.session().createQuery(chrHQL);
             chrQuery.setParameterList(("probes"), probes);
-
-
             List<Gene> chromosomeGeneList = chrQuery.list();
             return chromosomeGeneList;
         } else {
@@ -464,7 +521,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         List<String> probes = uniqueProbesPages.getPageResults();
 
-       ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
+        ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
         if (probes.size() > 0) {
 
             //Search Cellular
@@ -472,7 +529,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query goCellularQuery = this.session().createQuery(goCellularHQL);
             goCellularQuery.setParameterList(("probes"), probes);
             List<Object[]> goCellularList = goCellularQuery.list();
-            if(goCellularList.size() > 0){
+            if (goCellularList.size() > 0) {
                 goHash.add(goCellularList);
             }
 
@@ -481,7 +538,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query goMolecularQuery = this.session().createQuery(goMolecularHQL);
             goMolecularQuery.setParameterList(("probes"), probes);
             List<Object[]> goMolecularList = goMolecularQuery.list();
-            if(goMolecularList.size() > 0){
+            if (goMolecularList.size() > 0) {
                 goHash.add(goMolecularList);
             }
             //Search Biological
@@ -489,7 +546,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query goBiologicalQuery = this.session().createQuery(goBiologicalHQL);
             goBiologicalQuery.setParameterList(("probes"), probes);
             List<Object[]> goBiologicalList = goBiologicalQuery.list();
-            if(goBiologicalList.size() > 0){
+            if (goBiologicalList.size() > 0) {
                 goHash.add(goBiologicalList);
             }
             return goHash;
@@ -506,9 +563,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         List<String> probes = uniqueProbesPages.getPageResults();
 
-
         if (probes.size() > 0) {
-
             //Search Cellular
             String goTFHQL = "SELECT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
             Query goTFQuery = this.session().createQuery(goTFHQL);
@@ -519,7 +574,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             return new ArrayList<Object[]>();
         }
     }
-
 
 
     @Override
@@ -1038,14 +1092,14 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //create query
         String countQLStr = countQL.toString();
-        System.out.println("=================================> ds level probe cout ql string: " + countQLStr);
+        //  System.out.println("=================================> ds level probe cout ql string: " + countQLStr);
         Query probeCountQuery = this.session().createQuery(countQLStr);
         String orderByCond = createOrderBy(orderBy, sortBy);
         if (StringUtils.isNotBlank(orderByCond)) {
             probeQL.append(orderByCond);
         }
         String probeQLStr = probeQL.toString();
-        System.out.println("=================================> ds level probe query ql string: " + probeQLStr);
+        //System.out.println("=================================> ds level probe query ql string: " + probeQLStr);
         Query probeQuery = this.session().createQuery(probeQLStr);
 
         if (searchGenes.length > 0) {
@@ -1193,8 +1247,8 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         probeQuery.setMaxResults(probePagination.getSizePerPage());
         List<String> probeList = probeQuery.list();
         probePagination.setPageResults(probeList);
-        System.out.println("===========> ds level found total probe size: " + probePagination.getTotalRecords());
-        System.out.println("===========> ds level found total probe pages: " + probePagination.getTotalPages());
+        // System.out.println("===========> ds level found total probe size: " + probePagination.getTotalRecords());
+        // System.out.println("===========> ds level found total probe pages: " + probePagination.getTotalPages());
         return probePagination;
     }
 
@@ -1262,7 +1316,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //create count query
         String countQLStr = countQL.toString();
-        System.out.println("=================================> data level only probe count string: " + countQLStr);
+        //System.out.println("=================================> data level only probe count string: " + countQLStr);
         Query probeCountQuery = this.session().createQuery(countQLStr);
 
         String orderByCond = createOrderBy(orderBy, sortBy);
@@ -1271,7 +1325,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
         //create pagination query
         String probeQLStr = probeQL.toString();
-        System.out.println("=================================> data level only probe query string: " + probeQLStr);
+        //  System.out.println("=================================> data level only probe query string: " + probeQLStr);
         Query probeQuery = this.session().createQuery(probeQLStr);
 
         if (searchGenes.length > 0) {
@@ -1359,8 +1413,8 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         probeQuery.setMaxResults(probPagination.getSizePerPage());
         List<String> dataList = probeQuery.list();
         probPagination.setPageResults(dataList);
-        System.out.println("===========> data level only query found total probe size: " + probPagination.getTotalRecords());
-        System.out.println("===========>  data level only query found total probe pages: " + probPagination.getTotalPages());
+        // System.out.println("===========> data level only query found total probe size: " + probPagination.getTotalRecords());
+        // System.out.println("===========>  data level only query found total probe pages: " + probPagination.getTotalPages());
         return probPagination;
     }
 

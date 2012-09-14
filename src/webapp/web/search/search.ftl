@@ -27,7 +27,32 @@
 <body>
 <#include "../template/navsection.ftl"/>
 <div class="nav_namebar_div nav_title_gray">
+<@s.if test="%{searched == true}">
+    <@s.if test="%{searchType == 'gene'}">
+        <a href="${base}/search/searchGene.jspx"><@s.text name="experiment.search.action.title" /> - Gene Summary</a>
+    </@s.if>
+    <@s.if test="%{searchType == 'data'}">
+        <a href="${base}/search/searchData.jspx"><@s.text name="experiment.search.action.title" /> - Experiment Data</a>
+    </@s.if>
+    <@s.if test="%{searchType == 'transcript'}">
+        <a href="${base}/search/searchTFSite.jspx"><@s.text name="experiment.search.action.title" /> - TF Anaylsis</a>
+    </@s.if>
+    <@s.if test="%{searchType == 'geneontology'}">
+        <a href="${base}/search/searchOntology.jspx"><@s.text name="experiment.search.action.title" /> - Ontology Analysis</a>
+    </@s.if>
+    <@s.if test="%{searchType == 'chromosome'}">
+        <a href="${base}/search/searchChromosome.jspx"><@s.text name="experiment.search.action.title" /> - Chromosome</a>
+    </@s.if>
+    <@s.if test="%{searchType == 'subtype'}">
+        <a href="${base}/search/searchSubtype.jspx"><@s.text name="experiment.search.action.title" /> - IFN Subtype</a>
+    </@s.if>
+    <@s.if test="%{searchType == 'tissueexp'}">
+        <a href="${base}/search/searchTissueExpression.jspx"><@s.text name="experiment.search.action.title" /> - Basal Expression</a>
+    </@s.if>
+</@s.if>
+<@s.else>
     <a href="${base}/search/showSearch.jspx"><@s.text name="experiment.search.action.title" /></a>
+</@s.else>
 </div>
 <div style="clear:both"></div>
 <div class="main_container">

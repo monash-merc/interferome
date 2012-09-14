@@ -589,7 +589,7 @@ public class SearchAction extends DMBaseAction {
                 }
             }
 
-            System.out.println("TF Site Size: " + tfSiteList.size());
+           // System.out.println("TF Site Size: " + tfSiteList.size());
 
             //set the searched flag as true
             searched = true;
@@ -663,7 +663,7 @@ public class SearchAction extends DMBaseAction {
             HashMap<String, Integer> genes = new HashMap<String, Integer>();
             while(i.hasNext()){
                    TissueExpression t = (TissueExpression)i.next();
-                   System.out.println(t.getGene().getEnsgAccession());
+                  // System.out.println(t.getGene().getEnsgAccession());
                    if(genes.containsKey(t.getGene().getEnsgAccession())){
                         this.tissueExpressionList.get(genes.get(t.getGene().getEnsgAccession())).addTissueExpression(t);
                    }
