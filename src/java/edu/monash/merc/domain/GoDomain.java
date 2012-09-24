@@ -29,6 +29,7 @@
 package edu.monash.merc.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
 
@@ -43,6 +44,9 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "go_domain")
+@org.hibernate.annotations.Table(appliesTo = "go_domain",
+        indexes = {@Index(name = "idx_namespace", columnNames = {"namespace"})
+        })
 public class GoDomain extends Domain {
 
     @Id

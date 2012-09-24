@@ -29,6 +29,7 @@
 package edu.monash.merc.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
 import java.util.List;
@@ -44,6 +45,11 @@ import java.util.List;
  */
 @Entity
 @Table(name = "ontology")
+@org.hibernate.annotations.Table(appliesTo = "ontology",
+        indexes = {@Index(name = "idx_go_term_acc", columnNames = {"go_term_acc"}),
+                @Index(name = "idx_go_term_name", columnNames = {"go_term_name"}),
+                @Index(name = "idx_go_count", columnNames = {"go_count"})
+        })
 public class Ontology extends Domain {
 
     @Id

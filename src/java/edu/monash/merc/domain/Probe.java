@@ -29,6 +29,7 @@
 package edu.monash.merc.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -46,6 +47,11 @@ import java.util.List;
  */
 @Entity
 @Table(name = "probe")
+@org.hibernate.annotations.Table(appliesTo = "probe",
+        indexes = {@Index(name = "idx_probeset", columnNames = {"probeset"}),
+                @Index(name = "idx_platform", columnNames = {"platform"}),
+                @Index(name = "idx_species", columnNames = {"species"})
+        })
 public class Probe extends Domain {
 
     @Id

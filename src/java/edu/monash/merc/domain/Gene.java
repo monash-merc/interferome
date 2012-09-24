@@ -47,7 +47,13 @@ import java.util.List;
 @Entity
 @Table(name = "gene")
 @org.hibernate.annotations.Table(appliesTo = "gene",
-        indexes = {@Index(name = "idx_ensg_accession", columnNames = {"ensg_accession"})
+        indexes = {@Index(name = "idx_ensg_accession", columnNames = {"ensg_accession"}),
+                @Index(name = "idx_display_name", columnNames = {"display_name"}),
+                @Index(name = "idx_chromosome", columnNames = {"chromosome"}),
+                @Index(name = "idx_refseq_dna", columnNames = {"refseq_dna"}),
+                @Index(name = "idx_unigene", columnNames = {"unigene"}),
+                @Index(name = "idx_genbank_id", columnNames = {"genbank_id"}),
+                @Index(name = "idx_entrez_id", columnNames = {"entrez_id"})
         })
 public class Gene extends Domain {
     @Id

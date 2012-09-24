@@ -47,7 +47,7 @@ import java.util.List;
 @Table(name = "dataset")
 @org.hibernate.annotations.Table(appliesTo = "dataset",
         indexes = {@Index(name = "treattime", columnNames = {"treatment_time"}),
-                @Index(name = "treatcon", columnNames = "treatment_con")
+                @Index(name = "treatcon", columnNames = {"treatment_con"})
         })
 public class Dataset extends Domain {
 

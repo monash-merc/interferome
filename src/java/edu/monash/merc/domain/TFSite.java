@@ -29,6 +29,7 @@
 package edu.monash.merc.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
 
@@ -44,6 +45,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "tf_site")
+@org.hibernate.annotations.Table(appliesTo = "tf_site",
+        indexes = {@Index(name = "idx_factor", columnNames = {"factor"})
+        })
 public class TFSite extends Domain {
 
     @Id
@@ -135,14 +139,13 @@ public class TFSite extends Domain {
         this.factor = factor;
     }
 
-    public String getEnsemblID(){
+    public String getEnsemblID() {
         return ensemblID;
     }
 
-    public void setEnsemblID(String ensemblID){
+    public void setEnsemblID(String ensemblID) {
         this.ensemblID = ensemblID;
     }
-
 
 
 }

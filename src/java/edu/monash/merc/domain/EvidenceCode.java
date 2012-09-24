@@ -29,6 +29,7 @@
 package edu.monash.merc.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
 
@@ -43,6 +44,9 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "evidence_code")
+@org.hibernate.annotations.Table(appliesTo = "evidence_code",
+        indexes = {@Index(name = "idx_code", columnNames = {"code"})
+        })
 public class EvidenceCode extends Domain {
 
     @Id

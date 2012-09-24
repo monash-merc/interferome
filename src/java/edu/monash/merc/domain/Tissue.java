@@ -46,6 +46,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "tissue")
+@org.hibernate.annotations.Table(appliesTo = "tissue",
+        indexes = {@Index(name = "idx_display_name", columnNames = {"display_name"})
+        })
 public class Tissue extends Domain {
     @Id
     @GeneratedValue(generator = "tissue_pk_seq")
