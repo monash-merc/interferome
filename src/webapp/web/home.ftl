@@ -55,8 +55,9 @@
                     The Database of IFN Regulated Genes
                 </div>
                 <div class="content_div">
-                    This database is an upgrade of the original database contains type I, II and III interferon (IFN)
-                    regulated genes manually curated from publicly available microarray datasets.
+                    This database is an upgrade of the original database and contains type I, II and III interferon
+                    (IFN)
+                    regulated genes, manually curated from publicly available microarray datasets.
                 </div>
                 <br/>
 
@@ -65,15 +66,14 @@
                 </div>
                 <div class="content_div">
                     IFNs were identified as antiviral proteins more than 50 years ago and since then have been shown to
-                    regulate cell proliferation, survival, migration and specialised function. Consequently they are
+                    regulate cell proliferation, survival, migration and specialised functions. Consequently they are
                     involved in numerous homeostatic and pathological processes including infections, cancer,
                     autoimmunity, inflammation and metabolic disorders. These cytokines are also used as therapeutics in
                     diseases such as chronic viral infections, cancer and multiple sclerosis. IFNs potentially regulate
                     the transcription of up to 2000 genes in an IFN subtype, dose, cell type and stimulus dependent
-                    manner. The understanding of the various IFN activated pathways that regulate subsets of genes will
-                    enhance our understanding of these pathophysiological processes. This database of IFN regulated
-                    genes is an attempt at integrating information from high-throughput experiments to gain a detailed
-                    understanding of IFN biology.
+                    manner. This database of IFN regulated genes is an attempt at integrating information from
+                    high-throughput experiments to gain a detailed understanding of the various IFN activated pathways
+                    that regulate subsets of genes to enhance our understanding of pathophysiological processes.
                 </div>
                 <br/>
 
