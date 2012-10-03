@@ -14,10 +14,10 @@ function HeatMap(){
     //Skip first (header) row
     var rowLength = oTable.rows.length;
     var columns = oTable.rows.item(0).cells.length - 1;
-    var boxWidth = 20;
-    var boxHeight = 20;
+    var boxWidth = 10;
+    var boxHeight = 10;
 
-    paper = new Raphael(document.getElementById('tissueexp_container'), 120+(boxWidth*columns) , 100+(boxHeight*rowLength));
+    paper = new Raphael(document.getElementById('tissueexp_container'), 100+(boxWidth*columns) , 50+(boxHeight*rowLength));
 
     var colorStats = calculateColorStatistics(oTable);
     var yPos = 70;
@@ -55,7 +55,7 @@ function HeatMap(){
     }
 
     //document.getElementById("tf_table").style.visibility="hidden";
-
+    document.getElementById("tesites").style.visibility = "hidden";
 }
 
 function calculateColorStatistics(oTable){
@@ -85,7 +85,7 @@ function calculateColorStatistics(oTable){
 }
 
 function getColor(median, min, max, value){
-    //Choose Color on blue scale
+    //Choose Color on blue/green scale
 
     if(parseFloat(value) < median){
         var blueVal = Math.round(255 - (255/(min-median))*(parseFloat(value)-median));

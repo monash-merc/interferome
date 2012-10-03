@@ -430,13 +430,13 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //Count Unique members of each list
             //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
             //T1T2T3
-            types[6] = findUniqueGene(findUniqueGene(t1GeneList, t2GeneList), t3GeneList).size();
+            types[6] = findOverlapGenes(findOverlapGenes(t1GeneList, t2GeneList), t3GeneList).size();
             //T2T3
-            types[5] = findUniqueGene(t2GeneList, t3GeneList).size() - types[6];
+            types[5] = findOverlapGenes(t2GeneList, t3GeneList).size() - types[6];
             //T1T3
-            types[4] = findUniqueGene(t1GeneList, t3GeneList).size() - types[6];
+            types[4] = findOverlapGenes(t1GeneList, t3GeneList).size() - types[6];
             //T1T2
-            types[3] = findUniqueGene(t1GeneList, t2GeneList).size() - types[6];
+            types[3] = findOverlapGenes(t1GeneList, t2GeneList).size() - types[6];
             //T3   -> - T123 - T13 - T23
             if (t3GeneList.size() == 0) {
                 types[2] = 0;
@@ -460,27 +460,21 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     }
 
     //simon version
-    private List<Gene> findUniqueGene(List<Gene> geneList1, List<Gene> geneList2) {
-        List<Gene> uniqueGenes = new ArrayList<Gene>();
-        //genelist1 is empty. but genelist2 is not empty
-        if (geneList1 != null && geneList1.size() == 0) {
-            if (geneList2 != null && geneList2.size() > 0) {
-                return geneList2;
-            }
+    private List<Gene> findOverlapGenes(List<Gene> geneList1, List<Gene> geneList2) {
+        List<Gene> overlapGenes = new ArrayList<Gene>();
+        //genelist1 is empty. or  //genelist2 is empty.
+        if ((geneList1 != null && geneList1.size() == 0) || (geneList2 != null && geneList2.size() == 0) ){
+            return overlapGenes;
         }
-        if (geneList2 != null && geneList2.size() == 0) {
-            if (geneList1 != null && geneList1.size() > 0) {
-                return geneList1;
-            }
-        }
-        if (geneList1 != null && geneList1.size() > 0 && geneList2 != null && geneList2.size() > 0) {
+         //genelist1 is not empty and genelist2 is not empty
+       if (geneList1 != null && geneList1.size() > 0 && geneList2 != null && geneList2.size() > 0) {
             for (Gene g : geneList1) {
                 if (geneList2.contains(g)) {
-                    uniqueGenes.add(g);
+                   overlapGenes.add(g);
                 }
             }
         }
-        return uniqueGenes;
+        return overlapGenes;
     }
 
     //sam version

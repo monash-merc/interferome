@@ -82,11 +82,11 @@ function drawVenn(){
     });
     paper.text(150,150, document.getElementById('t1').value);
     paper.text(300,150, document.getElementById('t2').value);
+    paper.text(225,275, document.getElementById('t3').value);
     paper.text(225,150, document.getElementById('t1t2').value);
     paper.text(265,215, document.getElementById('t2t3').value);
     paper.text(185,215, document.getElementById('t1t3').value);
-    paper.text(225,275, document.getElementById('t3').value);
-    paper.text(225,150, document.getElementById('t2t3').value);
+    //paper.text(225,150, document.getElementById('t2t3').value);
     paper.text(225,195, document.getElementById('t1t2t3').value);
 
     var t1Title = paper.text(110, 110, "Type 1");
