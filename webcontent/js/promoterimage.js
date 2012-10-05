@@ -27,7 +27,7 @@ function PromoterImage(){
         }
     }
 
-
+    var tfLegendSiteList = new Array();
     $('#tfsites tr').each(function() {
 
         var geneName = $(this).find(".tfgene").html();
@@ -37,6 +37,11 @@ function PromoterImage(){
             var tfSites = new Array();
             for(var rowCount = 0; rowCount < tfRow.length; rowCount++){
                 tfSites[rowCount] = tfRow[rowCount].split(",");
+                //Add TF Site to Array if it isnt in there
+                if(tfLegendSiteList.indexOf(tfSites[rowCount][0]) == -1){
+                    tfLegendSiteList.push(tfSites[rowCount][0]);
+                }
+
             }
 
             addLine(paper, geneName, tfSites);
@@ -44,6 +49,27 @@ function PromoterImage(){
         }
 
     })
+
+    var xPos = 100;
+
+    for(var j = 0; j < tfLegendSiteList.length; j++){
+        if(tfLegendSiteList[j] != null && tfLegendSiteList[j] != ""){
+            var color = findColor(tfLegendSiteList[j]);
+
+            if(color != null){
+                var site = paper.rect(xPos, (25*rowCount)+90, 10, 10);
+                site.attr({fill: color, stroke: color, title: tfLegendSiteList[j]});
+                xPos = xPos + 30;
+                var lbl = paper.text(xPos, (25*rowCount)+95, tfLegendSiteList[j]);
+                lbl.attr({'text-anchor': 'start'});
+                //yPos = yPos + (tfLegendSiteList[j].toString().length*2);
+                var len = tfLegendSiteList[j].toString().length*10;
+                xPos = xPos + len;
+                alert(xPos);
+            }
+        }
+
+    }
 
     document.getElementById("tf_table").style.display="none";
 
@@ -85,7 +111,6 @@ function addLine(paper, gene, siteList){
         }
 
     }
-
 }
 
 function findColor(site){
