@@ -8,11 +8,11 @@
 
 function PromoterImage(){
     //This is the background
-    var rowCount = countRows()
-    paper = new Raphael(document.getElementById('promoter_container'), 1000, 50+(87.5*rowCount));
+    var rowCount = countRows();
+    var paper = new Raphael(document.getElementById('promoter_container'), 1000, 50+(87.5*rowCount));
     //
 
-    var scale = paper.path("M 30 25 l 700 0");
+    paper.path("M 30 25 l 700 0");
     var label = 1;
     for(var i = 30; i <= 730; i = i+87.5){
         if(label == 1){
@@ -48,7 +48,7 @@ function PromoterImage(){
 
         }
 
-    })
+    });
 
     var xPos = 100;
 
@@ -81,7 +81,7 @@ function countRows(){
 
         count++;
 
-    })
+    });
     return count;
 }
 
