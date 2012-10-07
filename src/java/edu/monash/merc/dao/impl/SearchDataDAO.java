@@ -343,7 +343,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         List<String> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
-            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
+            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND g.ensgAccession like 'ENSG' GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
             Query chrQuery = this.session().createQuery(chrHQL);
             chrQuery.setParameterList(("probes"), probes);
 

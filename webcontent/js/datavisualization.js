@@ -3,7 +3,7 @@ window.onload = function() {
         var pi = new PromoterImage();
     }
 
-    if(document.getElementById('chromosome_container')){
+    if(document.getElementById('hs_chromosome_container')){
         var ci = new ChromosomeImage();
     }
 
@@ -101,6 +101,6 @@ function drawVenn(){
     t3Title.attr({
         "font-size": "16pt"
     });
-
+    paper.
     document.getElementById("hiddenlist").style.display = "none";
 }

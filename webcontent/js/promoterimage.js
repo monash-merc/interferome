@@ -65,7 +65,6 @@ function PromoterImage(){
                 //yPos = yPos + (tfLegendSiteList[j].toString().length*2);
                 var len = tfLegendSiteList[j].toString().length*10;
                 xPos = xPos + len;
-                alert(xPos);
             }
         }
 

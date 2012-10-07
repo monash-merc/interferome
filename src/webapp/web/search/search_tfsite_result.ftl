@@ -2,6 +2,7 @@
     Search Results
 </div>
 <div class="search_table_div">
+    Sites shown are only the most prevalent for the dataset searched.
     <div id="promoter_container"></div>
     <div id="tf_table">
         <table id="tfsites">

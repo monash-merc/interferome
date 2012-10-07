@@ -26,7 +26,7 @@
                     <td><@s.property value="#onResults[0].goTermName"/></td>
                     <td><@s.property value="#onResults[0].goTermDefinition"/></td>
                     <td><@s.property value="#onResults[1]"/></td>
-                    <td><@s.property value="#onResults[0].goCount"/></td>
+                    <!--<td>property value="#onResults[0].goCount"/></td>-->
                 </tr>
             </@s.iterator>
        </table>
