@@ -577,19 +577,18 @@ public class SearchAction extends DMBaseAction {
             tfSiteList = new HashMap<String, List<TFSite>>();
 
             for (Object[] row : results) {
-                String geneName = ((Gene)row[0]).getGeneName();
-                if(tfSiteList.containsKey(geneName)){
+                String geneName = ((Gene) row[0]).getGeneName();
+                if (tfSiteList.containsKey(geneName)) {
                     List<TFSite> existingResults = tfSiteList.get(geneName);
-                    existingResults.add((TFSite)row[1]);
-                }
-                else{
+                    existingResults.add((TFSite) row[1]);
+                } else {
                     List<TFSite> newTFSiteList = new ArrayList<TFSite>();
-                    newTFSiteList.add((TFSite)row[1]);
+                    newTFSiteList.add((TFSite) row[1]);
                     tfSiteList.put(geneName, newTFSiteList);
                 }
             }
 
-           // System.out.println("TF Site Size: " + tfSiteList.size());
+            // System.out.println("TF Site Size: " + tfSiteList.size());
 
             //set the searched flag as true
             searched = true;
@@ -607,7 +606,7 @@ public class SearchAction extends DMBaseAction {
     }
 
     @SuppressWarnings("unchecked")
-     public String searchChromosome() {
+    public String searchChromosome() {
         try {
             //get the logged in user if existed
             user = getCurrentUser();
@@ -624,7 +623,6 @@ public class SearchAction extends DMBaseAction {
             //query the data by pagination
             chromosomeList = this.searchDataService.searchChromosome(searchBean, pageNo, pageSize, orderBy, orderByType);
             chromosomeGeneList = this.searchDataService.searchChromosomeGeneList(searchBean, pageNo, pageSize, orderBy, orderByType);
-
 
 
             //set the searched flag as true
@@ -661,16 +659,15 @@ public class SearchAction extends DMBaseAction {
             this.tissueExpressionList = new ArrayList<GeneExpressionRecord>();
             Iterator i = te.iterator();
             HashMap<String, Integer> genes = new HashMap<String, Integer>();
-            while(i.hasNext()){
-                   TissueExpression t = (TissueExpression)i.next();
-                  // System.out.println(t.getGene().getEnsgAccession());
-                   if(genes.containsKey(t.getGene().getEnsgAccession())){
-                        this.tissueExpressionList.get(genes.get(t.getGene().getEnsgAccession())).addTissueExpression(t);
-                   }
-                   else{
-                       this.tissueExpressionList.add(new GeneExpressionRecord(t));
-                       genes.put(t.getGene().getEnsgAccession(), this.tissueExpressionList.size()-1);
-                   }
+            while (i.hasNext()) {
+                TissueExpression t = (TissueExpression) i.next();
+                // System.out.println(t.getGene().getEnsgAccession());
+                if (genes.containsKey(t.getGene().getEnsgAccession())) {
+                    this.tissueExpressionList.get(genes.get(t.getGene().getEnsgAccession())).addTissueExpression(t);
+                } else {
+                    this.tissueExpressionList.add(new GeneExpressionRecord(t));
+                    genes.put(t.getGene().getEnsgAccession(), this.tissueExpressionList.size() - 1);
+                }
             }
 
             //set the searched flag as true
@@ -777,13 +774,27 @@ public class SearchAction extends DMBaseAction {
                 searchBean = new SearchBean();
             }
         }
+        boolean hasError = false;
+        //check at least one non-default conditon is provided
         boolean defaultSearch = searchBean.isDefaultSearchCondition();
         if (user == null && defaultSearch) {
             addFieldError("onecondreq", getText("data.search.at.least.one.condition.required"));
+            hasError = true;
+        }
+        //check at least one of Gene list. Gene Bank list and Gene Ensembl Id list is provide
+        boolean selectOneOfThree = searchBean.selectOneOfThreeList();
+        System.out.println(" ==== one of three selected : " + selectOneOfThree);
+        if (!selectOneOfThree) {
+            addFieldError("oneofthreecondreq", getText("data.search.at.least.one.of.three.conditions.required"));
+            hasError = true;
+        }
+        //if not meet the above condition, we just return back immediately
+        if (hasError) {
             return false;
         }
 
-        boolean hasError = false;
+        //check individual conditions
+        hasError = false;
         RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
         if (doseRangeCond.isRangeProvided()) {
             double fromDose = doseRangeCond.getFromValue();
@@ -820,31 +831,20 @@ public class SearchAction extends DMBaseAction {
             }
         }
 
-        String anyFoldRange = searchBean.getAnyRangeFold();
-        boolean upProvided = searchBean.isUpProvided();
-        boolean downProvided = searchBean.isDownProvided();
 
-        if (StringUtils.equals("byrange", anyFoldRange)) {
-            if (!upProvided && !downProvided) {
-                addFieldError("updownValue", getText("data.search.fold.change.range.not.specified"));
-                hasError = true;
-            }
+        double upValue = searchBean.getUpValue();
+        if (upValue < 1) {
+            addFieldError("upValue", getText("data.search.invalid.foldchange.up.value"));
+            hasError = true;
         }
 
-        if (upProvided) {
-            double upValue = searchBean.getUpValue();
-            if (upProvided && upValue < 1) {
-                addFieldError("upValue", getText("data.search.invalid.foldchange.up.value"));
-                hasError = true;
-            }
+
+        double downValue = searchBean.getDownValue();
+        if (downValue < 1) {
+            addFieldError("downValue", getText("data.search.invalid.foldchange.down.value"));
+            hasError = true;
         }
-        if (downProvided) {
-            double downValue = searchBean.getDownValue();
-            if (downProvided && downValue < 1) {
-                addFieldError("downValue", getText("data.search.invalid.foldchange.down.value"));
-                hasError = true;
-            }
-        }
+
         //if validation has an error, just return false
         if (hasError) {
             return false;
@@ -999,20 +999,12 @@ public class SearchAction extends DMBaseAction {
             }
 
             //fold changes
-            boolean upProvided = searchBean.isUpProvided();
-            boolean downProvided = searchBean.isDownProvided();
-            if (!upProvided && !downProvided) {
-                csvWriter.writeNext(new String[]{"Fold Change", "Any"});
-            } else {
-                if (upProvided) {
-                    double upValue = searchBean.getUpValue();
-                    csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
-                }
-                if (downProvided) {
-                    double downValue = searchBean.getDownValue();
-                    csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
-                }
-            }
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
             //gene symbol ids
             String genes = searchBean.getGenes();
             if (StringUtils.isNotBlank(genes)) {

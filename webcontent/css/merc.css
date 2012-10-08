@@ -1615,6 +1615,14 @@ body {
     padding-left: 5px;
     margin-left: 160px;
 }
+.search_field_value_block {
+    display: block;
+    color: #212121;
+    line-height: 22px;
+    padding-left: 5px;
+    margin-left: 160px;
+}
+
 
 .search_field_list {
     display: block;

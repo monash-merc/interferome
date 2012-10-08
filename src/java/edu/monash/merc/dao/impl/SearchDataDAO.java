@@ -463,14 +463,14 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     private List<Gene> findOverlapGenes(List<Gene> geneList1, List<Gene> geneList2) {
         List<Gene> overlapGenes = new ArrayList<Gene>();
         //genelist1 is empty. or  //genelist2 is empty.
-        if ((geneList1 != null && geneList1.size() == 0) || (geneList2 != null && geneList2.size() == 0) ){
+        if ((geneList1 != null && geneList1.size() == 0) || (geneList2 != null && geneList2.size() == 0)) {
             return overlapGenes;
         }
-         //genelist1 is not empty and genelist2 is not empty
-       if (geneList1 != null && geneList1.size() > 0 && geneList2 != null && geneList2.size() > 0) {
+        //genelist1 is not empty and genelist2 is not empty
+        if (geneList1 != null && geneList1.size() > 0 && geneList2 != null && geneList2.size() > 0) {
             for (Gene g : geneList1) {
                 if (geneList2.contains(g)) {
-                   overlapGenes.add(g);
+                    overlapGenes.add(g);
                 }
             }
         }
@@ -600,9 +600,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
         String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
 
-        boolean foldChangeUpProvided = searchBean.isUpProvided();
+        // boolean foldChangeUpProvided = searchBean.isUpProvided();
         double upValue = searchBean.getUpValue();
-        boolean foldChangeDownProvided = searchBean.isDownProvided();
+        //boolean foldChangeDownProvided = searchBean.isDownProvided();
         double downValue = searchBean.getDownValue();
 
         List<String> threeIdQuery = new ArrayList<String>();
@@ -618,12 +618,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         if (searchEnsembls.length > 0) {
             threeIdQuery.add(" rep.ensembl IN (:ensembls");
         }
-        if (foldChangeUpProvided) {
-            upDownQuery.add(" d.value >= " + upValue);
-        }
-        if (foldChangeDownProvided) {
-            upDownQuery.add(" d.value <= -" + downValue);
-        }
+
+        upDownQuery.add(" d.value >= " + upValue);
+
+        upDownQuery.add(" d.value <= -" + downValue);
+
         //create all or conditions
         List<String> orConds = createOrCondsWithDs(threeIdQuery, upDownQuery, dsIdQuery);
 
@@ -860,9 +859,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
         String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
 
-        boolean foldChangeUpProvided = searchBean.isUpProvided();
+
         double upValue = searchBean.getUpValue();
-        boolean foldChangeDownProvided = searchBean.isDownProvided();
+
         double downValue = searchBean.getDownValue();
 
         List<String> threeIdQuery = new ArrayList<String>();
@@ -876,12 +875,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         if (searchEnsembls.length > 0) {
             threeIdQuery.add(" rep.ensembl IN (:ensembls");
         }
-        if (foldChangeUpProvided) {
-            upDownQuery.add(" d.value >= " + upValue);
-        }
-        if (foldChangeDownProvided) {
-            upDownQuery.add(" d.value <= -" + downValue);
-        }
+
+        upDownQuery.add(" d.value >= " + upValue);
+
+        upDownQuery.add(" d.value <= -" + downValue);
+
 
         //create all or conditions
         List<String> orConds = createOrCondsForDataOnly(threeIdQuery, upDownQuery);
@@ -1030,9 +1028,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
         String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
 
-        boolean foldChangeUpProvided = searchBean.isUpProvided();
+
         double upValue = searchBean.getUpValue();
-        boolean foldChangeDownProvided = searchBean.isDownProvided();
+
         double downValue = searchBean.getDownValue();
 
         List<String> threeIdQuery = new ArrayList<String>();
@@ -1048,12 +1046,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         if (searchEnsembls.length > 0) {
             threeIdQuery.add(" rep.ensembl IN (:ensembls");
         }
-        if (foldChangeUpProvided) {
-            upDownQuery.add(" d.value >= " + upValue);
-        }
-        if (foldChangeDownProvided) {
-            upDownQuery.add(" d.value <= -" + downValue);
-        }
+        upDownQuery.add(" d.value >= " + upValue);
+        upDownQuery.add(" d.value <= -" + downValue);
+
         //create all or conditions
         List<String> orConds = createOrCondsWithDs(threeIdQuery, upDownQuery, dsIdQuery);
 
@@ -1257,9 +1252,8 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
         String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
 
-        boolean foldChangeUpProvided = searchBean.isUpProvided();
         double upValue = searchBean.getUpValue();
-        boolean foldChangeDownProvided = searchBean.isDownProvided();
+
         double downValue = searchBean.getDownValue();
 
         List<String> threeIdQuery = new ArrayList<String>();
@@ -1273,12 +1267,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         if (searchEnsembls.length > 0) {
             threeIdQuery.add(" rep.ensembl IN (:ensembls");
         }
-        if (foldChangeUpProvided) {
-            upDownQuery.add(" d.value >= " + upValue);
-        }
-        if (foldChangeDownProvided) {
-            upDownQuery.add(" d.value <= -" + downValue);
-        }
+
+        upDownQuery.add(" d.value >= " + upValue);
+
+        upDownQuery.add(" d.value <= -" + downValue);
 
         //create all or conditions
         List<String> orConds = createOrCondsForDataOnly(threeIdQuery, upDownQuery);
