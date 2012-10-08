@@ -140,7 +140,7 @@
     <div class="search_field_row">
         <div class="search_field_title">Gene Symbol List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.genes" cols="80" rows="5" cssClass="input_textarea" />  &nbsp; &nbsp; <br/>(Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.genes" cols="80" rows="5" cssClass="input_textarea" />  &nbsp; &nbsp; <br/>(eg: UBA7,THRA &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>
@@ -152,7 +152,7 @@
     <div class="search_field_row">
         <div class="search_field_title">GenBank Accession List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.genBanks" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/> (Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.genBanks" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/> (eg: L13852,X55005 &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>
@@ -164,7 +164,7 @@
     <div class="search_field_row">
         <div class="search_field_title">Ensembl Id List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.ensembls" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/>(Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.ensembls" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/>(eg: ENSG00000182179,ENSG00000126351 &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>
