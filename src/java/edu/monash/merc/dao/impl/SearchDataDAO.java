@@ -519,7 +519,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         if (probes.size() > 0) {
 
             //Search Cellular
-            String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id";
+            String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goCellularQuery = this.session().createQuery(goCellularHQL);
             goCellularQuery.setParameterList(("probes"), probes);
             List<Object[]> goCellularList = goCellularQuery.list();
@@ -528,7 +528,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             }
 
             //Search Molecular
-            String goMolecularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'molecular_function' GROUP BY o.id";
+            String goMolecularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'molecular_function' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goMolecularQuery = this.session().createQuery(goMolecularHQL);
             goMolecularQuery.setParameterList(("probes"), probes);
             List<Object[]> goMolecularList = goMolecularQuery.list();
@@ -536,7 +536,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 goHash.add(goMolecularList);
             }
             //Search Biological
-            String goBiologicalHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'biological_process' GROUP BY o.id";
+            String goBiologicalHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'biological_process' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goBiologicalQuery = this.session().createQuery(goBiologicalHQL);
             goBiologicalQuery.setParameterList(("probes"), probes);
             List<Object[]> goBiologicalList = goBiologicalQuery.list();

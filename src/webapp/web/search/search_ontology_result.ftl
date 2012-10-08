@@ -12,8 +12,14 @@
             <div id="tags<@s.property value='%{#ontologyList.count}' />">
                  <ul>
                   <@s.iterator status="ontlResults" value="#ontlResults" id="onResults">
-                        <li><a style='font-size:<@s.property value="#onResults[1]"/>0pt' href="${goLink}
-                        <@s.property value="#onResults[0].goTermAccession"/>" target="_blank"><@s.property value="#onResults[0].goTermName"/></a></li>
+                      <@s.if test="%{#ontlResults.count < 16}">
+                        <@s.if test="%{#onResults[1] < 100}">
+                            <li><a style='font-size:<@s.property value="%{#onResults[1]}/10"/>pt' href="${goLink}<@s.property value="#onResults[0].goTermAccession"/>" target="_blank"><@s.property value="#onResults[0].goTermName"/></a></li>
+                        </@s.if>
+                        <@s.else>
+                            <li><a style='font-size:10pt' href="${goLink}<@s.property value="#onResults[0].goTermAccession"/>" target="_blank"><@s.property value="#onResults[0].goTermName"/></a></li>
+                        </@s.else>
+                      </@s.if>
                   </@s.iterator>
                 </ul>
             </div>
