@@ -3,7 +3,13 @@
 </div>
 <div class="data_header_div">
     <span class="name_title">Found a total of <font color="green"> ${genePagination.totalRecords} </font> Gene(s)</span>
-
+<@s.if test="%{genePagination.totalRecords >0 }">
+    <div class="export_div">
+        Save as a CSV file <a
+            href="${base}/search/exportCsvFileGene.jspx?maxRecords=<@s.property value='genePagination.totalRecords' />&orderBy=${orderBy}&orderByType=${orderByType}">
+        <img src="${base}/images/export.png" class="search_ctip_image" id="export_csv"/></a>
+    </div>
+</@s.if>
     <div style="clear:both"></div>
     <!-- page sorting block -->
     <div class="msg_content">
