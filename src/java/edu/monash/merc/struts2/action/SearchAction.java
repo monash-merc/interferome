@@ -828,7 +828,7 @@ public class SearchAction extends DMBaseAction {
         //check at least one of Gene list. Gene Bank list and Gene Ensembl Id list is provide
         boolean selectOneOfThree = searchBean.selectOneOfThreeList();
 
-        if (!selectOneOfThree) {
+        if (user == null && !selectOneOfThree) {
             addFieldError("oneofthreecondreq", getText("data.search.at.least.one.of.three.conditions.required"));
             hasError = true;
         }

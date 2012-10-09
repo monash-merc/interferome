@@ -109,6 +109,8 @@ public class SubmitDataAction extends DMBaseAction {
     private boolean uploadFile(){
         //start to upload the tf site file
         try{
+
+            //TODO: change the file location (same as the ImageCropAction.java), store the metadata of the uploaded file into DB
             String filePath = getText("data.upload.directory");
             System.out.println(filePath);
             FileUtils.copyFileToDirectory(upload, new File(filePath));
