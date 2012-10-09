@@ -30,19 +30,24 @@ package edu.monash.merc.dao.impl;
 
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
-import edu.monash.merc.domain.*;
+import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Ontology;
+import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
 import edu.monash.merc.repository.ISearchDataRepository;
-import edu.monash.merc.service.ProbeService;
 import edu.monash.merc.util.MercUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
@@ -528,17 +533,17 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             geneCountQuery.setParameterList(("probes"), probes);
             Long searchedGenen = ((Long) geneCountQuery.uniqueResult());
 
-           //Get Count of all GO domains (m)
+            //Get Count of all GO domains (m)
             HashMap<String, Long> countHash = new HashMap<String, Long>();
             String goCellularTotalHQL = "SELECT o, COUNT(DISTINCT g) FROM  GeneOntology go INNER JOIN go.ontology o INNER JOIN go.gene g GROUP BY o";
             Query goCellularTotalQuery = this.session().createQuery(goCellularTotalHQL);
             List<Object[]> cellResult = goCellularTotalQuery.list();
-            System.out.println("Result Size: " + cellResult.size());
+            //System.out.println("Result Size: " + cellResult.size());
             Iterator<Object[]> totCountItr = cellResult.iterator();
-            while(totCountItr.hasNext()){
+            while (totCountItr.hasNext()) {
                 Object[] ontCountRes = totCountItr.next();
-                countHash.put(((Ontology)(ontCountRes[0])).getGoTermAccession(), (Long)ontCountRes[1]);
-                System.out.println("Adding To Hash: " + ((Ontology)(ontCountRes[0])).getGoTermAccession());
+                countHash.put(((Ontology) (ontCountRes[0])).getGoTermAccession(), (Long) ontCountRes[1]);
+                // System.out.println("Adding To Hash: " + ((Ontology)(ontCountRes[0])).getGoTermAccession());
             }
 
 
@@ -551,7 +556,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             goCellularQuery.setParameterList(("probes"), probes);
             List<Object[]> goCellularList = goCellularQuery.list();
             if (goCellularList.size() > 0) {
-                 goHash.add(addGOProbability(goCellularList, countHash, searchedGenen, totalGeneN));
+                goHash.add(addGOProbability(goCellularList, countHash, searchedGenen, totalGeneN));
             }
 
             //************************
@@ -584,40 +589,38 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     }
 
     /**
-     *
-     * @param goList The list of GO ids and associated count (Ontology, int) found for this search (k)
+     * @param goList           The list of GO ids and associated count (Ontology, int) found for this search (k)
      * @param goCategoryCounts A HashMap of GO Accession Number with a total count (m)
-     * @param geneSearched Number of genes searched (n)
-     * @param totalPopulation Total number of genes in database (N)
+     * @param geneSearched     Number of genes searched (n)
+     * @param totalPopulation  Total number of genes in database (N)
      * @return
      */
-    private List<Object[]> addGOProbability(List<Object[]> goList, HashMap<String, Long> goCategoryCounts, Long geneSearched, Long totalPopulation){
-            //Assume it is more efficient to get counts for all ontologies first and use this hash in probability calculations
-                //This assumption has not been tested and may be incorrect
-            //For each GO id found with this search (goList)
-            ArrayList<Object[]> returnVal = new ArrayList<Object[]>();
-            System.out.println(goCategoryCounts.size());
-            Iterator<Object[]> goItr = goList.iterator();
-            while(goItr.hasNext()){
-                Object[] goVal = goItr.next();
-                System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
-                Long m = goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession());
-                Double pvalue = null;
-                if(m != null){
-                    pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, (Long)goVal[1]);
-                }
-                else{
-                    System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
-                    pvalue = (double)1;
-                }
-                returnVal.add(new Object[] {goVal[0], goVal[1], pvalue});
+    private List<Object[]> addGOProbability(List<Object[]> goList, HashMap<String, Long> goCategoryCounts, Long geneSearched, Long totalPopulation) {
+        //Assume it is more efficient to get counts for all ontologies first and use this hash in probability calculations
+        //This assumption has not been tested and may be incorrect
+        //For each GO id found with this search (goList)
+        ArrayList<Object[]> returnVal = new ArrayList<Object[]>();
+        //System.out.println(goCategoryCounts.size());
+        Iterator<Object[]> goItr = goList.iterator();
+        while (goItr.hasNext()) {
+            Object[] goVal = goItr.next();
+            //  System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
+            Long m = goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession());
+            Double pvalue = null;
+            if (m != null) {
+                pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, (Long) goVal[1]);
+            } else {
+                // System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
+                pvalue = (double) 1;
             }
+            returnVal.add(new Object[]{goVal[0], goVal[1], pvalue});
+        }
 
-            return returnVal;
+        return returnVal;
     }
 
-    private double calculateGOEnrichPValue(long N, long n, long m, long k){
-       return 0.05;
+    private double calculateGOEnrichPValue(long N, long n, long m, long k) {
+        return 0.05;
         //return ((m/k)*((N-m)/(n-k)))/(N/n);
     }
 
