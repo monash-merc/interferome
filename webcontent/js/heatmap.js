@@ -17,17 +17,18 @@ function HeatMap(){
     var boxWidth = 10;
     var boxHeight = 10;
 
-    paper = new Raphael(document.getElementById('tissueexp_container'), 100+(boxWidth*columns) , 50+(boxHeight*rowLength));
+    paper = new Raphael(document.getElementById('tissueexp_container'), 150+(boxWidth*columns) , 250+(boxHeight*rowLength));
 
     var colorStats = calculateColorStatistics(oTable);
-    var yPos = 70;
+    var yPos = 170;
 
     //Draw Header
     var headX = 10;
     for(var k = 1; k < columns+1;k++){
         var tissue = oTable.rows.item(0).cells.item(k).innerHTML;
-        var text = paper.text(headX, 20, tissue);
+        var text = paper.text(headX, 170, tissue);
         text.transform("t100,100r90t-100,0");
+        text.attr({'text-anchor': 'end'})
         headX = 10 + ((k)*boxWidth);
     }
 
@@ -39,7 +40,9 @@ function HeatMap(){
         var xPos = 100;
         //Add Gene Name
         var geneName = oCells.item(0).innerHTML;
-        paper.text(60, yPos+(boxHeight/2), geneName);
+        var text = paper.text(60, yPos+(boxHeight/2), geneName);
+        text.attr({'text-anchor': 'start'})
+
         //Skip the header column (gene name)
         for(var j = 1; j < columns+1; j++){
             var cellVal = oCells.item(j).innerHTML;
@@ -56,6 +59,7 @@ function HeatMap(){
 
     //document.getElementById("tf_table").style.visibility="hidden";
     document.getElementById("tesites").style.visibility = "hidden";
+    document.getElementById("tissueexp_container").style.overflow = "scroll";
 }
 
 function calculateColorStatistics(oTable){

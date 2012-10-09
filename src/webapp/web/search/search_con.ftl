@@ -140,7 +140,7 @@
     <div class="search_field_row">
         <div class="search_field_title">Gene Symbol List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.genes" cols="80" rows="5" cssClass="input_textarea" />  &nbsp; &nbsp; <br/>(eg: UBA7,THRA &nbsp; Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.genes" cols="80" rows="5" cssClass="input_textarea" />  &nbsp; &nbsp; <br/>(eg: Isg15, Cxcl10, Stat1 &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>
