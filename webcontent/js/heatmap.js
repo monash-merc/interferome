@@ -45,12 +45,17 @@ function HeatMap(){
 
         //Skip the header column (gene name)
         for(var j = 1; j < columns+1; j++){
-            var cellVal = oCells.item(j).innerHTML;
-            if(cellVal != null && cellVal != ""){
-                var rect = paper.rect(xPos, yPos, boxWidth, boxHeight);
-                var color = getColor(colorStats[0], colorStats[1], colorStats[2], cellVal);
-                rect.attr({fill: color, stroke:"white"});
-                xPos=xPos+boxWidth;
+            var cell = oCells.item(j);
+            if(cell != null){
+                var cellVal = cell.innerHTML;
+                if(cellVal != null){
+                    if(cellVal != null && cellVal != ""){
+                        var rect = paper.rect(xPos, yPos, boxWidth, boxHeight);
+                        var color = getColor(colorStats[0], colorStats[1], colorStats[2], cellVal);
+                        rect.attr({fill: color, stroke:"white"});
+                        xPos=xPos+boxWidth;
+                    }
+                }
             }
 
         }
@@ -68,17 +73,28 @@ function calculateColorStatistics(oTable){
     var min = oTable.rows.item(1).cells.item(1).innerHTML;
     for (i = 1; i < oTable.rows.length; i++){
         //Skip the header column (gene name)
-        for(var j = 1; j < oTable.rows.item(0).cells.length; j++){
-            var cellVal = parseFloat(oTable.rows.item(i).cells.item(j).innerHTML);
-               averageArray.push(cellVal);
-               if(cellVal < min){
-                   min = cellVal;
+        var rowItem = oTable.rows.item(0);
+        if(rowItem != null){
+            for(var j = 1; j < rowItem.cells.length; j++){
+                var row = oTable.rows.item(i);
+                if(row != null){
+                   cell = row.cells.item(j);
+                   if(cell != null){
+                       var cellVal = cell.innerHTML;
+                       if(cellVal != null){
+                           cellVal = parseFloat(cellVal);
+                           averageArray.push(cellVal);
+                           if(cellVal < min){
+                               min = cellVal;
 
-               }
-               if(cellVal > max){
-                   max = cellVal;
-               }
-
+                           }
+                           if(cellVal > max){
+                               max = cellVal;
+                           }
+                       }
+                   }
+                }
+            }
         }
     }
     var returnVal = new Array();
