@@ -1295,7 +1295,6 @@ public class SearchAction extends DMBaseAction {
             csvWriter.writeNext(new String[]{"Ensembl Id", "Gene Name", "Description", "Entrez", "Genbank", "UniGene"});
             List<Gene> geneList = gPagination.getPageResults();
             for (Gene gene : geneList) {
-            //for (Data gene : dataList) {
                 //get geneTable
                 String geneName = gene.getGeneName();
                 String description = gene.getDescription();
