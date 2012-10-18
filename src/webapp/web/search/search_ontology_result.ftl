@@ -1,6 +1,13 @@
 <div class="result_title_div">
     Search Results
 </div>
+<div class="data_header_div">
+    <div class="export_div">
+        Save as a CSV file <a
+        href="${base}/search/exportCsvFileOntology.jspx">
+        <img src="${base}/images/export.png" class="search_ctip_image" id="export_csv"/></a>
+    </div>
+</div>
 <div class="search_table_div">
     <@s.iterator status="ontologyList" value="ontologyList" id="ontlResults">
 

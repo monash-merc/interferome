@@ -671,7 +671,18 @@
 				<param name="contentDisposition">${contentDisposition}</param>
 				<param name="bufferSize">${bufferSize}</param>
 			</result>
-		</action>
+        </action>
+        <!-- export the OntologyResult -->
+    	<action name="exportCsvFileOntology" class="search.searchAction" method="exportCsvFileOntology">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
     </package>
 
     <!-- Search -->
