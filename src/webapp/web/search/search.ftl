@@ -14,6 +14,12 @@
             });
         });
 
+        $(document).ready(function () {
+            $("#export_pic").easyTooltip({
+                tooltipId:"expcsv_tips",
+                content:'<h4>Save The Search Results To A PNG or GPEG File</h4>'
+            });
+        });
 
         $(document).ready(function () {
             $("#export_csv").easyTooltip({

@@ -531,7 +531,7 @@ public class SearchAction extends DMBaseAction {
             } else {
                 viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
             }
-            //orderBy = "goTermAccession";
+
             //validation failed
             if (!validConds()) {
                 return ERROR;
@@ -836,7 +836,6 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             ontologyList = this.searchDataService.searchOntology(searchBean, 1, maxRecords, orderBy, orderByType);
-
             this.csvInputStream = createCSVFileOntology(searchBean, ontologyList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
@@ -1541,7 +1540,6 @@ public class SearchAction extends DMBaseAction {
             }
             //write new empty line
             csvWriter.writeNext(new String[]{""});
-            //csvWriter.writeNext(new String[]{""});
             //create Go Functions (Cellular component, Molecular Function, Biological process)
             String[] goFunctions = new String[]{"Cellular component", "Molecular Function", "Biological process"};
             int it = 0;

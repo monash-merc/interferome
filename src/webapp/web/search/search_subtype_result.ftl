@@ -4,7 +4,7 @@
     <div class="export_div">
         Save as a PNG file <a
         href="${base}/search/exportCsvFile.jspx">
-        <img src="${base}/images/export.png" class="search_ctip_image" id="export_csv"/></a>
+        <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
     </div>
 <div class="search_table_div">
 <div id="venn">
