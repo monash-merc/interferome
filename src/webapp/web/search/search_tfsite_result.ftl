@@ -3,7 +3,7 @@
 </div>
 <div class="export_div">
     Save as a PNG file <a
-    href="${base}/search/exportCsvFile.jspx">
+    href="${base}/search/exportImageFileTFanalysis.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
 <br>

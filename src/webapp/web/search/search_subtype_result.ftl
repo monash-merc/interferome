@@ -1,11 +1,6 @@
 <div class="result_title_div">
     Search Results
 </div>
-    <div class="export_div">
-        Save as a PNG file <a
-        href="${base}/search/exportCsvFile.jspx">
-        <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
-    </div>
 <div class="search_table_div">
 <div class="nojava">
     <p>Javascript Must Be Enabled to View These Results</p>

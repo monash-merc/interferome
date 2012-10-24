@@ -40,6 +40,9 @@ import edu.monash.merc.exception.DCConfigException;
 import edu.monash.merc.exception.DCException;
 import edu.monash.merc.service.SearchDataService;
 import edu.monash.merc.util.MercUtil;
+import edu.monash.merc.util.captcha.ImageUtil;
+import edu.monash.merc.util.captcha.ImgCaptcha;
+import edu.monash.merc.util.captcha.TransparentBackgroundProducer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -181,6 +186,10 @@ public class SearchAction extends DMBaseAction {
      */
     private String goLink;
 
+    /**
+         * pic file inputstream
+         */
+    private InputStream imageStream;
 
     // For searching result csv file exporting
     private String contentType;
@@ -854,6 +863,50 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
+    public String exportImageFileTFanalysis() {
+            try {
+                //get the logged in user if existed
+                user = getCurrentUser();
+                if (user != null) {
+                    viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+                } else {
+                    viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+                }
+                //validation failed
+                if (!validConds()) {
+                    //sub type post process
+                    subTypePostProcess();
+                    return ERROR;
+                }
+                int maxRecordLimit = Integer.valueOf(appSetting.getPropValue(AppPropSettings.SEARCH_RESULT_TO_CSV_MAX_RECORD));
+
+                if (maxRecords == 0) {
+                    maxRecords = maxRecordLimit;
+                }
+                if (maxRecords > maxRecordLimit) {
+                    maxRecords = maxRecordLimit;
+                }
+
+                //query the data by pagination
+                List<Object[]> results = this.searchDataService.searchTFSite(searchBean, 1, maxRecords, orderBy, orderByType);
+                this.imageStream = createImageFileTFanalysis(searchBean, results);
+                String FileName = MercUtil.genCurrentTimestamp();
+
+                this.contentDisposition = "attachment;filename=\"" + FileName + "_TFanalysisSearchResults.png" + "\"";
+                this.bufferSize = 20480;
+                this.contentType = "application/octet-stream";
+
+                //set the searched flag as true
+                searched = true;
+                //sub type post process
+                subTypePostProcess();
+            } catch (Exception ex) {
+                logger.error(ex);
+                addActionError(getText("tfAnalysis.search.export.image.file.failed"));
+                return ERROR;
+            }
+            return SUCCESS;
+        }
     private boolean validConds() {
         //check the searchBean first
         if (searchBean == null) {
@@ -1585,6 +1638,33 @@ public class SearchAction extends DMBaseAction {
         }
 
     }
+    private InputStream createImageFileTFanalysis(SearchBean searchBean, List<Object[]> results) {
+
+        ByteArrayOutputStream picOutputStream = null;
+
+        try {
+            picOutputStream = new ByteArrayOutputStream();
+
+
+
+
+            //flush out
+            picOutputStream.flush();
+            this.imageStream = new ByteArrayInputStream(picOutputStream.toByteArray());
+            return this.imageStream;
+        } catch (Exception ex) {
+            throw new DCException(ex);
+        } finally {
+            if (picOutputStream != null) {
+                try {
+                    picOutputStream.close();
+                } catch (Exception cex) {
+                    //ignore whatever
+                }
+            }
+        }
+
+    }
     private void subTypePostProcess() {
         //Load the interferon subtypes based on the type selected
         //and if the type is not all value -1, then loaded the subtype again
@@ -1886,6 +1966,14 @@ public class SearchAction extends DMBaseAction {
     public void setCsvInputStream(InputStream csvInputStream) {
         this.csvInputStream = csvInputStream;
     }
+
+    public InputStream getImageStream() {
+   		return imageStream;
+   	}
+
+   	public void setImageStream(InputStream imageStream) {
+   		this.imageStream = imageStream;
+   	}
 
     public String getContentDisposition() {
         return contentDisposition;
