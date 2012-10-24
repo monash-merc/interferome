@@ -7,6 +7,9 @@
         <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
     </div>
 <div class="search_table_div">
+<div class="nojava">
+    <p>Javascript Must Be Enabled to View These Results</p>
+</div>
 <div id="venn">
 <div id="hiddenlist">
 <ul>

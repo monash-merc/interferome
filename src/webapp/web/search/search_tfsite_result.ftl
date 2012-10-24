@@ -12,6 +12,9 @@
 <br/>
 <div class="search_table_div">
     Sites shown are only the most prevalent for the dataset searched.
+    <div class="nojava">
+        <p>Javascript Must Be Enabled to View These Results</p>
+    </div>
     <div id="promoter_container"></div>
     <div id="tf_table">
         <table id="tfsites">

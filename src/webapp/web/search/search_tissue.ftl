@@ -2,6 +2,9 @@
     Search Results
 </div>
 <div class="search_table_div">
+    <div class="nojava">
+        <p>Javascript Must Be Enabled to View These Results</p>
+    </div>
     <div id="tissueexp_container"></div>
     <div id="te_table">
         <table id="tesites">

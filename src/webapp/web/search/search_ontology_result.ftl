@@ -10,7 +10,9 @@
 </div>
 <div class="search_table_div">
     <@s.iterator status="ontologyList" value="ontologyList" id="ontlResults">
-
+            <div class="nojava">
+                <p>Javascript Must Be Enabled to View These Results</p>
+            </div>
             <div id="myCanvasContainer<@s.property value='%{#ontologyList.count}' />">
                 <canvas width="500" height="300" id="myCanvas<@s.property value='%{#ontologyList.count}' />">
                     <p>In Internet Explorer versions up to 8, things inside the canvas are inaccessible!</p>
@@ -39,8 +41,7 @@
                     <td><@s.property value="#onResults[0].goTermName"/></td>
                     <td><@s.property value="#onResults[0].goTermDefinition"/></td>
                     <td><@s.property value="#onResults[1]"/></td>
-                    <!--<td><@s.property value="#onResults[2]"/></td>-->
-                    <td>N/A</td>
+                    <td><@s.property value="#onResults[2]"/></td>
                 </tr>
             </@s.iterator>
        </table>

@@ -62,6 +62,10 @@ window.onload = function() {
         document.getElementById('myCanvasContainer3').style.display = 'none';
     }
 
+    //Everything worked remove the java required tag
+    document.getElementsByClassName('nojava').style.display = 'none';
+
+
 };
 
 function drawVenn(){
