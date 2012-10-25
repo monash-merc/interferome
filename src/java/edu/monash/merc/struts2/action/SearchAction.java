@@ -1601,7 +1601,7 @@ public class SearchAction extends DMBaseAction {
                   //write Go Functions (Cellular component, Molecular Function, Biological process)
                   csvWriter.writeNext(new String[]{"Search GO " + goFunctions[it]});
                   //write a search results data column headers
-                  csvWriter.writeNext(new String[]{"Accession", "Term Name", "Term Definition", "Gene Count", "p Value"});
+                  csvWriter.writeNext(new String[]{"Accession", "Link","Term Name", "Term Definition", "Gene Count", "p Value"});
                   for ( Object[] objarray: list1)  {
                       Ontology ont1 = (Ontology) objarray[0];
                       //get String
@@ -1613,9 +1613,9 @@ public class SearchAction extends DMBaseAction {
                       //get result
                       long gCount = (Long) objarray[1];
                       double pvalue = (Double) objarray[2];
-
+                      this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
                       //write total records
-                      csvWriter.writeNext(new String[]{TermAccession,newDelimTermName,newDelimTermDefinition, String.valueOf(gCount), " N/A"});
+                      csvWriter.writeNext(new String[]{TermAccession,goLink+TermAccession,newDelimTermName,newDelimTermDefinition, String.valueOf(gCount), " N/A"});
                   }
               //write empty line
               csvWriter.writeNext(new String[]{""});

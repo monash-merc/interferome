@@ -1,15 +1,6 @@
 <div class="result_title_div">
     Search Results
 </div>
-<div class="export_div">
-    Save as a PNG file <a
-    href="${base}/search/exportImageFileTFanalysis.jspx">
-    <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
-</div>
-<br>
-<br/>
-<br>
-<br/>
 <div class="search_table_div">
     Sites shown are only the most prevalent for the dataset searched.
     <div class="nojava">
