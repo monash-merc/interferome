@@ -11,7 +11,7 @@
 <div class="search_table_div">
     <@s.iterator status="ontologyList" value="ontologyList" id="ontlResults">
             <div class="nojava">
-                <p>Javascript Must Be Enabled to View These Results</p>
+                <p>(Javascript Must Be Enabled to View These Results)</p>
             </div>
             <div id="myCanvasContainer<@s.property value='%{#ontologyList.count}' />">
                 <canvas width="500" height="300" id="myCanvas<@s.property value='%{#ontologyList.count}' />">

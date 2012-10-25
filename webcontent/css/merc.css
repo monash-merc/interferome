@@ -366,7 +366,10 @@ body {
     font-weight: normal;
     text-align: center;
 }
-
+.nojava{
+    font-size: 11px;
+    color: #858585
+}
 .empty_div {
     margin: 0 auto;
     height: 50px;
