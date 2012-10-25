@@ -63,8 +63,12 @@ window.onload = function() {
     }
 
     //Everything worked remove the java required tag
-    document.getElementsByClassName('nojava').style.display = 'none';
+    var noJavaDivs = document.getElementsByClassName('nojava')
 
+
+    for (var i = 0; i < noJavaDivs.length; i++) {
+        noJavaDivs[i].style.display = 'none';
+    }
 
 };
 
@@ -105,6 +109,6 @@ function drawVenn(){
     t3Title.attr({
         "font-size": "16pt"
     });
-    paper.
+
     document.getElementById("hiddenlist").style.display = "none";
 }

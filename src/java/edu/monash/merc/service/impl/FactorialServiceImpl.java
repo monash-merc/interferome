@@ -24,63 +24,55 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */package edu.monash.merc.common.page;
+ */
+package edu.monash.merc.service.impl;
 
-import java.text.DecimalFormat;
-import java.util.LinkedList;
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
+import edu.monash.merc.dao.impl.ExperimentDAO;
+import edu.monash.merc.dao.impl.FactorialDAO;
+import edu.monash.merc.domain.Experiment;
+import edu.monash.merc.domain.Factorial;
+import edu.monash.merc.service.ExperimentService;
+import edu.monash.merc.service.FactorialService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Pagination Implementation
+ * ExperimentService Service Implementation class
  *
- * @author Simon Yu - Xiaoming.Yu@monash.edu
+ * @author Sam Forster - sam.forster@monash.edu
  * @version 2.0
  */
+@Scope("prototype")
+@Service
+@Transactional
+public class FactorialServiceImpl implements FactorialService {
 
-public class Pagination<T> extends SimplePagination implements java.io.Serializable {
+	@Autowired
+	private FactorialDAO factorialDAO;
 
-	protected List<T> pageResults = new LinkedList<T>();
-
-    protected int searchedRecords = 0;
-    protected double searchSuccessPercentage = 0;
-
-	public Pagination() {
-
+	/**
+	 * @param factorialDAO
+	 *            the factorialDAO to set
+	 */
+	public void setFactorialDAO(FactorialDAO factorialDAO) {
+		this.factorialDAO = factorialDAO;
 	}
 
-    public Pagination(int pageNo, int sizePerPage, int totalRecords, int searchedRecords){
-        super(pageNo, sizePerPage, totalRecords);
-        this.searchedRecords = searchedRecords;
-        this.searchSuccessPercentage = ((double)totalRecords/(double)searchedRecords)*100;
+
+    @Override
+    public Factorial getFactorialByValue(long value) {
+        return this.factorialDAO.getFactorialBySearch(value);
     }
 
-	public Pagination(int pageNo, int sizePerPage, int totalRecords) {
-		super(pageNo, sizePerPage, totalRecords);
-	}
-
-	public Pagination(int pageNo, int sizePerPage, int totalRecords, List<T> results) {
-		super(pageNo, sizePerPage, totalRecords);
-		this.pageResults = results;
-	}
-
-	public int getFirstResult() {
-		return (pageNo - 1) * sizePerPage;
-	}
-
-	public List<T> getPageResults() {
-		return pageResults;
-	}
-
-	public void setPageResults(List<T> pageResults) {
-		this.pageResults = pageResults;
-	}
-
-    public int getSearchedRecords(){
-        return searchedRecords;
-    }
-
-    public double getSearchSuccessPercentage(){
-        DecimalFormat df = new DecimalFormat("#.#");
-        return Double.valueOf(df.format(searchSuccessPercentage));
+    @Override
+    public void addFactorial(Factorial fact) {
+        this.factorialDAO.add(fact);
     }
 }

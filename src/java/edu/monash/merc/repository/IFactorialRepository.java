@@ -24,63 +24,26 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */package edu.monash.merc.common.page;
+ */
 
-import java.text.DecimalFormat;
-import java.util.LinkedList;
+package edu.monash.merc.repository;
+
+import edu.monash.merc.domain.Factorial;
+import edu.monash.merc.domain.Gene;
+
+import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Pagination Implementation
- *
- * @author Simon Yu - Xiaoming.Yu@monash.edu
- * @version 2.0
+ * @author Simon Yu
+ * @version 1.0
+ * @email Xiaoming.Yu@monash.edu
+ * @since 1.0
+ *        <p/>
+ *        Date: 26/06/12
+ *        Time: 6:32 PM
  */
+public interface IFactorialRepository {
 
-public class Pagination<T> extends SimplePagination implements java.io.Serializable {
-
-	protected List<T> pageResults = new LinkedList<T>();
-
-    protected int searchedRecords = 0;
-    protected double searchSuccessPercentage = 0;
-
-	public Pagination() {
-
-	}
-
-    public Pagination(int pageNo, int sizePerPage, int totalRecords, int searchedRecords){
-        super(pageNo, sizePerPage, totalRecords);
-        this.searchedRecords = searchedRecords;
-        this.searchSuccessPercentage = ((double)totalRecords/(double)searchedRecords)*100;
-    }
-
-	public Pagination(int pageNo, int sizePerPage, int totalRecords) {
-		super(pageNo, sizePerPage, totalRecords);
-	}
-
-	public Pagination(int pageNo, int sizePerPage, int totalRecords, List<T> results) {
-		super(pageNo, sizePerPage, totalRecords);
-		this.pageResults = results;
-	}
-
-	public int getFirstResult() {
-		return (pageNo - 1) * sizePerPage;
-	}
-
-	public List<T> getPageResults() {
-		return pageResults;
-	}
-
-	public void setPageResults(List<T> pageResults) {
-		this.pageResults = pageResults;
-	}
-
-    public int getSearchedRecords(){
-        return searchedRecords;
-    }
-
-    public double getSearchSuccessPercentage(){
-        DecimalFormat df = new DecimalFormat("#.#");
-        return Double.valueOf(df.format(searchSuccessPercentage));
-    }
+    public Factorial getFactorialBySearch(long search);
 }

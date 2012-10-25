@@ -31,11 +31,13 @@ package edu.monash.merc.repository;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Factorial;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.SearchBean;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,5 +67,4 @@ public interface ISearchDataRepository {
     List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
     List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
 }

@@ -24,63 +24,68 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */package edu.monash.merc.common.page;
+ */
 
-import java.text.DecimalFormat;
-import java.util.LinkedList;
+package edu.monash.merc.domain;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
+
+import javax.persistence.*;
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Pagination Implementation
- *
- * @author Simon Yu - Xiaoming.Yu@monash.edu
- * @version 2.0
+ * @author Sam Forster
+ * @version 1.0
+ * @email sam.forster@monash.edu
+ * @since 1.0
+ *        <p/>
+ *        Date: 15/10/12
+ *        Time: 10:24 AM
  */
+@Entity
+@Table(name = "factorial")
+@org.hibernate.annotations.Table(appliesTo = "factorial",
+        indexes = {@Index(name = "idx_factNumber", columnNames = {"factorialNumber"})
+        })
+public class Factorial extends Domain {
+    @Id
+    @GeneratedValue(generator = "fact_pk_seq")
+    @GenericGenerator(name = "fact_pk_seq", strategy = "seqhilo")
+    @Column(name = "id", nullable = false)
+    private long id;
 
-public class Pagination<T> extends SimplePagination implements java.io.Serializable {
+    @Basic
+    @Column(name = "factorialNumber")
+    private long search;
 
-	protected List<T> pageResults = new LinkedList<T>();
+    @Basic
+    @Column(name = "answer",  columnDefinition = "longtext")
+    private BigInteger value;
 
-    protected int searchedRecords = 0;
-    protected double searchSuccessPercentage = 0;
-
-	public Pagination() {
-
-	}
-
-    public Pagination(int pageNo, int sizePerPage, int totalRecords, int searchedRecords){
-        super(pageNo, sizePerPage, totalRecords);
-        this.searchedRecords = searchedRecords;
-        this.searchSuccessPercentage = ((double)totalRecords/(double)searchedRecords)*100;
+    public long getId() {
+        return id;
     }
 
-	public Pagination(int pageNo, int sizePerPage, int totalRecords) {
-		super(pageNo, sizePerPage, totalRecords);
-	}
-
-	public Pagination(int pageNo, int sizePerPage, int totalRecords, List<T> results) {
-		super(pageNo, sizePerPage, totalRecords);
-		this.pageResults = results;
-	}
-
-	public int getFirstResult() {
-		return (pageNo - 1) * sizePerPage;
-	}
-
-	public List<T> getPageResults() {
-		return pageResults;
-	}
-
-	public void setPageResults(List<T> pageResults) {
-		this.pageResults = pageResults;
-	}
-
-    public int getSearchedRecords(){
-        return searchedRecords;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public double getSearchSuccessPercentage(){
-        DecimalFormat df = new DecimalFormat("#.#");
-        return Double.valueOf(df.format(searchSuccessPercentage));
+    public long getSearch() {
+        return search;
+    }
+
+    public void setSearch(long search) {
+        this.search = search;
+    }
+
+    public BigInteger getValue() {
+        return value;
+    }
+
+    public void setValue(BigInteger value) {
+        this.value = value;
     }
 }
