@@ -2129,3 +2129,14 @@ div#tissueexp_container{
      background: #90BADE;
      border-color: #90BADE;
  }
+
+ div#saveimage{
+     text-align:center;
+ }
+
+div#hssaveimage{
+    text-align:center;
+}
+div#mmsaveimage{
+    text-align:center;
+}

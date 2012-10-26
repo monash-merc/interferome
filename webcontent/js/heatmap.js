@@ -63,7 +63,10 @@ function HeatMap(){
     }
 
     //document.getElementById("tf_table").style.visibility="hidden";
-    document.getElementById("tesites").style.visibility = "hidden";
+    var svg = paper.toSVG();
+    var b64 = Base64.encode(svg);
+    document.getElementById("saveimage").innerHTML = "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+b64+"' title='heatmap.svg'>Download Image</a>";
+    document.getElementById("tf_table").style.display="none";
     document.getElementById("tissueexp_container").style.overflow = "scroll";
 }
 

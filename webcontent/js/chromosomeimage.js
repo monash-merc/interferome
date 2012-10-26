@@ -65,14 +65,23 @@ function ChromosomeImage(){
     mmChrom['X'] = new Array(0, 167);
     mmChrom['Y'] = new Array(0, 16);
 
-    drawChromosome((new Raphael(document.getElementById('hs_chromosome_container'), 500, 350)), hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
-    drawChromosome((new Raphael(document.getElementById('mm_chromosome_container'), 500, 350)), mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+    var hsPaper = (new Raphael(document.getElementById('hs_chromosome_container'), 500, 350));
+    var mmPaper = (new Raphael(document.getElementById('mm_chromosome_container'), 500, 350))
+    drawChromosome(hsPaper, hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
+    drawChromosome(mmPaper, mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
 
 
 
     //Successful Drawing of Chromosomes hide data table
-    document.getElementById("chromosome_result_tab").style.display="none";
+    var hssvg = hsPaper.toSVG();
+    var hsb64 = Base64.encode(hssvg);
+    var mmsvg = mmPaper.toSVG();
+    var mmb64 = Base64.encode(mmsvg);
+    document.getElementById("hssaveimage").innerHTML = "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+hsb64+"' title='chromosomes.svg'>Download Human Image</a>";
+    document.getElementById("mmsaveimage").innerHTML = "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+mmb64+"' title='chromosomes.svg'>Download Mouse Image</a>";
     document.getElementById("gene_table").style.display="none";
+    document.getElementById("chromosome_result_tab").style.display="none";
+
 }
 
 function drawChromosome(paper, visHashChrom, gene_pos_table, header){

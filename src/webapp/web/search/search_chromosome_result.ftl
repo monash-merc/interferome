@@ -11,7 +11,10 @@
         <p>(Javascript Must Be Enabled to View These Results)</p>
     </div>
     <div id="hs_chromosome_container"></div>
+    <div id="hssaveimage"></div>
     <div id="mm_chromosome_container"></div>
+    <div id="mmsaveimage"></div>
+
     <div id="gene_table">
 
         <!-- test if human and draw human table-->

@@ -13,7 +13,6 @@
                 content:'<h4>Treatment Concentration International Unit</h4><p>Please use the following formula to convert an interferome unit to an international unit.</p>'
             });
         });
-
         $(document).ready(function () {
             $("#export_pic").easyTooltip({
                 tooltipId:"expcsv_tips",

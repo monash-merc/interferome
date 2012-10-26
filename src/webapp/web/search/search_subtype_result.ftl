@@ -10,7 +10,8 @@
 <div class="nojava">
     <p>(Javascript Must Be Enabled to View These Results)</p>
 </div>
-<div id="venn">
+<div id="venn"></div>
+<div id="saveimage"></div>
 <div id="hiddenlist">
 <ul>
 <li id="t1" value="<@s.property value="subtypeList[0]"/>">Type I: &nbsp; <@s.property value="subtypeList[0]" /></li>
@@ -22,6 +23,7 @@
     <li id="t1t2t3" value="<@s.property value="subtypeList[6]"/>">Type I + II + III: &nbsp; <@s.property value="subtypeList[6]"/></li>
 </ul>
 </div>
+
 </div>
 </div>
 <br/>

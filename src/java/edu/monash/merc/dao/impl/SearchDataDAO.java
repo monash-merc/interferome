@@ -30,10 +30,7 @@ package edu.monash.merc.dao.impl;
 
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
-import edu.monash.merc.domain.Data;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.Ontology;
-import edu.monash.merc.domain.TissueExpression;
+import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -44,10 +41,9 @@ import org.hibernate.Query;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
@@ -280,6 +276,24 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //probes.add("A_33_P3818959");
         //probes.add("A_23_P105923");
         //probes.add("A_23_P105923");
+        //TODO: This needs to be checked to combine the lists and get a complete count
+        int searchCount = 0;
+
+        int gbCount = searchBean.getGenBanks().split(",|\t|\n").length;
+        if(searchCount < gbCount){
+            searchCount = gbCount;
+        }
+        int ensCount = searchBean.getEnsembls().split(",|\t|\n").length;
+        if(searchCount < ensCount){
+            searchCount = ensCount;
+        }
+        int gCount = searchBean.getGenes().split(",|\t|\n").length;
+        if(searchCount < gCount){
+            searchCount = gCount;
+            //Multiply by 2 for hs and mm species
+            searchCount=searchCount*2;
+        }
+
 
         Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
@@ -298,7 +312,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             int total = ((Long) geneCountQuery.uniqueResult()).intValue();
             if (total == 0) {
 
-                return new Pagination<Gene>(startPageNo, recordPerPage, total);
+                return new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             }
 
             // System.out.println("================= found total genes size: " + total);
@@ -307,7 +321,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query geneQuery = this.session().createQuery(geneHQL);
             geneQuery.setParameterList(("probes"), probes);
 
-            Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total);
+            Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             geneQuery.setFirstResult(genePagination.getFirstResult());
             geneQuery.setMaxResults(genePagination.getSizePerPage());
 
@@ -317,7 +331,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             genePagination.setPageResults(geneList);
             return genePagination;
         } else {
-            return new Pagination<Gene>(startPageNo, recordPerPage, 0);
+            return new Pagination<Gene>(startPageNo, recordPerPage, 0, searchCount);
         }
     }
 
@@ -599,29 +613,52 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //Assume it is more efficient to get counts for all ontologies first and use this hash in probability calculations
         //This assumption has not been tested and may be incorrect
         //For each GO id found with this search (goList)
-        ArrayList<Object[]> returnVal = new ArrayList<Object[]>();
+        List<Object[]> returnVal = new ArrayList<Object[]>();
         //System.out.println(goCategoryCounts.size());
         Iterator<Object[]> goItr = goList.iterator();
         while (goItr.hasNext()) {
             Object[] goVal = goItr.next();
             //  System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
             Long m = goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession());
-            Double pvalue = null;
+            Double kk = null;
             if (m != null) {
-                pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, (Long) goVal[1]);
-            } else {
-                // System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
-                pvalue = (double) 1;
+                kk = (double)((Long) goVal[1])/m;
+                kk = kk*100;
+                DecimalFormat df = new DecimalFormat("#.##");
+                kk = Double.valueOf(df.format(kk));
             }
-            returnVal.add(new Object[]{goVal[0], goVal[1], pvalue});
+
+            returnVal.add(new Object[]{goVal[0], goVal[1], kk, m, null});
         }
+
+        //sort returnVal
+        Collections.sort(returnVal, new Comparator<Object[]>(){
+
+            @Override
+            public int compare(Object[] o1, Object[] o2) {
+                Double oKK1 = (Double)o1[2];
+                Double oKK2 = (Double)o2[2];
+                return oKK2.compareTo(oKK1);
+            }
+        });
+
+
+        Iterator i = returnVal.iterator();
+        while(i.hasNext()){
+            Object[] o = (Object[])i.next();
+
+
+            o[4] = calculateGOEnrichPValue(totalPopulation, geneSearched, (Long)o[3], (Long) o[1]);;
+        }
+
+
 
         return returnVal;
     }
 
-    private double calculateGOEnrichPValue(long N, long n, long m, long k) {
-        return 0.05;
-        //return ((m/k)*((N-m)/(n-k)))/(N/n);
+    private String calculateGOEnrichPValue(long N, long n, long m, long k) {
+        return "N/A";
+        //((m/k)*((N-m)/(n-k)))/((N/n)+1);
     }
 
 

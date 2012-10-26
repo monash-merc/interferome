@@ -6,9 +6,6 @@
     href="${base}/search/exportCsvFileTissueExpression.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
-<br>
-<br/>
-<br>
 <br/>
 <div class="search_table_div">
     <div class="nojava">
@@ -38,6 +35,8 @@
 
         </li>
     </div>
+    <div id="saveimage"></div>
+
 
 </div>
 <br/>

@@ -5,11 +5,11 @@
  * Time: 11:17 PM
  * To change this template use File | Settings | File Templates.
  */
-
+var paper;
 function PromoterImage(){
     //This is the background
     var rowCount = countRows();
-    var paper = new Raphael(document.getElementById('promoter_container'), 1000, 50+(87.5*rowCount));
+    paper = new Raphael(document.getElementById('promoter_container'), 1000, 50+(87.5*rowCount));
     //
 
     paper.path("M 30 25 l 700 0");
@@ -69,9 +69,18 @@ function PromoterImage(){
         }
 
     }
-
+    var svg = paper.toSVG();
+    var b64 = Base64.encode(svg);
+    document.getElementById("saveimage").innerHTML = "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+b64+"' title='promoter.svg'>Download Image</a>";
     document.getElementById("tf_table").style.display="none";
 
+
+
+}
+
+function save(){
+    alert(paper);
+    savesvg(paper);
 }
 
 function countRows(){
