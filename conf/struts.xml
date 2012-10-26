@@ -683,6 +683,50 @@
     			<param name="bufferSize">${bufferSize}</param>
     		</result>
     	</action>
+        <!-- export the TF Anaylsis  -->
+    	<action name="exportCsvFileTFanalysis" class="search.searchAction" method="exportCsvFileTFanalysis">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
+        <!-- export the Chromosome -->
+    	<action name="exportCsvFileChromosome" class="search.searchAction" method="exportCsvFileChromosome">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
+        <!-- export the Subtypes -->
+    	<action name="exportCsvFileSubtypes" class="search.searchAction" method="exportCsvFileSubtypes">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
+        <!-- export the TissueExpression -->
+    	<action name="exportCsvFileTissueExpression" class="search.searchAction" method="exportCsvFileTissueExpression">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
     </package>
 
     <!-- Search -->

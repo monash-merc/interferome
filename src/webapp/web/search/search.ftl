@@ -17,7 +17,7 @@
         $(document).ready(function () {
             $("#export_pic").easyTooltip({
                 tooltipId:"expcsv_tips",
-                content:'<h4>Save The Search Results To A PNG File</h4>'
+                content:'<h4>Save The Search Data Results To A CSV File</h4>'
             });
         });
 

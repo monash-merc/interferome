@@ -13,7 +13,7 @@
         <a href="${base}/search/searchOntology.jspx">Ontology Analysis</a>
     </div>
     <div class="search_menu_link">
-        <a href="${base}/search/searchTFSite.jspx">TF Anaylsis</a>
+        <a href="${base}/search/searchTFSite.jspx">TF Analysis</a>
     </div>
     <div class="search_menu_link">
         <a href="${base}/search/searchChromosome.jspx">Chromosome</a>
