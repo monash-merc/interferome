@@ -193,7 +193,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromDose > 0) && (toDose > 0) && (fromDose == toDose)) {
                 return " ds.treatmentCon = " + fromDose;
             }
-            if ((fromDose > 0) && (toDose > 0) && (fromDose > toDose)) {
+            if ((fromDose > 0) && (toDose > 0) && (fromDose < toDose)) {
                 return " ds.treatmentCon >= " + fromDose + " AND ds.treatmentCon <= " + toDose;
             }
             if ((fromDose == 0) && (toDose > 0)) {
@@ -215,7 +215,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromTime > 0) && (toTime > 0) && (fromTime == toTime)) {
                 return " ds.treatmentTime = " + fromTime;
             }
-            if ((fromTime > 0) && (toTime > 0) && (fromTime > toTime)) {
+            if ((fromTime > 0) && (toTime > 0) && (fromTime < toTime)) {
                 return " ds.treatmentTime >= " + fromTime + " AND ds.treatmentTime <= " + toTime;
             }
             if ((fromTime == 0) && (toTime > 0)) {
