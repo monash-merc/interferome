@@ -2233,13 +2233,13 @@ public class SearchAction extends DMBaseAction {
                     finishedMGenes.add(ensemblM);
                 }
             }
-            csvWriter.writeNext(new String[]{""});
-            csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
-            for (Object[] obja : chromosomeList) {
-                String chrom = (String) obja[0];
-                long genecounter = (Long) obja[1];
-                csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
-            }
+            //csvWriter.writeNext(new String[]{""});
+            //csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
+            //for (Object[] obja : chromosomeList) {
+            //    String chrom = (String) obja[0];
+            //    long genecounter = (Long) obja[1];
+            //    csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
+            //}
 
             //flush out
             csvWriter.flush();
