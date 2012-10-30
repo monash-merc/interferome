@@ -658,7 +658,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     private String calculateGOEnrichPValue(long N, long n, long m, long k) {
         return "N/A";
-        //((m/k)*((N-m)/(n-k)))/((N/n)+1);
+        //return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
     }
 
 

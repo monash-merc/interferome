@@ -1787,7 +1787,7 @@ public class SearchAction extends DMBaseAction {
                     String newDelimTermDefinition = MercUtil.replaceAllDelimsByNewDelim(TermDefinition, SEMICOLON, new String[]{",", "\t", "\n"});
                     //get result
                     long gCount = (Long) objarray[1];
-                    double pvalue = (Double) objarray[2];
+                    long pvalue = (Long) objarray[4];
                     this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
                     //write total records
                     csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), "N/A"});
