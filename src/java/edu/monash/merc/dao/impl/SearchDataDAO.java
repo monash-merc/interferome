@@ -648,7 +648,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Object[] o = (Object[])i.next();
 
 
-            o[4] = calculateGOEnrichPValue(totalPopulation, geneSearched, (Long)o[3], (Long) o[1]);;
+            o[4] = calculateGOEnrichPValue(totalPopulation, geneSearched, (Long)o[3], (Long) o[1]);
         }
 
 
@@ -656,11 +656,28 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         return returnVal;
     }
 
-    private String calculateGOEnrichPValue(long N, long n, long m, long k) {
-        return "N/A";
-        //return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
-    }
+    private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
+        //return "N/A";
+         Double goC = binomialCoefficient(m,k);
+        Double tgn = binomialCoefficient(N,n);
+        Double goT = binomialCoefficient((N-m),(n-k));
 
+        return (goC *goT / tgn );
+
+       // return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
+
+    }
+    private Double binomialCoefficient(long a, long b){
+        //static long combinations(int n, int k) {
+        Double coeff = 1.0;
+        for (long i = a - b + 1; i <= a; i++) {
+            coeff *= i;
+        }
+        for (long i = 1; i <= b; i++) {
+            coeff /= i;
+        }
+        return coeff;
+}
 
     @SuppressWarnings("unchecked")
     @Override

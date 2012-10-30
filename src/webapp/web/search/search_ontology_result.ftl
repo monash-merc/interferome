@@ -41,8 +41,8 @@
                     <td><@s.property value="#onResults[0].goTermName"/></td>
                     <td><@s.property value="#onResults[0].goTermDefinition"/></td>
                     <td><@s.property value="#onResults[1]"/></td>
-                    <!-- td><@s.property value="#onResults[2]"/></td -->
-                    <td>N/A</td>
+                    <td><@s.property value="#onResults[4]"/></td>
+                    <!--td>N/A</td-->
                 </tr>
             </@s.iterator>
        </table>
