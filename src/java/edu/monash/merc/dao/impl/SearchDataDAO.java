@@ -649,6 +649,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
 
             o[4] = calculateGOEnrichPValue(totalPopulation, geneSearched, (Long)o[3], (Long) o[1]);
+
         }
 
 
@@ -658,11 +659,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
         //return "N/A";
-        Double goC = binomialCoefficient(m,k);
-        Double tgn = binomialCoefficient(N,n);
-        Double goT = binomialCoefficient((N-m),(n-k));
-
-        return (goC *goT / tgn );
+        Double pvalue = (binomialCoefficient(m,k)*binomialCoefficient((N-m),(n-k)))/ binomialCoefficient(N,n);
+        DecimalFormat df = new DecimalFormat("#.##E0");
+        return (Double.valueOf(df.format(pvalue)));
 
        // return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
 
