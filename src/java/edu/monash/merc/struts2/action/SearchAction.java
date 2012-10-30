@@ -729,7 +729,7 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
-
+    // Export CSV
     public String exportCsvFile() {
         try {
             //get the logged in user if existed
@@ -1165,7 +1165,7 @@ public class SearchAction extends DMBaseAction {
         }
         return true;
     }
-
+    // create CSV
     private InputStream createCSVFile(SearchBean searchBean, Pagination<Data> dPagination) {
         CSVWriter csvWriter = null;
         try {

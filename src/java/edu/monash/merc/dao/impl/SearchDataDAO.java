@@ -667,7 +667,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     }
     private Double binomialCoefficient(long a, long b){
-        //static long combinations(int n, int k) {
+        if (b < 0 || b > a){
+        return null;
+        }
+        if (b > (a - b))  {
+        b = a - b;
+        }
         Double coeff = 1.0;
         for (long i = a - b + 1; i <= a; i++) {
             coeff *= i;
