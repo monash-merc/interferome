@@ -658,7 +658,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
         //return "N/A";
-         Double goC = binomialCoefficient(m,k);
+        Double goC = binomialCoefficient(m,k);
         Double tgn = binomialCoefficient(N,n);
         Double goT = binomialCoefficient((N-m),(n-k));
 
@@ -677,7 +677,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             coeff /= i;
         }
         return coeff;
-}
+    }
 
     @SuppressWarnings("unchecked")
     @Override
