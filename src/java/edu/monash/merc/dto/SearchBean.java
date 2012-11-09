@@ -125,27 +125,27 @@ public class SearchBean implements Serializable {
     /**
      * select any fold change value or by range
      */
-    private String anyRangeFold = "any";
+    // private String anyRangeFold = "any";
 
     /**
      * flag if up value provide
      */
-    private boolean upProvided;
+    // private boolean upProvided;
 
     /**
      * select up to value
      */
-    private double upValue;
+    private double upValue = 2.0;
 
     /**
      * flag if up value provide
      */
-    private boolean downProvided;
+    // private boolean downProvided;
 
     /**
      * select down to value
      */
-    private double downValue;
+    private double downValue = 2.0;
 
     /**
      * provided the gene list, separated by comma
@@ -309,21 +309,21 @@ public class SearchBean implements Serializable {
         this.abVariation = abVariation;
     }
 
-    public String getAnyRangeFold() {
-        return anyRangeFold;
-    }
+//    public String getAnyRangeFold() {
+//        return anyRangeFold;
+//    }
+//
+//    public void setAnyRangeFold(String anyRangeFold) {
+//        this.anyRangeFold = anyRangeFold;
+//    }
 
-    public void setAnyRangeFold(String anyRangeFold) {
-        this.anyRangeFold = anyRangeFold;
-    }
-
-    public boolean isUpProvided() {
-        return upProvided;
-    }
-
-    public void setUpProvided(boolean upProvided) {
-        this.upProvided = upProvided;
-    }
+//    public boolean isUpProvided() {
+//        return upProvided;
+//    }
+//
+//    public void setUpProvided(boolean upProvided) {
+//        this.upProvided = upProvided;
+//    }
 
     public double getUpValue() {
         return upValue;
@@ -333,13 +333,13 @@ public class SearchBean implements Serializable {
         this.upValue = upValue;
     }
 
-    public boolean isDownProvided() {
-        return downProvided;
-    }
-
-    public void setDownProvided(boolean downProvided) {
-        this.downProvided = downProvided;
-    }
+//    public boolean isDownProvided() {
+//        return downProvided;
+//    }
+//
+//    public void setDownProvided(boolean downProvided) {
+//        this.downProvided = downProvided;
+//    }
 
     public double getDownValue() {
         return downValue;
@@ -439,9 +439,7 @@ public class SearchBean implements Serializable {
         if (!isNoneDsCondition()) {
             return false;
         }
-        if (!StringUtils.equalsIgnoreCase(anyRangeFold, "any")) {
-            return false;
-        }
+
         if (StringUtils.isNotBlank(genes)) {
             return false;
         }
@@ -497,9 +495,20 @@ public class SearchBean implements Serializable {
                 return false;
             }
         }
+        //fold change
+        if ((upValue != 2.0) || (downValue != 2.0)) {
+            return false;
+        }
         //not select any normal or abnormal variation
         VariationCondtion variationCondtion = getVariationCondtion();
         if (variationCondtion.isVarProvided()) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean selectOneOfThreeList() {
+        if (StringUtils.isBlank(genes) && StringUtils.isBlank(genBanks) && StringUtils.isBlank(ensembls)) {
             return false;
         }
         return true;

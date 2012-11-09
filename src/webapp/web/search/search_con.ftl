@@ -69,7 +69,6 @@
    </div>
 </div>
 <div class="search_line_space"></div>
-
 <div class="search_data_outer_div">
     <table class="multiple_select_tab">
         <tr>
@@ -81,6 +80,14 @@
             <td width="80" align="center">Cell Line:</td>
             <td><@s.select name="searchBean.cellLines" id="select_cellline" headerKey="-1" headerValue="All"  multiple="true" size="4" list="cellLineMap" cssClass="search_mul_select"  /></td>
         </tr>
+        <tr>
+            <td></td><td></td><td></td>
+            <td colspan="6">
+                <div class="comment_gray">
+                    (Select multiple values using Shift key)
+                </div>
+            </td>
+        </tr>
     </table>
 </div>
 
@@ -91,7 +98,7 @@
         <table>
             <tr>
                 <td>
-                    <div class="search_field_title">Normal | Abnormal:</div>
+                    <div class="search_field_title">Sample Types:</div>
                 </td>
                 <td>
                      <@s.radio name="searchBean.variation" list="variationMap" value="searchBean.variation" id="search_normal" title="search by normal or abnormal"/>
@@ -118,61 +125,13 @@
 <div class="search_data_outer_div">
     <div class="search_field_row">
         <div class="search_field_title">Fold Change:</div>
-        <div class="search_field_radio">
-            <@s.radio name="searchBean.anyRangeFold" list="anyOrRanges" value="searchBean.anyRangeFold" id="search_fold" title="search by fold change"/>
+        <div class="search_field_value_block">
+            Up: <@s.textfield name="searchBean.upValue" id="upValue" cssClass="search_input"/>&nbsp; Down: <@s.textfield name="searchBean.downValue" id="downValue" cssClass="search_input"/>
 
-            <@s.if test="%{searchBean.anyRangeFold =='any'}">
-            <@s.select name="upordown" id="selected_up_down" style="display: none;" headerKey="-1" headerValue=" - select up or down - " list="upDown" cssClass="search_select_mid"  /> &nbsp;
-            </@s.if>
-            <@s.else>
-            <@s.select name="upordown" id="selected_up_down" headerKey="-1" headerValue=" - select up or down - " list="upDown" cssClass="search_select_mid"  /> &nbsp;
-            </@s.else>
-
-            <div class="fold_change_div">
-            <@s.if test="%{searchBean.anyRangeFold =='any'}">
-                <div class="updown_range" id="foldchange_up"></div>
-                <div class="updown_range" id="foldchange_down"></div>
-            </@s.if>
-            <@s.else>
-                <!-- up value -->
-                <@s.if test="%{searchBean.upProvided == true}">
-                    <div class="updown_range" id="foldchange_up">
-                        <table>
-                            <tr>
-                                <td width="50">Up: <@s.hidden name="searchBean.upProvided" id="upProvided"/></td>
-                                <td><@s.textfield name="searchBean.upValue" id="upValue" cssClass="search_input"/></td>
-                                <td class="search_unit">(value >= 1.0)</td>
-                                <td><img src="${base}/images/delete.png" id="remove_up" class="remove_image" /></td>
-                            </tr>
-                        </table>
-                    </div>
-                </@s.if>
-                <@s.else>
-                    <div class="updown_range" id="foldchange_up"></div>
-                </@s.else>
-
-                <!-- down value -->
-                <@s.if test="%{searchBean.downProvided == true}">
-                    <div class="updown_range" id="foldchange_down">
-                        <table>
-                            <tr>
-                                <td width="50">Down: <@s.hidden name="searchBean.downProvided" id="downProvided" /></td>
-                                <td><@s.textfield name="searchBean.downValue" id="downValue" cssClass="search_input"/></td>
-                                <td class="search_unit">(value >= 1.0)</td>
-                                <td><img src="${base}/images/delete.png" id="remove_down" class="remove_image" /></td>
-                            </tr>
-                        </table>
-                    </div>
-                </@s.if>
-                <@s.else>
-                    <div class="updown_range" id="foldchange_down"></div>
-                </@s.else>
-
-            </@s.else>
+            <div class="comment_gray">
+                (The Fold Change value must be greater or equal to 1)
             </div>
-            <div style="clear:both"></div>
         </div>
-
     </div>
 </div>
 <div class="search_line_space"></div>
@@ -181,7 +140,7 @@
     <div class="search_field_row">
         <div class="search_field_title">Gene Symbol List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.genes" cols="80" rows="5" cssClass="input_textarea" />  &nbsp; &nbsp; <br/>(Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.genes" cols="80" rows="5" cssClass="input_textarea" />  &nbsp; &nbsp; <br/>(eg: Isg15, Cxcl10, Stat1 &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>
@@ -193,7 +152,7 @@
     <div class="search_field_row">
         <div class="search_field_title">GenBank Accession List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.genBanks" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/> (Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.genBanks" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/> (eg: L13852,X55005 &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>
@@ -205,7 +164,7 @@
     <div class="search_field_row">
         <div class="search_field_title">Ensembl Id List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.ensembls" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/>(Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.ensembls" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/>(eg: ENSG00000182179,ENSG00000126351 &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>

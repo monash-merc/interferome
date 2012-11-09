@@ -22,7 +22,10 @@
                 </div>
                 <div class="empty_div"></div>
                 <div class="help_row_div">
-                  Please download the PDF version : <a href="http://interferome.googlecode.com/files/Data%20Publication%20to%20Interferome%20User%20Guide25.pdf">User Guide</a>
+                    Interferome User Guide (Pdf) : <a href="http://interferome.googlecode.com/files/Data%20Publication%20to%20Interferome%20User%20Guide25.pdf">User Guide</a>
+                    <@s.if test="%{#session.authentication_flag =='authenticated'}">
+                        Data Administrator Guide (Pdf) : <a href="http://interferome.googlecode.com/files/Data%20Publication%20to%20Interferome%20User%20Guide25.pdf">User Guide</a>
+                    </@s.if>
                 </div>
                 <div class="empty_div"></div>
                 <div class="parag_title_div">
