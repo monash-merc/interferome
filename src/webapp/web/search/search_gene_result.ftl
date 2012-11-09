@@ -5,7 +5,7 @@
     <span class="name_title">Found a total of <font color="green"> ${genePagination.totalRecords}</font> of ${genePagination.searchedRecords} searched Gene(s) (${genePagination.searchSuccessPercentage}%)</span>
 <@s.if test="%{genePagination.totalRecords >0 }">
     <div class="export_div">
-        Save as a CSV file <a
+        Save as a TXT file <a
             href="${base}/search/exportCsvFileGene.jspx?maxRecords=<@s.property value='genePagination.totalRecords' />&orderBy=${orderBy}&orderByType=${orderByType}">
         <img src="${base}/images/export.png" class="search_ctip_image" id="export_csv"/></a>
     </div>

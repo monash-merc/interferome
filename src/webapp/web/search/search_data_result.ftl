@@ -6,7 +6,7 @@
 
 <@s.if test="%{dataPagination.totalRecords >0 }">
     <div class="export_div">
-        Save as a CSV file <a
+        Save as a TXT file <a
             href="${base}/search/exportCsvFile.jspx?maxRecords=<@s.property value='dataPagination.totalRecords' />&orderBy=${orderBy}&orderByType=${orderByType}">
         <img src="${base}/images/export.png" class="search_ctip_image" id="export_csv"/></a>
     </div>

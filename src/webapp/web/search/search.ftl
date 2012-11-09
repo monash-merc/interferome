@@ -17,14 +17,14 @@
         $(document).ready(function () {
             $("#export_pic").easyTooltip({
                 tooltipId:"expcsv_tips",
-                content:'<h4>Save The Search Data Results To A CSV File</h4>'
+                content:'<h4>Save The Search Data Results To A TXT File</h4>'
             });
         });
 
         $(document).ready(function () {
             $("#export_csv").easyTooltip({
                 tooltipId:"expcsv_tips",
-                content:'<h4>Save The Search Results To A CSV File</h4><p>(Maximum records are up to ${maxRecords})</p>'
+                content:'<h4>Save The Search Results To A TXT File</h4><p>(Maximum records are up to ${maxRecords})</p>'
             });
         });
     </script>

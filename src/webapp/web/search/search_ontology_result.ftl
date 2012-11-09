@@ -3,7 +3,7 @@
 </div>
 <div class="data_header_div">
     <div class="export_div">
-        Save as a CSV file <a
+        Save as a TXT file <a
         href="${base}/search/exportCsvFileOntology.jspx">
         <img src="${base}/images/export.png" class="search_ctip_image" id="export_csv"/></a>
     </div>
@@ -32,7 +32,15 @@
                   </@s.iterator>
                 </ul>
             </div>
-
+        <@s.if test="#onResults[0].goDomain.id == 3">
+            Cellular Component
+        </@s.if>
+        <@s.if test="#onResults[0].goDomain.id == 2">
+            Molecular Function
+        </@s.if>
+        <@s.if test="#onResults[0].goDomain.id == 1">
+            Biological Process
+        </@s.if>
         <table  class="search_result_tab">
             <tr class="search_result_header"><td>Accession</td><td>Term Name</td><td>Term Definition</td><td>Gene Count</td><td>p Value</td></tr>
             <@s.iterator status="ontlResults" value="#ontlResults" id="onResults">

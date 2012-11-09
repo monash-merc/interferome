@@ -2,7 +2,7 @@
     Search Results
 </div>
 <div class="export_div">
-    <a
+    Save as a TXT file<a
     href="${base}/search/exportCsvFileSubtypes.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
