@@ -42,6 +42,7 @@ import edu.monash.merc.util.interferome.dataset.ExpFactor;
 import edu.monash.merc.util.interferome.dataset.IFNTypeFactor;
 import edu.monash.merc.util.interferome.dataset.VarFactor;
 import edu.monash.merc.util.reporter.ImportReporterThread;
+import edu.monash.merc.util.tfsite.ImportTFSiteThread;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -104,6 +105,9 @@ public class DMServiceImpl implements DMService {
     private ReporterService reporterService;
 
     @Autowired
+    private TFSiteService tfSiteService;
+
+    @Autowired
     private FactorService factorService;
 
     @Autowired
@@ -120,6 +124,24 @@ public class DMServiceImpl implements DMService {
 
     @Autowired
     private DataService dataService;
+
+    @Autowired
+    private GeneService geneService;
+
+    @Autowired
+    private EvidenceCodeService evidenceCodeService;
+
+    @Autowired
+    private GeneOntologyService geneOntologyService;
+
+    @Autowired
+    private GoDomainService goDomainService;
+
+    @Autowired
+    private OntologyService ontologyService;
+
+    @Autowired
+    private ProbeService probeService;
 
     public void setProfileService(ProfileService profileService) {
         this.profileService = profileService;
@@ -204,6 +226,30 @@ public class DMServiceImpl implements DMService {
 
     public void setIfnTypeService(IFNTypeService ifnTypeService) {
         this.ifnTypeService = ifnTypeService;
+    }
+
+    public void setGeneService(GeneService geneService) {
+        this.geneService = geneService;
+    }
+
+    public void setEvidenceCodeService(EvidenceCodeService evidenceCodeService) {
+        this.evidenceCodeService = evidenceCodeService;
+    }
+
+    public void setGeneOntologyService(GeneOntologyService geneOntologyService) {
+        this.geneOntologyService = geneOntologyService;
+    }
+
+    public void setGoDomainService(GoDomainService goDomainService) {
+        this.goDomainService = goDomainService;
+    }
+
+    public void setOntologyService(OntologyService ontologyService) {
+        this.ontologyService = ontologyService;
+    }
+
+    public void setProbeService(ProbeService probeService) {
+        this.probeService = probeService;
     }
 
     @Override
@@ -959,10 +1005,75 @@ public class DMServiceImpl implements DMService {
         return counter;
     }
 
+
     @Override
     public void importReporters(ReporterBean reporterBean) {
         ImportReporterThread reporterThread = new ImportReporterThread(this, reporterBean);
         reporterThread.importReporter();
+    }
+
+
+    //TFSite
+
+    @Override
+    public void saveTFSite(TFSite tfSite) {
+        this.tfSiteService.saveTFSite(tfSite);
+    }
+
+    @Override
+    public void mergeTFSite(TFSite tfSite) {
+        this.tfSiteService.mergeTFSite(tfSite);
+    }
+
+    @Override
+    public void updateTFSite(TFSite tfSite) {
+        this.tfSiteService.updateTFSite(tfSite);
+    }
+
+    @Override
+    public TFSite getTFSite(TFSite tfSite) {
+        return this.tfSiteService.getTFSite(tfSite);
+    }
+
+    @Override
+    public TfSiteCounter importAllTFSites(List<TFSite> tfSites) {
+        int countUpdated = 0;
+        int countNew = 0;
+        //reporters counter
+        TfSiteCounter counter = new TfSiteCounter();
+
+        for (TFSite tfSite : tfSites) {
+            Gene gene = this.getGeneByEnsgAccession(tfSite.getEnsemblID());
+            if (gene != null) {
+                tfSite.setGene(gene);
+                if (StringUtils.isNotBlank(tfSite.getFactor())) {
+                    TFSite existedTFSite = this.getTFSite(tfSite);
+                    if (existedTFSite != null) {
+                        tfSite.setId(existedTFSite.getId());
+                        // this.mergeReporter(reporter);
+                        this.updateTFSite(tfSite);
+                        //count how many reporters have been updated
+                        countUpdated++;
+                    } else {
+                        this.saveTFSite(tfSite);
+                        //count how many reporters are new
+                        countNew++;
+                    }
+                }
+            }
+        }
+        counter.setTotalUpdated(countUpdated);
+        counter.setTotalNew(countNew);
+        return counter;
+
+
+    }
+
+
+    @Override
+    public void importTFSite(TFSiteBean tfSiteBean) {
+        ImportTFSiteThread tfSiteThread = new ImportTFSiteThread(this, tfSiteBean);
+        tfSiteThread.importTFSite();
     }
 
     @Override
@@ -1186,5 +1297,552 @@ public class DMServiceImpl implements DMService {
     @Override
     public List<String> getAbnormalFactors() {
         return this.ifnVariationService.getAbnormalFactors();
+    }
+
+    //Gene
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Gene getGeneById(long id) {
+        return this.geneService.getGeneById(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveGene(Gene gene) {
+        this.geneService.saveGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void mergeGene(Gene gene) {
+        this.geneService.mergeGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateGene(Gene gene) {
+        this.geneService.updateGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteGene(Gene gene) {
+        this.geneService.deleteGene(gene);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Gene getGeneByEnsgAccession(String ensgAccession) {
+        return this.geneService.getGeneByEnsgAccession(ensgAccession);
+    }
+
+    @Override
+    public List<Gene> getGenesByProbesetId(String probeId) {
+        return this.geneService.getGenesByProbesetId(probeId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void importGenes(List<Gene> genes, Date importedTime) {
+        if (genes != null) {
+            for (Gene gene : genes) {
+                gene.setImportedTime(importedTime);
+                Gene foundGene = this.getGeneByEnsgAccession(gene.getEnsgAccession());
+                if (foundGene != null) {
+                    gene.setId(foundGene.getId());
+                    this.mergeGene(gene);
+                } else {
+                    this.saveGene(gene);
+                }
+            }
+        }
+    }
+
+    //EvidenceCode
+    @Override
+    public EvidenceCode getEvidenceCodeById(long id) {
+        return this.evidenceCodeService.getEvidenceCodeById(id);
+    }
+
+    @Override
+    public void saveEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.saveEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public void mergeEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.mergeEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public void updateEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.updateEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public void deleteEvidenceCode(EvidenceCode evidenceCode) {
+        this.evidenceCodeService.deleteEvidenceCode(evidenceCode);
+    }
+
+    @Override
+    public EvidenceCode getEvidenceCodeByCode(String code) {
+        return this.evidenceCodeService.getEvidenceCodeByCode(code);
+    }
+
+
+    //GeneOntology
+    @Override
+    public GeneOntology getGeneOntologyById(long id) {
+        return this.geneOntologyService.getGeneOntologyById(id);
+    }
+
+    @Override
+    public void saveGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.saveGeneOntology(geneOntology);
+    }
+
+    @Override
+    public void mergeGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.mergeGeneOntology(geneOntology);
+    }
+
+    @Override
+    public void updateGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.updateGeneOntology(geneOntology);
+    }
+
+    @Override
+    public void deleteGeneOntology(GeneOntology geneOntology) {
+        this.geneOntologyService.deleteGeneOntology(geneOntology);
+    }
+
+    @Override
+    public GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession) {
+        return this.geneOntologyService.getGeneOntologyByGeneAndOntology(ensgAccession, goTermAccession);
+    }
+
+    //GoDomain
+    @Override
+    public GoDomain getGoDomainById(long id) {
+        return this.goDomainService.getGoDomainById(id);
+    }
+
+    @Override
+    public void saveGoDomain(GoDomain goDomain) {
+        this.goDomainService.saveGoDomain(goDomain);
+    }
+
+    @Override
+    public void mergeGoDomain(GoDomain goDomain) {
+        this.goDomainService.mergeGoDomain(goDomain);
+    }
+
+    @Override
+    public void updateGoDomain(GoDomain goDomain) {
+        this.goDomainService.updateGoDomain(goDomain);
+    }
+
+    @Override
+    public void deleteGoDomain(GoDomain goDomain) {
+        this.goDomainService.deleteGoDomain(goDomain);
+    }
+
+    @Override
+    public GoDomain getGoDomainByNamespace(String namespace) {
+        return this.goDomainService.getGoDomainByNamespace(namespace);
+    }
+
+
+    //Ontology
+    @Override
+    public Ontology getOntologyById(long id) {
+        return this.ontologyService.getOntologyById(id);
+    }
+
+    @Override
+    public void saveOntology(Ontology ontology) {
+        this.ontologyService.saveOntology(ontology);
+    }
+
+    @Override
+    public void mergeOntology(Ontology ontology) {
+        this.ontologyService.mergeOntology(ontology);
+    }
+
+    @Override
+    public void updateOntology(Ontology ontology) {
+        this.ontologyService.updateOntology(ontology);
+    }
+
+    @Override
+    public void deleteOntology(Ontology ontology) {
+        this.ontologyService.deleteOntology(ontology);
+    }
+
+    @Override
+    public Ontology getOntologyByGoTermAccession(String goTermAccession) {
+        return this.ontologyService.getOntologyByGoTermAccession(goTermAccession);
+    }
+
+    @Override
+    public void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans) {
+        if (geneOntologyBeans != null) {
+            for (GeneOntologyBean geneOntologyBean : geneOntologyBeans) {
+                String ensgAc = geneOntologyBean.getEnsembleGeneId();
+                String goTermAc = geneOntologyBean.getGoTermAccession();
+                String goTermName = geneOntologyBean.getGoTermName();
+                String goTermDefinition = geneOntologyBean.getGoTermDefinition();
+                String goEvCode = geneOntologyBean.getGoTermEvidenceCode();
+                String goDomainNamespace = geneOntologyBean.getGoDomain();
+
+                GoDomain goDomain = this.getGoDomainByNamespace(goDomainNamespace);
+                if (goDomain == null) {
+                    goDomain = new GoDomain();
+                    goDomain.setNamespace(goDomainNamespace);
+                    this.saveGoDomain(goDomain);
+                }
+
+                Ontology ontology = this.getOntologyByGoTermAccession(goTermAc);
+                if (ontology == null) {
+                    ontology = new Ontology();
+                    ontology.setGoTermAccession(goTermAc);
+                    ontology.setGoTermDefinition(goTermDefinition);
+                    ontology.setGoTermName(goTermName);
+                    ontology.setGoDomain(goDomain);
+                    this.saveOntology(ontology);
+                }
+
+                EvidenceCode evidenceCode = this.getEvidenceCodeByCode(goEvCode);
+                if (evidenceCode == null) {
+                    evidenceCode = genEvidneceCodeEntity(goEvCode);
+                    this.saveEvidenceCode(evidenceCode);
+                }
+
+                Gene gene = this.getGeneByEnsgAccession(ensgAc);
+                if (gene != null) {
+                    GeneOntology geneOntology = this.getGeneOntologyByGeneAndOntology(ensgAc, goTermAc);
+                    if (geneOntology == null) {
+                        geneOntology = new GeneOntology();
+                        geneOntology.setEvidenceCode(evidenceCode);
+                        geneOntology.setGene(gene);
+                        geneOntology.setOntology(ontology);
+                        this.saveGeneOntology(geneOntology);
+                    } else {
+                        EvidenceCode fEvidenceCode1 = geneOntology.getEvidenceCode();
+                        int fRank = fEvidenceCode1.getRank();
+                        int currentRank = evidenceCode.getRank();
+
+                        //the smaller rank number should best evidenc
+                        if (currentRank < fRank) {
+                            geneOntology.setEvidenceCode(evidenceCode);
+                            geneOntology.setGene(gene);
+                            geneOntology.setOntology(ontology);
+                            this.mergeGeneOntology(geneOntology);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private EvidenceCode genEvidneceCodeEntity(String code) {
+        String expCode = "EXP";
+        String expDesc = "Inferred from Experiment";
+        int expRank = 1;
+
+        String idaCode = "IDA";
+        String idaDesc = "Inferred from Direct Assay";
+        int idaRank = 2;
+
+        String ipiCode = "IPI";
+        String ipiDesc = "Inferred from Physical Interaction";
+        int ipiRank = 3;
+
+        String impCode = "IMP";
+        String impDesc = "Inferred from Mutant Phenotype";
+        int impRank = 4;
+
+        String igiCode = "IGI";
+        String igiDesc = "Inferred from Genetic Interaction";
+        int igiRank = 5;
+
+
+        String iepCode = "IEP";
+        String iepDesc = "Inferred from Expression Pattern";
+        int iepRank = 6;
+
+        String issCode = "ISS";
+        String issDesc = "Inferred from Sequence or Structural Similarity";
+        int issRank = 7;
+
+        String isoCode = "ISO";
+        String isoDesc = "Inferred from Sequence Orthology";
+        int isoRank = 8;
+
+        String isaCode = "ISA";
+        String isaDesc = "Inferred from Sequence Alignment";
+        int isaRank = 9;
+
+        String ismCode = "ISM";
+        String ismDesc = "Inferred from Sequence Model";
+        int ismRank = 10;
+
+        String igcCode = "IGC";
+        String igcDesc = "Inferred from Genomic Context";
+        int igcRank = 11;
+
+        String ibaCode = "IBA";
+        String ibaDesc = "Inferred from Biological aspect of Ancestor";
+        int ibaRank = 12;
+
+        String ibdCode = "IBD";
+        String ibdDesc = "Inferred from Biological aspect of Descendant";
+        int ibdRank = 13;
+
+        String ikrCode = "IKR";
+        String ikrDesc = "Inferred from Key Residues";
+        int ikrRank = 14;
+
+        String irdCode = "IRD";
+        String irdDesc = "Inferred from Rapid Divergence";
+        int irdRank = 15;
+
+        String rcaCode = "RCA";
+        String rcaDesc = "inferred from Reviewed Computational Analysis";
+        int rcaRank = 16;
+
+        String tasCode = "TAS";
+        String tasDesc = "Traceable Author Statement";
+        int tasRank = 17;
+
+        String nasCode = "NAS";
+        String nasDesc = "Non-traceable Author Statement";
+        int nasRank = 18;
+
+        String icCode = "IC";
+        String icDesc = "Inferred by Curator";
+        int icRank = 19;
+
+        String ndCode = "ND";
+        String ndDesc = "No biological Data available";
+        int ndRank = 20;
+
+        String ieaCode = "IEA";
+        String ieaDesc = "Inferred from Electronic Annotation";
+        int ieaRank = 21;
+
+        String nrCode = "NR";
+        String nrDesc = "Not Recorded";
+        int nrRank = 22;
+
+        EvidenceCode evidenceCode = new EvidenceCode();
+        if (StringUtils.equals(code, expCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(expDesc);
+            evidenceCode.setRank(expRank);
+        }
+        if (StringUtils.equals(code, idaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(idaDesc);
+            evidenceCode.setRank(idaRank);
+        }
+        if (StringUtils.equals(code, ipiCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ipiDesc);
+            evidenceCode.setRank(ipiRank);
+        }
+        if (StringUtils.equals(code, impCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(impDesc);
+            evidenceCode.setRank(impRank);
+        }
+        if (StringUtils.equals(code, igiCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(igiDesc);
+            evidenceCode.setRank(igiRank);
+        }
+        if (StringUtils.equals(code, iepCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(iepDesc);
+            evidenceCode.setRank(iepRank);
+        }
+        if (StringUtils.equals(code, issCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(issDesc);
+            evidenceCode.setRank(issRank);
+        }
+        if (StringUtils.equals(code, isoCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(isoDesc);
+            evidenceCode.setRank(isoRank);
+        }
+        if (StringUtils.equals(code, isaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(isaDesc);
+            evidenceCode.setRank(isaRank);
+        }
+        if (StringUtils.equals(code, ismCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ismDesc);
+            evidenceCode.setRank(ismRank);
+        }
+        if (StringUtils.equals(code, igcCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(igcDesc);
+            evidenceCode.setRank(igcRank);
+        }
+        if (StringUtils.equals(code, ibaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ibaDesc);
+            evidenceCode.setRank(ibaRank);
+        }
+        if (StringUtils.equals(code, ibdCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ibdDesc);
+            evidenceCode.setRank(ibdRank);
+        }
+        if (StringUtils.equals(code, ikrCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ikrDesc);
+            evidenceCode.setRank(ikrRank);
+        }
+        if (StringUtils.equals(code, irdCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(irdDesc);
+            evidenceCode.setRank(irdRank);
+        }
+        if (StringUtils.equals(code, rcaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(rcaDesc);
+            evidenceCode.setRank(rcaRank);
+        }
+        if (StringUtils.equals(code, tasCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(tasDesc);
+            evidenceCode.setRank(tasRank);
+        }
+        if (StringUtils.equals(code, nasCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(nasDesc);
+            evidenceCode.setRank(nasRank);
+        }
+        if (StringUtils.equals(code, icCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(icDesc);
+            evidenceCode.setRank(icRank);
+        }
+        if (StringUtils.equals(code, ndCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ndDesc);
+            evidenceCode.setRank(ndRank);
+        }
+        if (StringUtils.equals(code, ieaCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(ieaDesc);
+            evidenceCode.setRank(ieaRank);
+        }
+        if (StringUtils.equals(code, nrCode)) {
+            evidenceCode.setCode(code);
+            evidenceCode.setDescription(nrDesc);
+            evidenceCode.setRank(nrRank);
+        }
+
+        return evidenceCode;
+    }
+
+    @Override
+    public Probe getProbeById(long id) {
+        return this.probeService.getProbeById(id);
+    }
+
+    @Override
+    public void saveProbe(Probe probe) {
+        this.probeService.saveProbe(probe);
+    }
+
+    @Override
+    public void mergeProbe(Probe probe) {
+        this.probeService.mergeProbe(probe);
+    }
+
+    @Override
+    public void updateProbe(Probe probe) {
+        this.probeService.updateProbe(probe);
+    }
+
+    @Override
+    public void deleteProbe(Probe probe) {
+        this.probeService.deleteProbe(probe);
+    }
+
+    @Override
+    public Probe getProbeByProbeId(String probesetId) {
+        return this.probeService.getProbeByProbeId(probesetId);
+    }
+
+    @Override
+    public List<Probe> getProbesByGeneAccession(String geneAccession) {
+        return this.probeService.getProbesByGeneAccession(geneAccession);
+    }
+
+    @Override
+    public List<Probe> getProbesByGeneId(long geneId) {
+        return this.probeService.getProbesByGeneId(geneId);
+    }
+
+    @Override
+    public void importProbes(List<ProbeGeneBean> probeGeneBeans) {
+
+        if (probeGeneBeans != null) {
+            for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
+                String ensgAc = probeGeneBean.getEnsgAccession();
+                String probeId = probeGeneBean.getProbeId();
+                String platform = probeGeneBean.getPlatform();
+                String probeType = probeGeneBean.getProbeType();
+                Gene gene = this.getGeneByEnsgAccession(ensgAc);
+                if (gene != null) {
+                    Probe probe = this.getProbeByProbeId(probeId);
+                    if (probe == null) {
+                        probe = new Probe();
+                        probe.setProbeId(probeId);
+                        probe.setPlatform(platform);
+                        probe.setSpecies(probeType);
+                    }
+
+                    List<Gene> geneList = this.getGenesByProbesetId(probe.getProbeId());
+                    if (geneList != null) {
+                        if (!geneList.contains(gene)) {
+                            geneList.add(gene);
+                        }
+                    } else {
+                        geneList = new ArrayList<Gene>();
+                        geneList.add(gene);
+                    }
+                    probe.setGenes(geneList);
+                    //check if primary key id is zero which means new entity,
+                    if (probe.getId() == 0) {
+                        this.saveProbe(probe);
+                    } else {
+                        this.mergeProbe(probe);
+                    }
+                }
+            }
+
+        }
     }
 }
