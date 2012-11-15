@@ -34,10 +34,6 @@
 
             </@s.iterator>
         </table>
-
-
-        </li>
     </div>
-
 </div>
 <br/>

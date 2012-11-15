@@ -33,13 +33,13 @@
                 </ul>
             </div>
         <@s.if test="#onResults[0].goDomain.id == 3">
-            Cellular Component
+            <span style="font-size: 12pt;font-weight: bold;">Cellular Component</span>
         </@s.if>
         <@s.if test="#onResults[0].goDomain.id == 2">
-            Molecular Function
+            <span style="font-size: 12pt;font-weight: bold;">Molecular Function</span>
         </@s.if>
         <@s.if test="#onResults[0].goDomain.id == 1">
-            Biological Process
+            <span style="font-size: 12pt;font-weight: bold;">Biological Process</span>
         </@s.if>
         <table  class="search_result_tab">
             <tr class="search_result_header"><td>Accession</td><td>Term Name</td><td>Term Definition</td><td>Gene Count</td><td>p Value</td></tr>
@@ -49,8 +49,8 @@
                     <td><@s.property value="#onResults[0].goTermName"/></td>
                     <td><@s.property value="#onResults[0].goTermDefinition"/></td>
                     <td><@s.property value="#onResults[1]"/></td>
-                    <!-- td><@s.property value="#onResults[2]"/></td -->
-                    <td>N/A</td>
+                    <td><@s.property value="#onResults[2]"/></td>
+                    <!-- td>td>N/A</td-->
                 </tr>
             </@s.iterator>
        </table>
