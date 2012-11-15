@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.text.DecimalFormat;
 
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
@@ -197,7 +198,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromDose > 0) && (toDose > 0) && (fromDose == toDose)) {
                 return " ds.treatmentCon = " + fromDose;
             }
-            if ((fromDose > 0) && (toDose > 0) && (fromDose > toDose)) {
+            if ((fromDose > 0) && (toDose > 0) && (fromDose < toDose)) {
                 return " ds.treatmentCon >= " + fromDose + " AND ds.treatmentCon <= " + toDose;
             }
             if ((fromDose == 0) && (toDose > 0)) {
@@ -219,7 +220,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromTime > 0) && (toTime > 0) && (fromTime == toTime)) {
                 return " ds.treatmentTime = " + fromTime;
             }
-            if ((fromTime > 0) && (toTime > 0) && (fromTime > toTime)) {
+            if ((fromTime > 0) && (toTime > 0) && (fromTime < toTime)) {
                 return " ds.treatmentTime >= " + fromTime + " AND ds.treatmentTime <= " + toTime;
             }
             if ((fromTime == 0) && (toTime > 0)) {
@@ -522,10 +523,22 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
         if (probes.size() > 0) {
+            String species = searchBean.getSpecies();
             //Get Count of all genes in db (N)
             String geneTotalCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g";
             Query geneTotalCountQuery = this.session().createQuery(geneTotalCountHQL);
             Long totalGeneN = ((Long) geneTotalCountQuery.uniqueResult());
+            //Get Count of all Human genes in db (Nh)
+            String geneTotalHumanCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.species = 'Human'";
+            Query geneTotalHumanCountQuery = this.session().createQuery(geneTotalHumanCountHQL);
+            Long totalGeneNh = ((Long) geneTotalHumanCountQuery.uniqueResult());
+            //Get Count of all Mouse genes in db (Nm)
+            String geneTotalMouseCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.species = 'Mouse'";
+            Query geneTotalMouseCountQuery = this.session().createQuery(geneTotalMouseCountHQL);
+            Long totalGeneNm = ((Long) geneTotalMouseCountQuery.uniqueResult());
+
+            if (StringUtils.contains(species, "Homo sapiens"))   totalGeneN = totalGeneNh;
+            if (StringUtils.contains(species, "Mus musculus"))   totalGeneN = totalGeneNm;
 
             //Get Count of all genes searched (n)
             String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
@@ -619,9 +632,29 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         return returnVal;
     }
 
-    private double calculateGOEnrichPValue(long N, long n, long m, long k) {
-        return 0.05;
-        //return ((m/k)*((N-m)/(n-k)))/(N/n);
+    private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
+        //return "N/A";
+        Double pvalue = (binomialCoefficient(m,k)*binomialCoefficient((N-m),(n-k)))/ binomialCoefficient(N,n);
+        DecimalFormat df = new DecimalFormat("#.##E0");
+        return (Double.valueOf(df.format(pvalue)));
+        //return N*1.0;
+       // return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
+    }
+    private Double binomialCoefficient(long a, long b){
+        if (b < 0 || b > a){
+        return null;
+        }
+        if (b > (a - b))  {       // take advantage of symmetry
+        b = a - b;
+        }
+        Double coeff = 1.0;
+        for (long i = a - b + 1; i <= a; i++) {
+            coeff *= i;
+        }
+        for (long i = 1; i <= b; i++) {
+            coeff /= i;
+        }
+        return coeff;
     }
 
 
