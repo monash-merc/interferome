@@ -97,18 +97,18 @@ function drawVenn(){
     //paper.text(225,150, document.getElementById('t2t3').value);
     paper.text(225,195, document.getElementById('t1t2t3').value);
 
-    var t1Title = paper.text(110, 110, "Type 1");
+    var t1Title = paper.text(110, 110, "Type I");
     t1Title.attr({
         "font-size": "16pt"
     });
-    var t2Title = paper.text(340, 110, "Type 2");
+    var t2Title = paper.text(340, 110, "Type II");
     t2Title.attr({
         "font-size": "16pt"
     });
-    var t3Title = paper.text(225, 340, "Type 3");
+    var t3Title = paper.text(225, 340, "Type III");
     t3Title.attr({
         "font-size": "16pt"
     });
-
+    paper.
     document.getElementById("hiddenlist").style.display = "none";
 }
