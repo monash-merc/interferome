@@ -759,7 +759,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFile(searchBean, dataPagination);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_DataSearchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_DataSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -769,7 +769,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.txt.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -805,7 +805,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileGene(searchBean, genePagination);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_GeneSearchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_GeneSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -815,7 +815,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.txt.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -850,7 +850,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileOntology(searchBean, ontologyList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_OntologySearchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_OntologySearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -860,7 +860,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.txt.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -913,7 +913,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileTFanalysis(searchBean, tfSiteList);
             String FileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + FileName + "_TFanalysisSearchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + FileName + "_TFanalysisSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -923,7 +923,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.txt.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -960,7 +960,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileChromosome(searchBean, chromosomeGeneList, chromosomeList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_ChromosomeSearchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_ChromosomeSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -970,7 +970,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.txt.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -1006,7 +1006,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileSubtypes(searchBean, subtypeList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_SubtypesSearchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_SubtypesSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -1016,7 +1016,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.txt.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -1064,7 +1064,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileTissueExpression(searchBean, tissueExpressionList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_TissueExpressionSearchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_TissueExpressionSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -1074,7 +1074,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.txt.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -1790,7 +1790,7 @@ public class SearchAction extends DMBaseAction {
                     double pvalue = (Double) objarray[2];
                     this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
                     //write total records
-                    csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), "N/A"});
+                    csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), String.valueOf(pvalue)});
                 }
                 //write empty line
                 csvWriter.writeNext(new String[]{""});
@@ -2233,13 +2233,13 @@ public class SearchAction extends DMBaseAction {
                     finishedMGenes.add(ensemblM);
                 }
             }
-            csvWriter.writeNext(new String[]{""});
-            csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
-            for (Object[] obja : chromosomeList) {
-                String chrom = (String) obja[0];
-                long genecounter = (Long) obja[1];
-                csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
-            }
+    //        csvWriter.writeNext(new String[]{""});
+    //        csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
+    //        for (Object[] obja : chromosomeList) {
+    //            String chrom = (String) obja[0];
+    //            long genecounter = (Long) obja[1];
+    //            csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
+    //        }
 
             //flush out
             csvWriter.flush();
