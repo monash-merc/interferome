@@ -2195,12 +2195,13 @@ public class SearchAction extends DMBaseAction {
                 csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
             }
             //write new empty line
-            csvWriter.writeNext(new String[]{""});
+
+            if (StringUtils.contains(species, "Homo sapiens")|| StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{""});
             csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
             csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
             //write data result
             List<String> finishedHGenes = new ArrayList<String>();
-
             for (Gene chr : chromosomeGeneList) {
                 String ensembl = chr.getEnsgAccession();
                 if (!finishedHGenes.contains(ensembl)) {
@@ -2215,7 +2216,10 @@ public class SearchAction extends DMBaseAction {
                     finishedHGenes.add(ensembl);
                 }
             }
-            csvWriter.writeNext(new String[]{""});
+            }
+
+            if (StringUtils.contains(species, "Mus musculus")|| StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{""});
             csvWriter.writeNext(new String[]{"Mouse Chromosomal Location"});
             csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
             List<String> finishedMGenes = new ArrayList<String>();
@@ -2232,6 +2236,7 @@ public class SearchAction extends DMBaseAction {
                     }
                     finishedMGenes.add(ensemblM);
                 }
+            }
             }
     //        csvWriter.writeNext(new String[]{""});
     //        csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});

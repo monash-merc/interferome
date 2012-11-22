@@ -2,7 +2,7 @@
     Search Results
 </div>
 <div class="data_header_div">
-    <span class="name_title">Found a total of <font color="green"> ${genePagination.totalRecords}</font> of ${genePagination.searchedRecords} searched Gene(s) (${genePagination.searchSuccessPercentage}%)</span>
+    <span class="name_title"><font color="green"> ${genePagination.totalRecords}</font> genes returned from a search of ${genePagination.searchedRecords} terms across species list</span>
 <@s.if test="%{genePagination.totalRecords >0 }">
     <div class="export_div">
         Save as a TXT file <a

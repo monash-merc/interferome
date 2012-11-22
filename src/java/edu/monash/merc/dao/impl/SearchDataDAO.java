@@ -282,6 +282,28 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //probes.add("A_23_P105923");
         //probes.add("A_23_P105923");
 
+
+        int searchCount = 0;
+        //String species = searchBean.getSpecies();
+        int gbCount = searchBean.getGenBanks().split(",|\t|\n").length;
+        int ensCount = searchBean.getEnsembls().split(",|\t|\n").length;
+        int gCount = searchBean.getGenes().split(",|\t|\n").length;
+       // if (StringUtils.equals(species, "-1")){
+        if(searchCount < gbCount || searchCount < ensCount || searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
+        //  if(searchCount < gbCount && searchCount < ensCount && searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
+        //  else if(searchCount < gbCount && searchCount < ensCount) searchCount = gbCount + ensCount;
+        //  else if(searchCount < ensCount && searchCount < gCount) searchCount = ensCount + gCount;
+        //  else if(searchCount < gbCount && searchCount < gCount) searchCount = gbCount + gCount;
+        //  else if(searchCount < gbCount) searchCount = gbCount;
+        //  else if(searchCount < ensCount) searchCount = ensCount;
+        //  else if(searchCount < gCount) searchCount = gCount;
+        //}
+        //else if (StringUtils.contains(species, "Homo sapiens") || StringUtils.contains(species, "Mus musculus")){
+         //if(searchCount < ensCount)  searchCount = ensCount;
+         //if(searchCount < gCount)  searchCount = gCount;
+         //if(searchCount < gbCount)  searchCount = gbCount;
+       // }
+
         Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
         List<String> probes = uniqueProbesPages.getPageResults();
@@ -299,7 +321,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             int total = ((Long) geneCountQuery.uniqueResult()).intValue();
             if (total == 0) {
 
-                return new Pagination<Gene>(startPageNo, recordPerPage, total);
+                return new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             }
 
             // System.out.println("================= found total genes size: " + total);
@@ -308,7 +330,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query geneQuery = this.session().createQuery(geneHQL);
             geneQuery.setParameterList(("probes"), probes);
 
-            Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total);
+            Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             geneQuery.setFirstResult(genePagination.getFirstResult());
             geneQuery.setMaxResults(genePagination.getSizePerPage());
 
@@ -318,7 +340,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             genePagination.setPageResults(geneList);
             return genePagination;
         } else {
-            return new Pagination<Gene>(startPageNo, recordPerPage, 0);
+            return new Pagination<Gene>(startPageNo, recordPerPage, 0, searchCount);
         }
     }
 
