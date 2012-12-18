@@ -56,9 +56,9 @@ public class Data extends Domain {
     @JoinColumn(name = "dataset_id", referencedColumnName = "id", nullable = false)
     private Dataset dataset;
 
-    @ManyToOne(targetEntity = Reporter.class)
-    @JoinColumn(name = "reporter_id", referencedColumnName = "id", nullable = false)
-    private Reporter reporter;
+    @ManyToOne(targetEntity = Probe.class)
+    @JoinColumn(name = "probe_id", referencedColumnName = "id", nullable = false)
+    private Probe probe;
 
     public long getId() {
         return id;
@@ -84,11 +84,11 @@ public class Data extends Domain {
         this.dataset = dataset;
     }
 
-    public Reporter getReporter() {
-        return reporter;
+    public Probe getProbe() {
+        return probe;
     }
 
-    public void setReporter(Reporter reporter) {
-        this.reporter = reporter;
+    public void setProbe(Probe probe) {
+        this.probe = probe;
     }
 }

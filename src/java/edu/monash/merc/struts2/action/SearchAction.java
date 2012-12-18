@@ -220,6 +220,9 @@ public class SearchAction extends DMBaseAction {
      */
     private Pagination<Gene> genePagination;
 
+
+    private Pagination<Probe> probePagination;
+
     /**
      * TFSite Search Results
      */
@@ -1355,15 +1358,39 @@ public class SearchAction extends DMBaseAction {
                 String searchIfnType = dataset.getIfnType().getTypeName();
                 double treatmentTime = dataset.getTreatmentTime();
 
-                //report
-                Reporter reporter = data.getReporter();
-                String geneSymbol = reporter.getGeneSymbol();
-                String geneDesc = reporter.getGeneTitle();
-                String genBankId = reporter.getGenBankAccession();
-                String ensemblId = reporter.getEnsembl();
-                String probeId = reporter.getProbeId();
-                //write the csv into OutputStream
+                //get Probe /reporter
+                Probe probe = data.getProbe();
+                String probeId = probe.getProbeId();
+                //get Gene Aliases
+                List<Gene> geneList = probe.getGenes();
+                for (Gene gene : geneList) {
+                String geneSymbol = gene.getGeneName();
+               // int al=0;
+               // String geneAliasTemp = "";
+               // List<GeneAlias> geneAliasLists = gene.getGeneAlias();
+               //     for (GeneAlias geneAliasList : geneAliasLists) {
+               //         String geneAlias = geneAliasList.getAliasName();
+               //         geneAliasTemp += geneAlias;
+              //          if (!StringUtils.equals(geneAlias, "-1")) {
+               //             if (al < geneAliasLists.size() - 1) {
+               //                 geneAliasTemp += SEMICOLON;
+               //             }
+               //         }
+               //         al ++;
+               //     }
+               //     if (StringUtils.equals("-1", geneAliasTemp)) {
+               //         geneAliasTemp = geneSymbol;
+               //     } else {
+               //         geneAliasTemp= geneSymbol+SEMICOLON + geneAliasTemp;
+               //     }
+
+                String geneDesc = gene.getDescription();
+                String genBankId = gene.getGenbankId();
+                String ensemblId = gene.getEnsgAccession();
+
                 csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneSymbol, geneDesc, genBankId, ensemblId, probeId});
+                }//write the csv into OutputStream
+               //csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneAliasTemp, geneDesc, genBankId, ensemblId, probeId});
             }
             //flush out
             csvWriter.flush();
@@ -3039,6 +3066,14 @@ public class SearchAction extends DMBaseAction {
 
     public void setDataOrderByMap(Map<String, String> dataOrderByMap) {
         this.dataOrderByMap = dataOrderByMap;
+    }
+
+    public Pagination<Probe> getProbePagination() {
+        return probePagination;
+    }
+
+    public void setProbePagination(Pagination<Probe> probePagination) {
+        this.probePagination = probePagination;
     }
 
     public Pagination<Gene> getGenePagination() {

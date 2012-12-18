@@ -60,8 +60,8 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
     @SuppressWarnings("unchecked")
     @Override
     public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
-        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
-        String dataHql = "SELECT d FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType WHERE ds.id =:dsId";
+        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.probes prob INNER JOIN prob.genes g LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
+    String dataHql = "SELECT d FROM Data d INNER JOIN d.probes prob INNER JOIN prob.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType WHERE ds.id =:dsId";
         Query countQuery = this.session().createQuery(countHql);
         countQuery.setParameter("dsId", dsId);
         int total = ((Long) countQuery.uniqueResult()).intValue();
@@ -86,7 +86,7 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "genesymbol")) {
-            return " ORDER BY rep.geneSymbol " + sortBy;
+            return " ORDER BY g.geneName " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "foldchange")) {
@@ -94,15 +94,15 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "genbank")) {
-            return " ORDER BY rep.genBankAccession " + sortBy;
+           return " ORDER BY g.genbankId " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "ensemblid")) {
-            return " ORDER BY rep.ensembl " + sortBy;
+            return " ORDER BY g.ensgAccession " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "probeid")) {
-            return " ORDER BY rep.probeId " + sortBy;
+            return " ORDER BY prob.probeId " + sortBy;
         }
         return null;
     }

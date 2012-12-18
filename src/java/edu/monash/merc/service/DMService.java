@@ -202,6 +202,30 @@ public interface DMService {
 
     public void importReporters(ReporterBean reporterBean);
 
+    //Probe
+    Probe getProbeById(long id);
+
+    List<Probe> getProbesByGeneAccession(String geneAccession);
+
+//    List<Probe> getProbesByGeneId(long geneId);
+
+    //void importProbes(List<ProbeGeneBean> probeGeneBeans);
+
+    public void saveProbe(Probe probe);
+
+    public void mergeProbe(Probe probe);
+
+    public void updateProbe(Probe probe);
+
+    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
+
+    public Probe getProbeByProbeId(String probeId);
+
+    public ProbCounter importAllProbes(List<Probe> probes);
+
+    public void importProbe(ProbeGeneBean probeGeneBeans);
+
+    // TFSite
     public void saveTFSite(TFSite tfSite);
 
     public void mergeTFSite(TFSite tfSite);
@@ -303,7 +327,7 @@ public interface DMService {
      */
     Gene getGeneByEnsgAccession(String ensgAccession);
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    List<Gene> getGenesByProbeId(String probeId);
 
     /**
      * import all genes
@@ -367,22 +391,4 @@ public interface DMService {
 
     void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
 
-    //Probe
-    Probe getProbeById(long id);
-
-    void saveProbe(Probe probe);
-
-    void mergeProbe(Probe probe);
-
-    void updateProbe(Probe probe);
-
-    void deleteProbe(Probe probe);
-
-    Probe getProbeByProbeId(String probesetId);
-
-    List<Probe> getProbesByGeneAccession(String geneAccession);
-
-    List<Probe> getProbesByGeneId(long geneId);
-
-    void importProbes(List<ProbeGeneBean> probeGeneBeans);
 }

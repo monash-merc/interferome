@@ -30,6 +30,7 @@ package edu.monash.merc.system.scheduling.impl;
 
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Species;
 import edu.monash.merc.dto.GeneOntologyBean;
 import edu.monash.merc.dto.ProbeGeneBean;
 import edu.monash.merc.system.scheduling.DataProcessor;
@@ -160,7 +161,9 @@ public class INFDataProcessor implements DataProcessor {
             client.configure(wsUrl, species, platform);
             List<ProbeGeneBean> probeGeneBeans = client.importProbes(probeType);
             logger.info("============> total probes  size for  " + species + " - " + probeType + " : " + probeGeneBeans.size());
-            this.dmService.importProbes(probeGeneBeans);
+
+            //this.dmService.importProbe(probeGeneBeans);
+            this.dmService.importProbe(null);
             logger.info("======== imported the probes into database successfully");
         } catch (Exception ex) {
             logger.error(ex);

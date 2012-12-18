@@ -28,6 +28,8 @@
 
 package edu.monash.merc.service.impl;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.dao.impl.GeneDAO;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.service.GeneService;
@@ -111,11 +113,21 @@ public class GeneServiceImpl implements GeneService {
      */
     @Override
     public Gene getGeneByEnsgAccession(String ensgAccession) {
-        return this.geneDao.getGeneByEnsgAccession(ensgAccession);
+        return this.geneDao.getGenesByEnsgAccession(ensgAccession);
     }
 
+   @Override
+    public List<Gene> getGenesByProbeId(String probeId) {
+        return this.geneDao.getGenesByProbeId(probeId);
+   }
+
+ //   @Override
+//    public Gene getGenesByProbeId(String probeId) {
+//         return this.geneDao.getGenesByProbeId(probeId);
+//    }
+
     @Override
-    public List<Gene> getGenesByProbesetId(String probeId) {
-        return this.geneDao.getGenesByProbesetId(probeId);
+    public Pagination<Gene> getGenes(int startPageNo, int recordsPerPage, OrderBy[] orderBys) {
+        return this.geneDao.getGenes(startPageNo, recordsPerPage, orderBys);
     }
 }

@@ -65,14 +65,14 @@ public class ProbeGeneBeanCreator {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
                     probeGeneBean.setEnsgAccession(columnValue);
                 }
-            } else if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.PLATFORM)) {
-                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    probeGeneBean.setPlatform(columnValue);
-                }
-            } else if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.SPECIES)) {
-                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    probeGeneBean.setProbeType(columnValue);
-                }
+           // } else if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.PLATFORM)) {
+           //   if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+           //       probeGeneBean.setPlatform(columnValue);
+           //   }
+           // } else if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.SPECIES)) {
+           //    if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+           //         probeGeneBean.setProbeType(columnValue);
+           //    }
             } else {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
                     probeGeneBean.setProbeId(columnValue);

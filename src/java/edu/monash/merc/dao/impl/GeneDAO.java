@@ -28,10 +28,14 @@
 
 package edu.monash.merc.dao.impl;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.repository.IGeneRepository;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
@@ -50,19 +54,67 @@ import java.util.List;
 @Scope("prototype")
 @Repository
 public class GeneDAO extends HibernateGenericDAO<Gene> implements IGeneRepository {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Gene getGeneByEnsgAccession(String ensgAccession) {
-        Criteria gCriteria = this.session().createCriteria(this.persistClass);
-        gCriteria.add(Restrictions.eq("ensgAccession", ensgAccession).ignoreCase());
-        return (Gene) gCriteria.uniqueResult();
-    }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Gene> getGenesByProbesetId(String probeId) {
+    public Pagination<Gene> getGenes(int startPageNo, int recordsPerPage, OrderBy[] orderBys) {
+    /**
+     * {@inheritDoc}
+     */
+    Criteria criteria = this.session().createCriteria(this.persistClass);
+    criteria.setProjection(Projections.rowCount());
+    int total = ((Long) criteria.uniqueResult()).intValue();
+    Pagination<Gene> p = new Pagination<Gene>(startPageNo, recordsPerPage, total);
+
+    // query reporter by size-per-page
+    Criteria queryCriteria = this.session().createCriteria(this.persistClass);
+    // add orders
+    if (orderBys != null && orderBys.length > 0)
+
+    {
+        for (int i = 0; i < orderBys.length; i++) {
+            Order order = orderBys[i].getOrder();
+            if (order != null) {
+                queryCriteria.addOrder(order);
+            }
+        }
+    } else
+
+    {
+        queryCriteria.addOrder(Order.desc("ensgAccession"));
+    }
+
+    // calculate the first result from the pagination and set this value into the start search index
+    queryCriteria.setFirstResult(p.getFirstResult());
+    // set the max results (size-per-page)
+    queryCriteria.setMaxResults(p.getSizePerPage());
+    queryCriteria.setComment("getGenes");
+    List<Gene> repList = queryCriteria.list();
+    p.setPageResults(repList);
+    return p;
+}
+
+    @Override
+    public Gene getGenesByEnsgAccession(String ensgAccession) {
+        Criteria Criteria = this.session().createCriteria(this.persistClass);
+        Criteria.add(Restrictions.eq("ensgAccession", ensgAccession).ignoreCase());
+        return (Gene) Criteria.uniqueResult();
+    }
+
+//    @SuppressWarnings("unchecked")
+//    @Override
+//    public Gene getGenesByProbeId(String probeId) {
+//        Criteria criteria = this.session().createCriteria(this.persistClass);
+//        Criteria geneCrit = criteria.createAlias("probes", "probes");
+//        geneCrit.add(Restrictions.eq("probeId", probeId));
+//        Gene result = (Gene) geneCrit.uniqueResult();
+//        this.session().evict(result);
+//        return result;
+//    }
+
+   @SuppressWarnings("unchecked")
+   @Override
+    public List<Gene> getGenesByProbeId(String probeId) {
         Criteria criteria = this.session().createCriteria(this.persistClass);
         // create the alias for genes
         Criteria geneCrit = criteria.createAlias("probes", "probes");

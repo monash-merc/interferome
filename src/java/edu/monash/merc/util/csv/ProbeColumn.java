@@ -26,66 +26,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.domain;
-
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Index;
-
-import javax.persistence.*;
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
+package edu.monash.merc.util.csv;
 
 /**
- * @author Sam Forster
- * @version 1.0
- * @email sam.forster@monash.edu
- * @since 1.0
- *        <p/>
- *        Date: 15/10/12
- *        Time: 10:24 AM
+ * ReporterColumn class
+ *
+ * @author Simon Yu - Xiaoming.Yu@monash.edu
+ * @version 2.0
  */
-@Entity
-@Table(name = "factorial")
-@org.hibernate.annotations.Table(appliesTo = "factorial",
-        indexes = {@Index(name = "idx_factNumber", columnNames = {"factorialNumber"})
-        })
-public class Factorial extends Domain {
-    @Id
-    @GeneratedValue(generator = "fact_pk_seq")
-    @GenericGenerator(name = "fact_pk_seq", strategy = "seqhilo")
-    @Column(name = "id", nullable = false)
-    private long id;
+public class ProbeColumn {
 
-    @Basic
-    @Column(name = "factorialNumber")
-    private long search;
+    private String columnName;
 
-    @Basic
-    @Column(name = "answer",  columnDefinition = "longtext")
-    private BigInteger value;
+    private String columnValue;
 
-    public long getId() {
-        return id;
+    public ProbeColumn(String columnName, String columnValue) {
+        this.columnName = columnName;
+        this.columnValue = columnValue;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public String getColumnName() {
+        return columnName;
     }
 
-    public long getSearch() {
-        return search;
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
 
-    public void setSearch(long search) {
-        this.search = search;
+    public String getColumnValue() {
+        return columnValue;
     }
 
-    public BigInteger getValue() {
-        return value;
-    }
-
-    public void setValue(BigInteger value) {
-        this.value = value;
+    public void setColumnValue(String columnValue) {
+        this.columnValue = columnValue;
     }
 }

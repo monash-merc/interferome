@@ -32,6 +32,7 @@ import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.Ontology;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.RangeCondition;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.text.DecimalFormat;
 
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
@@ -197,7 +199,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromDose > 0) && (toDose > 0) && (fromDose == toDose)) {
                 return " ds.treatmentCon = " + fromDose;
             }
-            if ((fromDose > 0) && (toDose > 0) && (fromDose > toDose)) {
+            if ((fromDose > 0) && (toDose > 0) && (fromDose < toDose)) {
                 return " ds.treatmentCon >= " + fromDose + " AND ds.treatmentCon <= " + toDose;
             }
             if ((fromDose == 0) && (toDose > 0)) {
@@ -219,7 +221,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromTime > 0) && (toTime > 0) && (fromTime == toTime)) {
                 return " ds.treatmentTime = " + fromTime;
             }
-            if ((fromTime > 0) && (toTime > 0) && (fromTime > toTime)) {
+            if ((fromTime > 0) && (toTime > 0) && (fromTime < toTime)) {
                 return " ds.treatmentTime >= " + fromTime + " AND ds.treatmentTime <= " + toTime;
             }
             if ((fromTime == 0) && (toTime > 0)) {
@@ -281,14 +283,36 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //probes.add("A_23_P105923");
         //probes.add("A_23_P105923");
 
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        int searchCount = 0;
+        //String species = searchBean.getSpecies();
+        int gbCount = searchBean.getGenBanks().split(",|\t|\n").length;
+        int ensCount = searchBean.getEnsembls().split(",|\t|\n").length;
+        int gCount = searchBean.getGenes().split(",|\t|\n").length;
+       // if (StringUtils.equals(species, "-1")){
+        if(searchCount < gbCount || searchCount < ensCount || searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
+        //  if(searchCount < gbCount && searchCount < ensCount && searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
+        //  else if(searchCount < gbCount && searchCount < ensCount) searchCount = gbCount + ensCount;
+        //  else if(searchCount < ensCount && searchCount < gCount) searchCount = ensCount + gCount;
+        //  else if(searchCount < gbCount && searchCount < gCount) searchCount = gbCount + gCount;
+        //  else if(searchCount < gbCount) searchCount = gbCount;
+        //  else if(searchCount < ensCount) searchCount = ensCount;
+        //  else if(searchCount < gCount) searchCount = gCount;
+        //}
+        //else if (StringUtils.contains(species, "Homo sapiens") || StringUtils.contains(species, "Mus musculus")){
+         //if(searchCount < ensCount)  searchCount = ensCount;
+         //if(searchCount < gCount)  searchCount = gCount;
+         //if(searchCount < gbCount)  searchCount = gbCount;
+       // }
+
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             //  String geneBaseHQL = "SELECT g FROM gene g INNER JOIN probe_gene pb ON g.id = pb.gene_id  INNER JOIN probe p on p.id = pb.probe_id " +
             //         " WHERE p.probeset IN (:probes) GROUP BY g.id";
-            String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes)";
             // String geneOntologyCountHQL = "SELECT COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.gene g INNER JOIN go.ontology o INNER o.goDomain gdom WHERE g.ensgAccession IN (:ensgacs) AND gdom.namespace = :namespace";
 
 
@@ -298,16 +322,16 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             int total = ((Long) geneCountQuery.uniqueResult()).intValue();
             if (total == 0) {
 
-                return new Pagination<Gene>(startPageNo, recordPerPage, total);
+                return new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             }
 
             // System.out.println("================= found total genes size: " + total);
 
-            String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g." + orderBy + " " + sortBy;
+            String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes) ORDER BY g." + orderBy + " " + sortBy;
             Query geneQuery = this.session().createQuery(geneHQL);
             geneQuery.setParameterList(("probes"), probes);
 
-            Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total);
+            Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             geneQuery.setFirstResult(genePagination.getFirstResult());
             geneQuery.setMaxResults(genePagination.getSizePerPage());
 
@@ -317,7 +341,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             genePagination.setPageResults(geneList);
             return genePagination;
         } else {
-            return new Pagination<Gene>(startPageNo, recordPerPage, 0);
+            return new Pagination<Gene>(startPageNo, recordPerPage, 0, searchCount);
         }
     }
 
@@ -325,13 +349,13 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {
-            String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g, te";
+            String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.gene g INNER JOIN g.probe p WHERE p.probeId IN (:probe) ORDER BY g, te";
             Query teQuery = this.session().createQuery(teHQL);
             teQuery.setParameterList(("probes"), probes);
             return teQuery.list();
@@ -343,12 +367,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
-            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND g.ensgAccession like 'ENSG' GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
+            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes) AND g.ensgAccession like 'ENSG' GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
             Query chrQuery = this.session().createQuery(chrHQL);
             chrQuery.setParameterList(("probes"), probes);
 
@@ -363,14 +387,14 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public Integer[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-        List<String> probes = uniqueProbesPages.getPageResults();
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        List<Probe> probes = uniqueProbesPages.getPageResults();
         //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
         Integer[] types = {0, 0, 0, 0, 0, 0, 0};
         if (probes.size() > 0) {
             //Get Type 1 Probes
-            String tp1 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
-                    "WHERE r.probeId IN (:probes) AND i.typeName = 'I'";
+            String tp1 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probes p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE p.probeId IN (:probes) AND i.typeName = 'I'";
             Query tp1Query = this.session().createQuery(tp1);
             tp1Query.setParameterList(("probes"), probes);
             List<String> t1ProbeList = tp1Query.list();
@@ -383,15 +407,15 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //if T1 probe list is empty. we don't need to query the genes
             List<Gene> t1GeneList = new ArrayList<Gene>();
             if (t1ProbeList != null && t1ProbeList.size() > 0) {
-                String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t1ProbeList) ";
+                String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:t1ProbeList) ";
                 Query tg1Query = this.session().createQuery(tg1);
                 tg1Query.setParameterList("t1ProbeList", t1ProbeList);
                 t1GeneList = tg1Query.list();
             }
 
             //Get Type 2 Probes
-            String tp2 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
-                    "WHERE r.probeId IN (:probes) AND i.typeName = 'II'";
+            String tp2 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probes p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE p.probeId IN (:probes) AND i.typeName = 'II'";
             Query tp2Query = this.session().createQuery(tp2);
             tp2Query.setParameterList(("probes"), probes);
             List<String> t2ProbeList = tp2Query.list();
@@ -404,15 +428,15 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //if T2 probe list is empty we don't need to query the genes
             List<Gene> t2GeneList = new ArrayList<Gene>();
             if (t2ProbeList != null && t2ProbeList.size() > 0) {
-                String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t2ProbeList) ";
+                String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:t2ProbeList) ";
                 Query tg2Query = this.session().createQuery(tg2);
                 tg2Query.setParameterList("t2ProbeList", t2ProbeList);
                 t2GeneList = tg2Query.list();
             }
 
             //Get Type III Probes
-            String tp3 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
-                    "WHERE r.probeId IN (:probes) AND i.typeName = 'III'";
+            String tp3 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probes p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE p.probeId IN (:probes) AND i.typeName = 'III'";
             Query tp3Query = this.session().createQuery(tp3);
             tp3Query.setParameterList(("probes"), probes);
             List<String> t3ProbeList = tp3Query.list();
@@ -425,7 +449,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //if the T3 probe list is empty. we don't need to query the genes
             List<Gene> t3GeneList = new ArrayList<Gene>();
             if (t3ProbeList != null && t3ProbeList.size() > 0) {
-                String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t3ProbeList) ";
+                String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:t3ProbeList) ";
                 Query tg3Query = this.session().createQuery(tg3);
                 tg3Query.setParameterList(("t3ProbeList"), t3ProbeList);
                 t3GeneList = tg3Query.list();
@@ -498,12 +522,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
-            String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g.chromosome";
+            String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes) ORDER BY g.chromosome";
             Query chrQuery = this.session().createQuery(chrHQL);
             chrQuery.setParameterList(("probes"), probes);
             List<Gene> chromosomeGeneList = chrQuery.list();
@@ -516,19 +540,31 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
         if (probes.size() > 0) {
+            String species = searchBean.getSpecies();
             //Get Count of all genes in db (N)
             String geneTotalCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g";
             Query geneTotalCountQuery = this.session().createQuery(geneTotalCountHQL);
             Long totalGeneN = ((Long) geneTotalCountQuery.uniqueResult());
+            //Get Count of all Human genes in db (Nh)
+            String geneTotalHumanCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe p WHERE p.species = 'Human'";
+            Query geneTotalHumanCountQuery = this.session().createQuery(geneTotalHumanCountHQL);
+            Long totalGeneNh = ((Long) geneTotalHumanCountQuery.uniqueResult());
+            //Get Count of all Mouse genes in db (Nm)
+            String geneTotalMouseCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe p WHERE p.species = 'Mouse'";
+            Query geneTotalMouseCountQuery = this.session().createQuery(geneTotalMouseCountHQL);
+            Long totalGeneNm = ((Long) geneTotalMouseCountQuery.uniqueResult());
+
+            if (StringUtils.contains(species, "Homo sapiens"))   totalGeneN = totalGeneNh;
+            if (StringUtils.contains(species, "Mus musculus"))   totalGeneN = totalGeneNm;
 
             //Get Count of all genes searched (n)
-            String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes)";
             Query geneCountQuery = this.session().createQuery(geneCountHQL);
             geneCountQuery.setParameterList(("probes"), probes);
             Long searchedGenen = ((Long) geneCountQuery.uniqueResult());
@@ -551,7 +587,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //Search Cellular
             //************************
             //Get the matching genes for each ontology (k)
-            String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
+            String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goCellularQuery = this.session().createQuery(goCellularHQL);
             goCellularQuery.setParameterList(("probes"), probes);
             List<Object[]> goCellularList = goCellularQuery.list();
@@ -563,7 +599,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //Search Molecular
             //************************
 
-            String goMolecularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'molecular_function' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
+            String goMolecularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes) AND gd.namespace = 'molecular_function' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goMolecularQuery = this.session().createQuery(goMolecularHQL);
             goMolecularQuery.setParameterList(("probes"), probes);
             List<Object[]> goMolecularList = goMolecularQuery.list();
@@ -575,7 +611,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //Search Biological
             //************************
 
-            String goBiologicalHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'biological_process' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
+            String goBiologicalHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes) AND gd.namespace = 'biological_process' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goBiologicalQuery = this.session().createQuery(goBiologicalHQL);
             goBiologicalQuery.setParameterList(("probes"), probes);
             List<Object[]> goBiologicalList = goBiologicalQuery.list();
@@ -619,22 +655,42 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         return returnVal;
     }
 
-    private double calculateGOEnrichPValue(long N, long n, long m, long k) {
-        return 0.05;
-        //return ((m/k)*((N-m)/(n-k)))/(N/n);
+    private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
+        //return "N/A";
+        Double pvalue = (binomialCoefficient(m,k)*binomialCoefficient((N-m),(n-k)))/ binomialCoefficient(N,n);
+        DecimalFormat df = new DecimalFormat("#.##E0");
+        return (Double.valueOf(df.format(pvalue)));
+        //return N*1.0;
+       // return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
+    }
+    private Double binomialCoefficient(long a, long b){
+        if (b < 0 || b > a){
+        return null;
+        }
+        if (b > (a - b))  {       // take advantage of symmetry
+        b = a - b;
+        }
+        Double coeff = 1.0;
+        for (long i = a - b + 1; i <= a; i++) {
+            coeff *= i;
+        }
+        for (long i = 1; i <= b; i++) {
+            coeff /= i;
+        }
+        return coeff;
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             //Search Cellular
-            String goTFHQL = "SELECT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            String goTFHQL = "SELECT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probe p WHERE p.probeId IN (:probes)";
             Query goTFQuery = this.session().createQuery(goTFHQL);
             goTFQuery.setParameterList(("probes"), probes);
             List<Object[]> goTFList = goTFQuery.list();
@@ -646,7 +702,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
 
     @Override
-    public Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         boolean noneDsQuery = searchBean.isNoneDsCondition();
         //no dataset level search condition, then just search data level only, otherwise we will search probe based on both data and dataset conditions
         if (noneDsQuery) {
@@ -685,13 +741,13 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String dsIdQuery = " ds.id IN (:dsIDs";
 
         if (searchGenes.length > 0) {
-            threeIdQuery.add(" rep.geneSymbol IN (:geneNames");
+            threeIdQuery.add(" g.geneName IN (:geneNames");
         }
         if (searchGenBanks.length > 0) {
-            threeIdQuery.add(" rep.genBankAccession IN (:genBanks");
+            threeIdQuery.add(" g.genbankId IN (:genBanks");
         }
         if (searchEnsembls.length > 0) {
-            threeIdQuery.add(" rep.ensembl IN (:ensembls");
+            threeIdQuery.add(" g.ensgAccession IN (:ensembls");
         }
 
         upDownQuery.add(" d.value >= " + upValue);
@@ -703,12 +759,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count data query
         StringBuilder countQL = new StringBuilder();
-        String countBaseHQL = "SELECT count(d) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        String countBaseHQL = "SELECT count(d) FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds";
         countQL.append(countBaseHQL);
 
         //data pagination query
         StringBuilder dataQL = new StringBuilder();
-        String dataBaseHQL = "SELECT d FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        String dataBaseHQL = "SELECT d FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         dataQL.append(dataBaseHQL);
 
         if (orConds.size() > 0) {
@@ -942,13 +998,13 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         List<String> threeIdQuery = new ArrayList<String>();
         List<String> upDownQuery = new ArrayList<String>();
         if (searchGenes.length > 0) {
-            threeIdQuery.add(" rep.geneSymbol IN (:geneNames");
+            threeIdQuery.add(" g.geneName IN (:geneNames");
         }
         if (searchGenBanks.length > 0) {
-            threeIdQuery.add(" rep.genBankAccession IN (:genBanks");
+            threeIdQuery.add(" g.genbankId IN (:genBanks");
         }
         if (searchEnsembls.length > 0) {
-            threeIdQuery.add(" rep.ensembl IN (:ensembls");
+            threeIdQuery.add(" g.ensgAccession IN (:ensembls");
         }
 
         upDownQuery.add(" d.value >= " + upValue);
@@ -961,11 +1017,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count data query
         StringBuilder countQL = new StringBuilder();
-        String countBase = "SELECT count(d) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        String countBase = "SELECT count(d) FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds";
         countQL.append(countBase);
         //data pagination query
         StringBuilder dataQL = new StringBuilder();
-        String pQueryBase = "SELECT d FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        String pQueryBase = "SELECT d FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         dataQL.append(pQueryBase);
 
         if (orConds.size() > 0) {
@@ -1082,7 +1138,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     //Search Probe By Data level and Dataset Level conditions
     @SuppressWarnings("unchecked")
-    private Pagination<String> searchProbeDataAndDsLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    private Pagination<Probe> searchProbeDataAndDsLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         //query the dataset first
         List<Long> foundDsIds = queryDatasets(searchBean);
         // System.out.println("============> ***** found dataset id list size: " + foundDsIds.size());
@@ -1092,7 +1148,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if (recordPerPage < 0) {
                 recordPerPage = 10;
             }
-            return new Pagination<String>(startPageNo, recordPerPage, 0);
+            return new Pagination<Probe>(startPageNo, recordPerPage, 0);
         }
         //start to search data based on the found dataset list
         String genes = searchBean.getGenes();
@@ -1113,13 +1169,13 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String dsIdQuery = " ds.id IN (:dsIDs";
 
         if (searchGenes.length > 0) {
-            threeIdQuery.add(" rep.geneSymbol IN (:geneNames");
+            threeIdQuery.add(" g.geneName IN (:geneNames");
         }
         if (searchGenBanks.length > 0) {
-            threeIdQuery.add(" rep.genBankAccession IN (:genBanks");
+            threeIdQuery.add(" g.genbankId IN (:genBanks");
         }
         if (searchEnsembls.length > 0) {
-            threeIdQuery.add(" rep.ensembl IN (:ensembls");
+            threeIdQuery.add(" g.ensgAccession IN (:ensembls");
         }
         upDownQuery.add(" d.value >= " + upValue);
         upDownQuery.add(" d.value <= -" + downValue);
@@ -1130,12 +1186,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count data query
         StringBuilder countQL = new StringBuilder();
-        String countBaseHQL = "SELECT count(distinct rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        String countBaseHQL = "SELECT count(distinct pro.probeId) FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds";
         countQL.append(countBaseHQL);
 
         //probe pagination query
         StringBuilder probeQL = new StringBuilder();
-        String probeBaseHQL = "SELECT distinct(rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        String probeBaseHQL = "SELECT distinct(pro.probeId) FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         probeQL.append(probeBaseHQL);
 
         if (orConds.size() > 0) {
@@ -1300,16 +1356,16 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if (recordPerPage < 0) {
                 recordPerPage = 10;
             }
-            return new Pagination<String>(startPageNo, recordPerPage, total);
+            return new Pagination<Probe>(startPageNo, recordPerPage, total);
         }
 
         if (recordPerPage < 0) {
             recordPerPage = total;
         }
-        Pagination<String> probePagination = new Pagination<String>(startPageNo, recordPerPage, total);
+        Pagination<Probe> probePagination = new Pagination<Probe>(startPageNo, recordPerPage, total);
         probeQuery.setFirstResult(probePagination.getFirstResult());
         probeQuery.setMaxResults(probePagination.getSizePerPage());
-        List<String> probeList = probeQuery.list();
+        List<Probe> probeList = probeQuery.list();
         probePagination.setPageResults(probeList);
         // System.out.println("===========> ds level found total probe size: " + probePagination.getTotalRecords());
         // System.out.println("===========> ds level found total probe pages: " + probePagination.getTotalPages());
@@ -1318,7 +1374,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     //Search Probe By Data level conditions
     @SuppressWarnings("unchecked")
-    private Pagination<String> searchProbeDataLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    private Pagination<Probe> searchProbeDataLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         String genes = searchBean.getGenes();
         String genBanks = searchBean.getGenBanks();
         String ensembls = searchBean.getEnsembls();
@@ -1334,13 +1390,13 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         List<String> threeIdQuery = new ArrayList<String>();
         List<String> upDownQuery = new ArrayList<String>();
         if (searchGenes.length > 0) {
-            threeIdQuery.add(" rep.geneSymbol IN (:geneNames");
+            threeIdQuery.add(" g.geneName IN (:geneNames");
         }
         if (searchGenBanks.length > 0) {
-            threeIdQuery.add(" rep.genBankAccession IN (:genBanks");
+            threeIdQuery.add(" g.genbankId IN (:genBanks");
         }
         if (searchEnsembls.length > 0) {
-            threeIdQuery.add(" rep.ensembl IN (:ensembls");
+            threeIdQuery.add(" g.ensgAccession IN (:ensembls");
         }
 
         upDownQuery.add(" d.value >= " + upValue);
@@ -1352,12 +1408,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count report DISTINCT query
         StringBuilder countQL = new StringBuilder();
-        String countBase = "SELECT count(distinct rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        String countBase = "SELECT count(distinct pro.probeId) FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds";
         countQL.append(countBase);
 
         //probe pagination query
         StringBuilder probeQL = new StringBuilder();
-        String pQueryBase = "SELECT distinct(rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        String pQueryBase = "SELECT distinct(pro.probeId) FROM Data d INNER JOIN d.probe pro INNER JOIN pro.gene g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         probeQL.append(pQueryBase);
 
         if (orConds.size() > 0) {
@@ -1463,16 +1519,16 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if (recordPerPage < 0) {
                 recordPerPage = 10;
             }
-            return new Pagination<String>(startPageNo, recordPerPage, total);
+            return new Pagination<Probe>(startPageNo, recordPerPage, total);
         }
         //if the recordPerPage is less than zero, we say it will return all results in a single page.
         if (recordPerPage < 0) {
             recordPerPage = total;
         }
-        Pagination<String> probPagination = new Pagination<String>(startPageNo, recordPerPage, total);
+        Pagination<Probe> probPagination = new Pagination<Probe>(startPageNo, recordPerPage, total);
         probeQuery.setFirstResult(probPagination.getFirstResult());
         probeQuery.setMaxResults(probPagination.getSizePerPage());
-        List<String> dataList = probeQuery.list();
+        List<Probe> dataList = probeQuery.list();
         probPagination.setPageResults(dataList);
         // System.out.println("===========> data level only query found total probe size: " + probPagination.getTotalRecords());
         // System.out.println("===========>  data level only query found total probe pages: " + probPagination.getTotalPages());
@@ -1524,7 +1580,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "genesymbol")) {
-            return " ORDER BY rep.geneSymbol " + sortBy;
+            return " ORDER BY g.geneName " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "foldchange")) {
@@ -1532,15 +1588,15 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "genbank")) {
-            return " ORDER BY rep.genBankAccession " + sortBy;
+            return " ORDER BY g.genbankId " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "ensemblid")) {
-            return " ORDER BY rep.ensembl " + sortBy;
+            return " ORDER BY g.ensgAccession " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "probeid")) {
-            return " ORDER BY rep.probeId " + sortBy;
+            return " ORDER BY pro.probeId " + sortBy;
         }
         return null;
     }

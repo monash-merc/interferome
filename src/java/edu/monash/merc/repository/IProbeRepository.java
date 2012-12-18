@@ -28,6 +28,8 @@
 
 package edu.monash.merc.repository;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Probe;
 
 import java.util.List;
@@ -43,9 +45,10 @@ import java.util.List;
  */
 public interface IProbeRepository {
 
-    Probe getProbeByProbeId(String probesetId);
-
+   // Probe getProbeByProbeId(String probesetId);
     List<Probe> getProbesByGeneAccession(String geneAccession);
 
     List<Probe> getProbesByGeneId(long geneId);
+    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
+    public Probe getProbeByProbeId(String probeId);
 }

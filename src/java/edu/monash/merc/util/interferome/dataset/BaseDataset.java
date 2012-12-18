@@ -37,7 +37,9 @@ package edu.monash.merc.util.interferome.dataset;
 public interface BaseDataset {
     public ExpFactor[] getExpFactors();
 
-    public String[] getReporters();
+   // public String[] getReporters();
+
+    public String[] getProbes();
 
     public String[] getData();
 

@@ -42,6 +42,7 @@ import edu.monash.merc.util.interferome.dataset.ExpFactor;
 import edu.monash.merc.util.interferome.dataset.IFNTypeFactor;
 import edu.monash.merc.util.interferome.dataset.VarFactor;
 import edu.monash.merc.util.reporter.ImportReporterThread;
+import edu.monash.merc.util.probe.ImportProbeThread;
 import edu.monash.merc.util.tfsite.ImportTFSiteThread;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1012,6 +1013,123 @@ public class DMServiceImpl implements DMService {
         reporterThread.importReporter();
     }
 
+    //Probes
+    @Override
+    public void saveProbe(Probe probe) {
+        this.probeService.saveProbe(probe);
+    }
+
+    @Override
+    public void mergeProbe(Probe probe) {
+        this.probeService.mergeProbe(probe);
+    }
+
+    @Override
+    public void updateProbe(Probe probe) {
+        this.probeService.updateProbe(probe);
+    }
+
+
+    @Override
+    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys) {
+        return this.probeService.getProbes(startPageNo, recordsPerPage, orderBys);
+    }
+
+    @Override
+    public Probe getProbeByProbeId(String probeId) {
+        return this.probeService.getProbeByProbeId(probeId);
+    }
+
+    @Override
+    public ProbCounter importAllProbes(List<Probe> probes) {
+        int countUpdated = 0;
+        int countNew = 0;
+        //reporters counter
+        ProbCounter counter = new ProbCounter();
+
+        for (Probe probe : probes) {
+            if (StringUtils.isNotBlank(probe.getProbeId())) {
+                Probe existedProbe = this.getProbeByProbeId(probe.getProbeId());
+                if (existedProbe != null) {
+                    probe.setId(existedProbe.getId());
+                    // this.mergeReporter(reporter);
+                    this.updateProbe(probe);
+                    //count how many reporters have been updated
+                    countUpdated++;
+                } else {
+                    this.saveProbe(probe);
+                    //count how many reporters are new
+                    countNew++;
+                }
+            }
+        }
+        counter.setTotalUpdated(countUpdated);
+        counter.setTotalNew(countNew);
+        return counter;
+    }
+
+
+    @Override
+    public void importProbe(ProbeGeneBean probeGeneBean) {
+        ImportProbeThread probeThread = new ImportProbeThread(this, probeGeneBean);
+        probeThread.importProbe();
+    }
+
+    @Override
+    public Probe getProbeById(long id) {
+        return this.probeService.getProbeById(id);
+    }
+
+
+    @Override
+    public List<Probe> getProbesByGeneAccession(String geneAccession) {
+        return this.probeService.getProbesByGeneAccession(geneAccession);
+    }
+
+//    @Override
+//    public List<Probe> getProbesByGeneId(long geneId) {
+//        return this.probeService.getProbesByGeneId(geneId);
+//    }
+
+//    @Override
+//    public void importProbes(List<ProbeGeneBean> probeGeneBeans) {
+//        if (probeGeneBeans != null) {
+//            for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
+//                String ensgAc = probeGeneBean.getEnsgAccession();
+//                String probeId = probeGeneBean.getProbeId();
+//                //String platform = probeGeneBean.getPlatform();
+//                //String probeType = probeGeneBean.getProbeType();
+//                Gene gene = this.getGeneByEnsgAccession(ensgAc);
+ //               if (gene != null) {
+//                    Probe probe = this.getProbeByProbeId(probeId);
+//                    if (probe == null) {
+//                        probe = new Probe();
+//                        probe.setProbeId(probeId);
+ //                      //probe.setPlatform(platform);
+//                       // probe.setSpecies(probeType);
+//                    }
+//
+//                    List<Gene> geneList = this.getGenesByProbesetId(probe.getProbeId());
+//                    if (geneList != null) {
+//                        if (!geneList.contains(gene)) {
+//                            geneList.add(gene);
+//                        }
+//                    } else {
+//                        geneList = new ArrayList<Gene>();
+//                        geneList.add(gene);
+//                    }
+//                    probe.setGenes(geneList);
+//                    //check if primary key id is zero which means new entity,
+//                    if (probe.getId() == 0) {
+//                        this.saveProbe(probe);
+//                    } else {
+//                        this.mergeProbe(probe);
+//                    }
+//                }
+//            }
+//
+//        }
+//    }
 
     //TFSite
 
@@ -1210,20 +1328,20 @@ public class DMServiceImpl implements DMService {
         dataset.setExperiment(experiment);
 
         // Create Data
-        String[] reporters = txtDataset.getReporters();
+        String[] probes = txtDataset.getProbes();
         String[] data_arr = txtDataset.getData();
 
         List<Data> dataList = new ArrayList<Data>();
         for (int i = 0; i < data_arr.length; i++) {
             String data_val = data_arr[i];
-            String probeId = reporters[i];
-            Reporter reporter = this.getReporterByProbeId(probeId);
-            if (null == reporter) {
+            String probeId = probes[i];
+            Probe probe = this.getProbeByProbeId(probeId);
+            if (null == probe) {
                 throw new DCException("the reporter not found by probe id - " + probeId);
             }
             Data data = new Data();
             data.setDataset(dataset);
-            data.setReporter(reporter);
+            data.setProbe(probe);
             data.setValue(Double.valueOf(data_val));
             dataList.add(data);
         }
@@ -1350,8 +1468,8 @@ public class DMServiceImpl implements DMService {
     }
 
     @Override
-    public List<Gene> getGenesByProbesetId(String probeId) {
-        return this.geneService.getGenesByProbesetId(probeId);
+    public List<Gene> getGenesByProbeId(String probeId) {
+        return this.geneService.getGenesByProbeId(probeId);
     }
 
     /**
@@ -1763,86 +1881,5 @@ public class DMServiceImpl implements DMService {
         }
 
         return evidenceCode;
-    }
-
-    @Override
-    public Probe getProbeById(long id) {
-        return this.probeService.getProbeById(id);
-    }
-
-    @Override
-    public void saveProbe(Probe probe) {
-        this.probeService.saveProbe(probe);
-    }
-
-    @Override
-    public void mergeProbe(Probe probe) {
-        this.probeService.mergeProbe(probe);
-    }
-
-    @Override
-    public void updateProbe(Probe probe) {
-        this.probeService.updateProbe(probe);
-    }
-
-    @Override
-    public void deleteProbe(Probe probe) {
-        this.probeService.deleteProbe(probe);
-    }
-
-    @Override
-    public Probe getProbeByProbeId(String probesetId) {
-        return this.probeService.getProbeByProbeId(probesetId);
-    }
-
-    @Override
-    public List<Probe> getProbesByGeneAccession(String geneAccession) {
-        return this.probeService.getProbesByGeneAccession(geneAccession);
-    }
-
-    @Override
-    public List<Probe> getProbesByGeneId(long geneId) {
-        return this.probeService.getProbesByGeneId(geneId);
-    }
-
-    @Override
-    public void importProbes(List<ProbeGeneBean> probeGeneBeans) {
-
-        if (probeGeneBeans != null) {
-            for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
-                String ensgAc = probeGeneBean.getEnsgAccession();
-                String probeId = probeGeneBean.getProbeId();
-                String platform = probeGeneBean.getPlatform();
-                String probeType = probeGeneBean.getProbeType();
-                Gene gene = this.getGeneByEnsgAccession(ensgAc);
-                if (gene != null) {
-                    Probe probe = this.getProbeByProbeId(probeId);
-                    if (probe == null) {
-                        probe = new Probe();
-                        probe.setProbeId(probeId);
-                        probe.setPlatform(platform);
-                        probe.setSpecies(probeType);
-                    }
-
-                    List<Gene> geneList = this.getGenesByProbesetId(probe.getProbeId());
-                    if (geneList != null) {
-                        if (!geneList.contains(gene)) {
-                            geneList.add(gene);
-                        }
-                    } else {
-                        geneList = new ArrayList<Gene>();
-                        geneList.add(gene);
-                    }
-                    probe.setGenes(geneList);
-                    //check if primary key id is zero which means new entity,
-                    if (probe.getId() == 0) {
-                        this.saveProbe(probe);
-                    } else {
-                        this.mergeProbe(probe);
-                    }
-                }
-            }
-
-        }
     }
 }

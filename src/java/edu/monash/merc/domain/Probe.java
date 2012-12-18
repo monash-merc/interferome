@@ -34,6 +34,9 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+//import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
@@ -45,12 +48,13 @@ import java.util.List;
  *        Date: 28/06/12
  *        Time: 2:20 PM
  */
+
 @Entity
 @Table(name = "probe")
 @org.hibernate.annotations.Table(appliesTo = "probe",
-        indexes = {@Index(name = "idx_probeset", columnNames = {"probeset"}),
-                @Index(name = "idx_platform", columnNames = {"platform"}),
-                @Index(name = "idx_species", columnNames = {"species"})
+        indexes = {@Index(name = "idx_probeset", columnNames = {"probe_id"})
+               // @Index(name = "idx_platform", columnNames = {"platform"}),
+                //@Index(name = "idx_species", columnNames = {"species"})
         })
 public class Probe extends Domain {
 
@@ -60,22 +64,27 @@ public class Probe extends Domain {
     private long id;
 
     @Basic
-    @Column(name = "probeset")
+    @Column(name = "probe_id")
     private String probeId;
 
-    @Basic
-    @Column(name = "platform")
-    private String platform;
+ //   @ManyToMany(mappedBy ="probes",targetEntity = Platform.class)
+ //   //@JoinTable(name = "platform", joinColumns = {@JoinColumn(name = "platform_id", referencedColumnName = "id")},inverseJoinColumns = {@JoinColumn(name = "probe_id", referencedColumnName = "id")}, uniqueConstraints = {@UniqueConstraint(columnNames = {
+ //   //        "platform_id","probe_id"})})
+ //   private List<Platform> platforms;
 
-    @Basic
-    @Column(name = "species")
-    private String species;
+    @ManyToOne(targetEntity = Species.class)
+    @JoinColumn(name = "species_id", referencedColumnName = "id", nullable = false)
+    private Species species;
+
 
     @ManyToMany(targetEntity = Gene.class)
     @JoinTable(name = "probe_gene", joinColumns = {@JoinColumn(name = "probe_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "gene_id", referencedColumnName = "id")}, uniqueConstraints = {@UniqueConstraint(columnNames = {
             "probe_id", "gene_id"})})
     @LazyCollection(LazyCollectionOption.TRUE)
     private List<Gene> genes;
+
+    @OneToMany(targetEntity = Data.class,mappedBy = "probe")
+    private List<Data> data;
 
     public long getId() {
         return id;
@@ -93,19 +102,19 @@ public class Probe extends Domain {
         this.probeId = probeId;
     }
 
-    public String getPlatform() {
-        return platform;
-    }
+ //   public List<Platform> getPlatforms() {
+////        return platforms;
+ //   }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
+//    public void setPlatforms(List<Platform> platforms) {
+//        this.platforms = platforms;
+//    }
 
-    public String getSpecies() {
+    public Species getSpecies() {
         return species;
     }
 
-    public void setSpecies(String species) {
+    public void setSpecies(Species species) {
         this.species = species;
     }
 
@@ -115,5 +124,13 @@ public class Probe extends Domain {
 
     public void setGenes(List<Gene> genes) {
         this.genes = genes;
+    }
+
+    public List<Data> getData() {
+        return data;
+    }
+
+    public void setData(List<Data> data) {
+        this.data = data;
     }
 }

@@ -248,13 +248,13 @@ public class BioMartClient {
                 for (int i = 0; i < columnsLines.length; i++) {
                     probeGeneBeanCreator.getColumns().add(new CSVColumn(columnsLines[i], columnValuesLines[i]));
                 }
-                String platformColumnName = ProbeGeneField.PLATFORM;
-                String platformColumnValue = columnsLines[1];
-                String probeSpeciesColumnName = ProbeGeneField.SPECIES;
-                String probeSpeciesColumnValue = probeType;
+               // String platformColumnName = ProbeGeneField.PLATFORM;
+               // String platformColumnValue = columnsLines[1];
+               // String probeSpeciesColumnName = ProbeGeneField.SPECIES;
+               // String probeSpeciesColumnValue = probeType;
 
-                probeGeneBeanCreator.getColumns().add(new CSVColumn(platformColumnName, platformColumnValue));
-                probeGeneBeanCreator.getColumns().add(new CSVColumn(probeSpeciesColumnName, probeSpeciesColumnValue));
+               // probeGeneBeanCreator.getColumns().add(new CSVColumn(platformColumnName, platformColumnValue));
+               // probeGeneBeanCreator.getColumns().add(new CSVColumn(probeSpeciesColumnName, probeSpeciesColumnValue));
                 ProbeGeneBean probeGeneBean = probeGeneBeanCreator.createProbeGeneBean();
                 if (StringUtils.isNotBlank(probeGeneBean.getEnsgAccession()) && StringUtils.isNotBlank(probeGeneBean.getProbeId())) {
                     probeGeneBeans.add(probeGeneBean);
@@ -399,7 +399,8 @@ public class BioMartClient {
         List<ProbeGeneBean> probeGeneBeans = bioMartClient.importProbes("Human");
 
         for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
-            System.out.println(probeGeneBean.getEnsgAccession() + " - " + probeGeneBean.getProbeId() + " - " + probeGeneBean.getPlatform() + " - " + probeGeneBean.getProbeType());
+            //System.out.println(probeGeneBean.getEnsgAccession() + " - " + probeGeneBean.getProbeId() + " - " + probeGeneBean.getPlatform() + " - " + probeGeneBean.getProbeType());
+            System.out.println(probeGeneBean.getEnsgAccession() + " - " + probeGeneBean.getProbeId());
 
         }
     }

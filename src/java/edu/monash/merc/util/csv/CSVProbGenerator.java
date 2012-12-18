@@ -26,46 +26,40 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dao.impl;
+package edu.monash.merc.util.csv;
 
-import edu.monash.merc.dao.HibernateGenericDAO;
-import edu.monash.merc.domain.ExperimentFactorValue;
-import edu.monash.merc.domain.Factorial;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.repository.IFactorialRepository;
-import edu.monash.merc.service.FactorialService;
-import edu.monash.merc.service.impl.FactorialServiceImpl;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Repository;
-
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
+import edu.monash.merc.domain.Probe;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 16/10/12
- * Time: 9:51 AM
+ * User: irinar
+ * Date: 14/12/12
+ * Time: 12:35 PM
  * To change this template use File | Settings | File Templates.
  */
+public class CSVProbGenerator {
+    private List<ProbeColumn> columns = new ArrayList<ProbeColumn>();
 
-@Scope("prototype")
-@Repository
-public class FactorialDAO extends HibernateGenericDAO<Factorial> implements IFactorialRepository {
+    public List<ProbeColumn> getColumns() {
+        return columns;
+    }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Factorial getFactorialBySearch(long search) {
-            Criteria fCriteria = this.session().createCriteria(this.persistClass);
-            fCriteria.add(Restrictions.eq("factorialNumber", search).ignoreCase());
-            return (Factorial) fCriteria.uniqueResult();
-        }
+    public void setColumns(List<ProbeColumn> columns) {
+        this.columns = columns;
+    }
 
+    public Probe genProbe() {
+        Probe probe = new Probe();
+         for (ProbeColumn prcolumn : columns) {
+             String columnName = prcolumn.getColumnName();
+             String columnValue = prcolumn.getColumnValue();
+             if (columnName.equalsIgnoreCase(PField.PROBEID)) {
+                 probe.setProbeId(columnValue);
+             }
+
+         }
+         return probe;
+    }
 }

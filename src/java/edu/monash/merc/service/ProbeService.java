@@ -28,6 +28,8 @@
 
 package edu.monash.merc.service;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Probe;
 
 import java.util.List;
@@ -47,13 +49,19 @@ public interface ProbeService {
 
     void saveProbe(Probe probe);
 
+    public int saveProbes(List<Probe> probes);
+
     void mergeProbe(Probe probe);
 
     void updateProbe(Probe probe);
 
+    public int updateProbes(List<Probe> probes);
+
     void deleteProbe(Probe probe);
 
-    Probe getProbeByProbeId(String probesetId);
+    public Probe getProbeByProbeId(String probeId);
+
+    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
 
     List<Probe> getProbesByGeneAccession(String geneAccession);
 

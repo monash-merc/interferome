@@ -48,7 +48,9 @@ public class TxtDataset implements BaseDataset {
 
     private String[] data;
 
-    private String[] reporters;
+    //private String[] reporters;
+
+    private String[] probes;
 
     private String name;
 
@@ -89,7 +91,8 @@ public class TxtDataset implements BaseDataset {
     public TxtDataset(String fileName, List<String> lines) {
         this.name = fileName;
         setExperimentalFactors(lines);
-        setReportersData(lines);
+        //setReportersData(lines);
+        setProbesData(lines);
     }
 
     private void setExperimentalFactors(List<String> lines) {
@@ -224,29 +227,54 @@ public class TxtDataset implements BaseDataset {
 
     }
 
-    private void setReportersData(List<String> lines) {
+//    private void setReportersData(List<String> lines) {
+//        String[] lines_array = (String[]) lines.toArray(new String[lines.size()]);
+//        String[] counts = lines_array[13].split("\\t");
+//        int no_reporters = Integer.parseInt(counts[1]);
+
+//        if (lines.size() != no_reporters + RD_OFFSET + 1) {
+//            throw new DCParseException("the base dataset file corrupted, not enough reporter/ data information");
+//        }
+//
+//        this.data = new String[no_reporters];
+//        this.reporters = new String[no_reporters];
+//
+//        for (int i = 0; i < no_reporters; i++) {
+//            try {
+//                String[] tokens = lines_array[i + RD_OFFSET].split("\\t");
+//                this.reporters[i] = tokens[0];
+//                this.data[i] = tokens[1];
+//            } catch (Exception e) {
+//                throw new DCParseException("dataset file corrupted, null reporter/ data found at line " + i +
+//                        ". " + no_reporters + " records expected");
+//            }
+//        }
+//    }
+
+    private void setProbesData(List<String> lines) {
         String[] lines_array = (String[]) lines.toArray(new String[lines.size()]);
         String[] counts = lines_array[13].split("\\t");
-        int no_reporters = Integer.parseInt(counts[1]);
+        int no_probes = Integer.parseInt(counts[1]);
 
-        if (lines.size() != no_reporters + RD_OFFSET + 1) {
-            throw new DCParseException("the base dataset file corrupted, not enough reporter/ data information");
+        if (lines.size() != no_probes + RD_OFFSET + 1) {
+            throw new DCParseException("the base dataset file corrupted, not enough annotation/ data information");
         }
 
-        this.data = new String[no_reporters];
-        this.reporters = new String[no_reporters];
+        this.data = new String[no_probes];
+        this.probes = new String[no_probes];
 
-        for (int i = 0; i < no_reporters; i++) {
+        for (int i = 0; i < no_probes; i++) {
             try {
                 String[] tokens = lines_array[i + RD_OFFSET].split("\\t");
-                this.reporters[i] = tokens[0];
+                this.probes[i] = tokens[0];
                 this.data[i] = tokens[1];
             } catch (Exception e) {
-                throw new DCParseException("dataset file corrupted, null reporter/ data found at line " + i +
-                        ". " + no_reporters + " records expected");
+                throw new DCParseException("dataset file corrupted, null probes/ data found at line " + i +
+                        ". " + no_probes + " probes expected");
             }
         }
     }
+
 
     public void setExpFactors(ExpFactor[] experimentalFactors) {
         this.expFactors = experimentalFactors;
@@ -266,13 +294,22 @@ public class TxtDataset implements BaseDataset {
         this.data = data;
     }
 
+//    @Override
+//    public String[] getReporters() {
+//        return reporters;
+//    }
+//
+//    public void setReporters(String[] reporters) {
+//        this.reporters = reporters;
+//    }
+
     @Override
-    public String[] getReporters() {
-        return reporters;
+    public String[] getProbes() {
+        return probes;
     }
 
-    public void setReporters(String[] reporters) {
-        this.reporters = reporters;
+    public void setProbes(String[] probes) {
+        this.probes = probes;
     }
 
     @Override

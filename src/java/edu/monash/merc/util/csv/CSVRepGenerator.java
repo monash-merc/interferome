@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CSVRepGenerator class
+ * CSVRepGenerator class       CSVProbGenerator
  *
  * @author Simon Yu - Xiaoming.Yu@monash.edu
  * @version 2.0
