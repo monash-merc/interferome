@@ -65,8 +65,33 @@ function ChromosomeImage(){
     mmChrom['X'] = new Array(0, 167);
     mmChrom['Y'] = new Array(0, 16);
 
-    drawChromosome((new Raphael(document.getElementById('hs_chromosome_container'), 500, 350)), hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
-    drawChromosome((new Raphael(document.getElementById('mm_chromosome_container'), 500, 350)), mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+
+    //count how  many results for human ...
+    var hsl= document.getElementById("hsGenePos");
+    var rowh=0;
+    for (var r = 1, row; row = hsl.rows[r]; r++) {
+        rowh=r;
+    }
+    // count how many results for mouse ...
+    var mml= document.getElementById("mmGenePos");
+    var rowm=0;
+    for (var r = 1, row; row = mml.rows[r]; r++) {
+        rowm=r;
+    }
+    //draw both genomes is there are genes for both human and mouse ...
+    if (rowh != 0 && rowm !=0){
+        drawChromosome((new Raphael(document.getElementById('hs_chromosome_container'), 500, 350)), hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
+        drawChromosome((new Raphael(document.getElementById('mm_chromosome_container'), 500, 350)), mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+    }
+    //else draw only human if mouse is missing
+    else if (rowh != 0 && rowm ==0){
+        drawChromosome((new Raphael(document.getElementById('hs_chromosome_container'), 500, 350)), hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
+    }
+    //else draw only mouse if human is missing ...
+    else if (rowh == 0 && rowm !=0){
+        drawChromosome((new Raphael(document.getElementById('mm_chromosome_container'), 500, 350)), mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+    }
+
 
 
 

@@ -11,7 +11,9 @@
     <p>(Javascript Must Be Enabled to View These Results)</p>
 </div>
 <div id="venn">
-<div id="hiddenlist">
+    <span style="color: gray; font-size: 10pt" xmlns="http://www.w3.org/1999/html">The Venn diagram shows the number of genes regulated by one or more IFN type (Type I, II or III).  It should be noted that there are far more  datasets for genes regulated by type I than for types II or III, this imbalance introduces the risk of false nagatives and bias for the under-represented types II and III; caution is therefore encouraged in interpreting low or negative results from these subtypes.</span>
+
+    <div id="hiddenlist">
 <ul>
 <li id="t1" value="<@s.property value="subtypeList[0]"/>">Type I: &nbsp; <@s.property value="subtypeList[0]" /></li>
                     <li id="t2" value="<@s.property value="subtypeList[1]"/>">Type II: &nbsp; <@s.property value="subtypeList[1]"/></li>

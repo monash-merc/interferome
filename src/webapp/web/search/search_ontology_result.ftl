@@ -42,7 +42,7 @@
             <span style="font-size: 12pt;font-weight: bold;">Biological Process</span>
         </@s.if>
         <table  class="search_result_tab">
-            <tr class="search_result_header"><td>Accession</td><td>Term Name</td><td>Term Definition</td><td>Gene Count</td><td>p Value</td></tr>
+            <tr class="search_result_header"><td>Accession</td><td>Term Name</td><td>Term Definition</td><td>Gene Count</td><td>p Value<sup>*</sup></td></tr>
             <@s.iterator status="ontlResults" value="#ontlResults" id="onResults">
                 <tr>
                     <td><@s.property value="#onResults[0].goTermAccession"/></td>
@@ -57,4 +57,8 @@
     </@s.iterator>
     </table>
 </div>
+<span style="color: gray; font-size: 10pt" xmlns="http://www.w3.org/1999/html">*The enrichment of each gene ontology term was tested for significance using the hypergeometric mean.  The p value returned represents the probability of that each term would be the observed with the given frequency had the genes been drawn at random from across the entire genome.  A low p value (less than 0.05) for an ontological term indicates a low probability that so many hits to that term would have been observed if the results had been due to random effects, and such terms might be considered to be enriched in the result set.</span>
+<span style="color: gray; font-size: 10pt"><p>Tavazoie S, Hughes JD, Campbell MJ, Cho RJ, Church GM. (1999) <i>Systematic determination of genetic network architecture.</i> Nature Genetics. <b>22:</b> 281–285.</p>
+<span style="color: gray; font-size: 10pt"><p>Isabelle Rivals, Leon Personnaz, Lieng Taing and Marie-Claude Potier. (2007) <i>Enrichment or depletion of a GO category within a class of genes: which test?</i>  Bioinformatics.  <b>23:</b> 401-407.</p></span>
+
 <br/>

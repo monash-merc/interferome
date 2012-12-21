@@ -43,14 +43,16 @@ public class Pagination<T> extends SimplePagination implements java.io.Serializa
 
     protected int searchedRecords = 0;
     protected double searchSuccessPercentage = 0;
+    protected String searchedSpecies;
 
 	public Pagination() {
 
 	}
 
-    public Pagination(int pageNo, int sizePerPage, int totalRecords, int searchedRecords){
+    public Pagination(int pageNo, int sizePerPage, int totalRecords, int searchedRecords, String searchedSpecies){
         super(pageNo, sizePerPage, totalRecords);
         this.searchedRecords = searchedRecords;
+        this.searchedSpecies = searchedSpecies;
         this.searchSuccessPercentage = ((double)totalRecords/(double)searchedRecords)*100;
     }
 
@@ -77,6 +79,10 @@ public class Pagination<T> extends SimplePagination implements java.io.Serializa
 
     public int getSearchedRecords(){
         return searchedRecords;
+    }
+
+    public String getSearchedSpecies(){
+        return searchedSpecies;
     }
 
     public double getSearchSuccessPercentage(){
