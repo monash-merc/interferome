@@ -257,7 +257,7 @@ public class TxtDataset implements BaseDataset {
         int no_probes = Integer.parseInt(counts[1]);
 
         if (lines.size() != no_probes + RD_OFFSET + 1) {
-            throw new DCParseException("the base dataset file corrupted, not enough annotation/ data information");
+            throw new DCParseException("the base dataset file corrupted, not enough probes/ data information");
         }
 
         this.data = new String[no_probes];

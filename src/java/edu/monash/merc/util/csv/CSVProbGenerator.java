@@ -51,15 +51,26 @@ public class CSVProbGenerator {
     }
 
     public Probe genProbe() {
-        Probe probe = new Probe();
+        Probe probes = new Probe();
          for (ProbeColumn prcolumn : columns) {
              String columnName = prcolumn.getColumnName();
              String columnValue = prcolumn.getColumnValue();
              if (columnName.equalsIgnoreCase(PField.PROBEID)) {
-                 probe.setProbeId(columnValue);
+                 probes.setProbeId(columnValue);
              }
+             if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
+                 probes.setEnsemblId(columnValue);
+             }
+              //TODO: Fix relations between Probe and Species domains
+             //if (columnName.equalsIgnoreCase(PField.SPECIES)) {
+             //    probes.setSpecies(columnValue);
+            // }
 
+             //TODO: Fix setGenes(null). I just fixed the syntax.
+            // if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
+             //    probes.setGenes(null);
+            // }
          }
-         return probe;
+         return probes;
     }
 }

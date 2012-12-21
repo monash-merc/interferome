@@ -45,19 +45,19 @@ import java.util.List;
  */
 public interface ProbeService {
 
-    Probe getProbeById(long id);
+    public Probe getProbeById(long id);
 
-    void saveProbe(Probe probe);
+    public void saveProbe(Probe probe);
 
     public int saveProbes(List<Probe> probes);
 
-    void mergeProbe(Probe probe);
+    public void mergeProbe(Probe probe);
 
-    void updateProbe(Probe probe);
+    public void updateProbe(Probe probe);
 
     public int updateProbes(List<Probe> probes);
 
-    void deleteProbe(Probe probe);
+    public void deleteProbe(Probe probe);
 
     public Probe getProbeByProbeId(String probeId);
 
@@ -65,5 +65,7 @@ public interface ProbeService {
 
     List<Probe> getProbesByGeneAccession(String geneAccession);
 
-    List<Probe> getProbesByGeneId(long geneId);
+    //List<Probe> getProbeBySpecies(String species);
+
+   // public List<Probe> getProbesByGeneId(long geneId);
 }

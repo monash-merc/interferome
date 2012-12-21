@@ -205,11 +205,11 @@ public interface DMService {
     //Probe
     Probe getProbeById(long id);
 
-    List<Probe> getProbesByGeneAccession(String geneAccession);
+    public List<Probe> getProbesByGeneAccession(String geneAccession);
+
+ //   public List<Probe> getProbeBySpecies(String species);
 
 //    List<Probe> getProbesByGeneId(long geneId);
-
-    //void importProbes(List<ProbeGeneBean> probeGeneBeans);
 
     public void saveProbe(Probe probe);
 
@@ -223,7 +223,9 @@ public interface DMService {
 
     public ProbCounter importAllProbes(List<Probe> probes);
 
-    public void importProbe(ProbeGeneBean probeGeneBeans);
+    public void importProbe(ProbeBean probeBeans);
+
+    void importProbes(List<ProbeGeneBean> probeGeneBeans);
 
     // TFSite
     public void saveTFSite(TFSite tfSite);

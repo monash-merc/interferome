@@ -34,6 +34,7 @@ import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.User;
 import edu.monash.merc.domain.UserType;
 import edu.monash.merc.dto.ProbeGeneBean;
+import edu.monash.merc.dto.ProbeBean;
 import edu.monash.merc.exception.DCException;
 import edu.monash.merc.util.MercUtil;
 import edu.monash.merc.util.csv.CSVProbGenerator;
@@ -105,24 +106,24 @@ public class ImportProbeAction extends DMBaseAction {
                 addFieldError("importnotfinished", getText("probe.import.working.in.progress"));
                 return INPUT;
             }
-            //start to upload the tf site file
+            //start to upload the probe file
             FileInputStream fis = null;
             fis = new FileInputStream(upload);
-            //get all tf site from the file
+            //get all probes from the file
             List<Probe> probes = generateProbes(fis);
-            //create tf site bean
-            ProbeGeneBean probeGeneBean = createProbeGeneBean(user, probes);
-            //call the import tf site service
-            this.dmService.importProbe(probeGeneBean);
+            //create probes bean
+            ProbeBean probeBean = createProbeBean(user, probes);
+            //call the import probes service
+            this.dmService.importProbe(probeBean);
             //set the success message
             String successMsg = getText("probe.import.start.success.msg");
             if (sendMailRequired) {
-                successMsg = getText("experiment.annotation.import.start.success.with.mail.msg");
+                successMsg = getText("probe.import.start.success.with.mail.msg");
             }
             setSuccessActMsg(successMsg);
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("tfsite.import.failed.to.start.msg") + " " + ex.getMessage());
+            addActionError(getText("probe.import.failed.to.start.msg") + " " + ex.getMessage());
             return ERROR;
         }
         return SUCCESS;
@@ -142,15 +143,15 @@ public class ImportProbeAction extends DMBaseAction {
 
             String[] columnValuesLine;
             while ((columnValuesLine = csvReader.readNext()) != null) {
-                Probe probe = new Probe();
+                Probe probes = new Probe();
                 if (columnValuesLine.length == columnsLine.length) {
                     CSVProbGenerator probGenerator = new CSVProbGenerator();
 
                     for (int i = 0; i < columnsLine.length; i++) {
                         probGenerator.getColumns().add(new ProbeColumn(columnsLine[i], columnValuesLine[i]));
                     }
-                    probe = probGenerator.genProbe();
-                    probeList.add(probe);
+                    probes = probGenerator.genProbe();
+                    probeList.add(probes);
                 }
             }
         } catch (Exception ex) {
@@ -170,22 +171,23 @@ public class ImportProbeAction extends DMBaseAction {
         return probeList;
     }
 
-    private ProbeGeneBean createProbeGeneBean(User user, List<Probe> probes) {
-        ProbeGeneBean probeGeneBean = new ProbeGeneBean();
+    private ProbeBean createProbeBean(User user, List<Probe> probes) {
+        ProbeBean probeBean = new ProbeBean();
         String serverQName = getServerQName();
         String appName = appSetting.getPropValue(AppPropSettings.APPLICATION_NAME);
         String adminEmail = appSetting.getPropValue(AppPropSettings.SYSTEM_ADMIN_EMAIL);
-        probeGeneBean.setServerName(serverQName);
-        probeGeneBean.setAppName(appName);
-        probeGeneBean.setFromMail(adminEmail);
-        probeGeneBean.setUser(user);
-        probeGeneBean.setToMail(user.getEmail());
-        probeGeneBean.setProbeName(this.uploadFileName);
-        probeGeneBean.setProbes(probes);
-        return probeGeneBean;
+        probeBean.setServerName(serverQName);
+        probeBean.setAppName(appName);
+        probeBean.setSendMailRequired(sendMailRequired);
+        probeBean.setFromMail(adminEmail);
+        probeBean.setUser(user);
+        probeBean.setToMail(user.getEmail());
+        probeBean.setProbeName(this.uploadFileName);
+        probeBean.setProbes(probes);
+        return probeBean;
     }
 
-    public void validateImportRep() {
+    public void validateImportProbes() {
         if (StringUtils.isBlank(getUploadFileName())) {
             addFieldError("uploadFileName", getText("probe.import.file.name.must.be.provided"));
             //call get user
@@ -234,4 +236,11 @@ public class ImportProbeAction extends DMBaseAction {
         this.uploadFileName = uploadFileName;
     }
 
+    public boolean isSendMailRequired() {
+         return sendMailRequired;
+     }
+
+     public void setSendMailRequired(boolean sendMailRequired) {
+         this.sendMailRequired = sendMailRequired;
+     }
 }

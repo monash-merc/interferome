@@ -107,10 +107,15 @@ public class ProbeServiceImpl implements ProbeService {
         return this.probeDao.getProbesByGeneAccession(geneAccession);
     }
 
-    @Override
-    public List<Probe> getProbesByGeneId(long geneId) {
-        return this.probeDao.getProbesByGeneId(geneId);
-    }
+//    @Override
+//    public List<Probe> getProbeBySpecies(String species) {
+//        return this.probeDao.getProbeBySpecies(species);
+//    }
+
+ //   @Override
+ //   public List<Probe> getProbesByGeneId(long geneId) {
+//        return this.probeDao.getProbesByGeneId(geneId);
+//    }
 
     @Override
     public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys) {

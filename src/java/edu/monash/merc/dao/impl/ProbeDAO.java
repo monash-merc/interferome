@@ -87,17 +87,20 @@ public class ProbeDAO extends HibernateGenericDAO<Probe> implements IProbeReposi
          // set the max results (size-per-page)
          queryCriteria.setMaxResults(p.getSizePerPage());
          queryCriteria.setComment("getProbes");
-         List<Probe> repList = queryCriteria.list();
-         p.setPageResults(repList);
+         List<Probe> probeList = queryCriteria.list();
+         p.setPageResults(probeList);
          return p;
      }
 
     @Override
     public Probe getProbeByProbeId(String probeId) {
-        Criteria gCriteria = this.session().createCriteria(this.persistClass);
-        gCriteria.add(Restrictions.eq("probeId", probeId).ignoreCase());
-        return (Probe) gCriteria.uniqueResult();
+        Criteria criteria = this.session().createCriteria(this.persistClass);
+        criteria.add(Restrictions.eq("probeId", probeId));
+        Probe result = (Probe) criteria.uniqueResult();
+        this.session().evict(result);
+        return result;
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -109,13 +112,23 @@ public class ProbeDAO extends HibernateGenericDAO<Probe> implements IProbeReposi
         return criteria.list();
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Probe> getProbesByGeneId(long geneId) {
-         Criteria criteria = this.session().createCriteria(this.persistClass);
-         // create the alias for genes
-         Criteria geneCrit = criteria.createAlias("genes", "genes");
-         geneCrit.add(Restrictions.eq("genes.id", geneId));
-         return criteria.list();
-     }
+//    @SuppressWarnings("unchecked")
+//    @Override
+//    public List<Probe> getProbesByGeneId(long geneId) {
+//         Criteria criteria = this.session().createCriteria(this.persistClass);
+//         // create the alias for genes
+//         Criteria geneCrit = criteria.createAlias("genes", "genes");
+//         geneCrit.add(Restrictions.eq("genes.id", geneId));
+//         return criteria.list();
+//     }
+
+//    @SuppressWarnings("unchecked")
+//    @Override
+//    public List<Probe> getProbeBySpecies(String species) {
+//         Criteria criteria = this.session().createCriteria(this.persistClass);
+//        // create the alias for species
+//         Criteria probeCriteria = criteria.createAlias("species","species");
+//         probeCriteria.add(Restrictions.eq("species.id", species));
+//        return criteria.list();
+//    }
 }

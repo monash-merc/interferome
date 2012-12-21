@@ -26,12 +26,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.repository;
+package edu.monash.merc.dto;
 
-import edu.monash.merc.common.page.Pagination;
-import edu.monash.merc.common.sql.OrderBy;
+import edu.monash.merc.domain.User;
 import edu.monash.merc.domain.Probe;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -41,14 +41,88 @@ import java.util.List;
  * @since 1.0
  *        <p/>
  *        Date: 28/06/12
- *        Time: 2:35 PM
+ *        Time: 4:21 PM
  */
-public interface IProbeRepository {
+public class ProbeBean implements Serializable {
 
-   // Probe getProbeByProbeId(String probesetId);
-    public List<Probe> getProbesByGeneAccession(String geneAccession);
-//    public List<Probe> getProbeBySpecies(String species);
-   // public  List<Probe> getProbesByGeneId(long geneId);
-    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
-    public Probe getProbeByProbeId(String probeId);
+    private String probeName;
+
+    private List<Probe> probes;
+
+    private User user;
+
+    private String appName;
+
+    private String serverName;
+
+    private boolean sendMailRequired;
+
+    private String fromMail;
+
+    private String toMail;
+
+    public String getProbeName() {
+        return probeName;
+    }
+
+    public void setProbeName(String probeName) {
+        this.probeName = probeName;
+    }
+
+    public List<Probe> getProbes() {
+        return probes;
+    }
+
+    public void setProbes(List<Probe> probes) {
+        this.probes = probes;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public boolean isSendMailRequired() {
+        return sendMailRequired;
+    }
+
+    public void setSendMailRequired(boolean sendMailRequired) {
+        this.sendMailRequired = sendMailRequired;
+    }
+
+    public String getFromMail() {
+        return fromMail;
+    }
+
+    public void setFromMail(String fromMail) {
+        this.fromMail = fromMail;
+    }
+
+    public String getToMail() {
+        return toMail;
+    }
+
+    public void setToMail(String toMail) {
+        this.toMail = toMail;
+    }
+
 }

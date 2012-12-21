@@ -37,4 +37,6 @@ package edu.monash.merc.util.csv;
  */
 public interface PField {
     static final String PROBEID = "ProbeID";
+    static final String ENSEMBLID = "EnsemblId";
+    //static final String SPECIES = "Species";
 }

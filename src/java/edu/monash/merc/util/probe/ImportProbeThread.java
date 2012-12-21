@@ -32,14 +32,12 @@ import edu.monash.merc.domain.AuditEvent;
 import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.User;
 import edu.monash.merc.dto.ProbCounter;
-import edu.monash.merc.dto.ProbeGeneBean;
+import edu.monash.merc.dto.ProbeBean;
 import edu.monash.merc.service.DMService;
 import org.apache.log4j.Logger;
 
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 /**
  * Created with IntelliJ IDEA.
  * User: irinar
@@ -52,7 +50,7 @@ public class ImportProbeThread implements Runnable{
 
     private DMService dmService;
 
-    private ProbeGeneBean probeGeneBean;
+    private ProbeBean probeBean;
 
     private static String MAIL_SUBJECT = "Probes Importing Results";
 
@@ -64,10 +62,10 @@ public class ImportProbeThread implements Runnable{
         this.probeThread = new Thread(this);
     }
 
-    public ImportProbeThread(DMService dmService, ProbeGeneBean probeGeneBean) {
+    public ImportProbeThread(DMService dmService, ProbeBean probeBean) {
         this.probeThread = new Thread(this);
         this.dmService = dmService;
-        this.probeGeneBean = probeGeneBean;
+        this.probeBean = probeBean;
     }
 
     public void importProbe() {
@@ -81,34 +79,35 @@ public class ImportProbeThread implements Runnable{
     public void run() {
         Thread runThread = Thread.currentThread();
         if ((probeThread != null) && (probeThread == runThread)) {
-            //here we use the singleton process id which mean only one importing reporter process allowed at one time.
+            //here we use the singleton process id which mean only one importing probes process allowed at one time.
             if (registerProcess(ProbeManager.PROCESS_ID)) {
                 String eventMsg = null;
                 try {
-                    List<Probe> probes = this.probeGeneBean.getProbes();
+                    List<Probe> probes = this.probeBean.getProbes();
                     if (probes != null && probes.size() > 0) {
                         ProbCounter probeCounter = this.dmService.importAllProbes(probes);
                         eventMsg = genEventMsg(probeCounter);
                     }
                 } catch (Exception ex) {
-                    logger.error("Failed to importing the annotations, " + ex);
-                    eventMsg = "Failed to importing the annotations, " + ex.getMessage();
+                    ex.printStackTrace();
+                    logger.error("Failed to importing the probes, " + ex);
+                    eventMsg = "Failed to importing the probes, " + ex.getMessage();
                 } finally {
                     // finally to unlock this process.
                     unRegisterProcess(ProbeManager.PROCESS_ID);
                 }
                 //save the audit event
                 recordAuditEventForImport(eventMsg);
-                boolean sendMailRequired = this.probeGeneBean.isSendMailRequired();
+                boolean sendMailRequired = this.probeBean.isSendMailRequired();
                 if (sendMailRequired) {
                     try {
                         sendMail(eventMsg);
                     } catch (Exception mex) {
-                        logger.error("Failed to send the annotation importing result to user, " + mex.getMessage());
+                        logger.error("Failed to send the probes importing result to user, " + mex.getMessage());
                     }
                 }
             } else {
-                logger.error("Another annotation importing process working in progress");
+                logger.error("Another probes importing process working in progress");
             }
         }
     }
@@ -124,8 +123,8 @@ public class ImportProbeThread implements Runnable{
     }
 
     private String genEventMsg(ProbCounter counter) {
-        String probeId = this.probeGeneBean.getProbeId();
-        String eventMsg = "The " + probeId + " annotation file has been imported successfully. A total of " + counter.getTotalNew() + " annotation have been added and a total of " + counter.getTotalUpdated() + " annotation have been updated";
+        String probeName = this.probeBean.getProbeName();
+        String eventMsg = "The " + probeName + " probes file has been imported successfully. A total of " + counter.getTotalNew() + " probes have been added and a total of " + counter.getTotalUpdated() + " probes have been updated";
         return eventMsg;
     }
 
@@ -133,28 +132,28 @@ public class ImportProbeThread implements Runnable{
     private void recordAuditEventForImport(String msg) {
         AuditEvent ev = new AuditEvent();
         ev.setCreatedTime(GregorianCalendar.getInstance().getTime());
-        String probeId = this.probeGeneBean.getProbeId();
-        User user = this.probeGeneBean.getUser();
+        String probeName = this.probeBean.getProbeName();
+        User user = this.probeBean.getUser();
         ev.setEvent(msg);
         ev.setOperator(user);
         ev.setEventOwner(user);
         try {
             this.dmService.saveAuditEvent(ev);
         } catch (Exception ex) {
-            logger.error("Failed to save the auditing event of the annotation importing - " + msg + ", " + ex.getMessage());
+            logger.error("Failed to save the auditing event of the probe importing - " + msg + ", " + ex.getMessage());
         }
     }
 
     private void sendMail(String msg) {
-        String appName = this.probeGeneBean.getAppName();
-        String serverName = this.probeGeneBean.getServerName();
-        String fromMail = this.probeGeneBean.getFromMail();
-        String toMail = this.probeGeneBean.getToMail();
-        String userName = this.probeGeneBean.getUser().getDisplayName();
-        String probeId = this.probeGeneBean.getProbeId();
+        String appName = this.probeBean.getAppName();
+        String serverName = this.probeBean.getServerName();
+        String fromMail = this.probeBean.getFromMail();
+        String toMail = this.probeBean.getToMail();
+        String userName = this.probeBean.getUser().getDisplayName();
+        String probeName = this.probeBean.getProbeName();
         Map<String, String> templateMap = new HashMap<String, String>();
         templateMap.put("RegisteredUser", userName);
-        templateMap.put("ProbeId", probeId);
+        templateMap.put("ProbeName", probeName);
         templateMap.put("ImportingMsg", msg);
         templateMap.put("SiteName", serverName);
         templateMap.put("AppName", appName);

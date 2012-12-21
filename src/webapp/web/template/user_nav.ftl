@@ -22,7 +22,7 @@
 		<li><a href="${base}/data/showImportExp.jspx">Import Experiments</a></li>
 		<li><a href="${base}/data/listExperiments.jspx">Experiments</a></li>
         <@s.if test="%{user.userType == 1 || user.userType ==2}">
-            <li><a href="${base}/data/showImportRep.jspx">Import Annotations</a></li>
+            <li><a href="${base}/data/showImportProbes.jspx">Import Probes</a></li>
             <li><a href="${base}/data/showImportTFSite.jspx">Import Transcription Site</a></li>
         </@s.if>
 		<li><a href="${base}/manage/getUserEvents.jspx">Events</a></li>

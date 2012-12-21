@@ -34,7 +34,6 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
-//import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.List;
@@ -52,7 +51,7 @@ import java.util.List;
 @Entity
 @Table(name = "probe")
 @org.hibernate.annotations.Table(appliesTo = "probe",
-        indexes = {@Index(name = "idx_probeset", columnNames = {"probe_id"})
+        indexes = {@Index(name = "probeId", columnNames = {"probe_id"})
                // @Index(name = "idx_platform", columnNames = {"platform"}),
                 //@Index(name = "idx_species", columnNames = {"species"})
         })
@@ -61,20 +60,27 @@ public class Probe extends Domain {
     @Id
     @GeneratedValue(generator = "probe_pk_seq")
     @GenericGenerator(name = "probe_pk_seq", strategy = "seqhilo")
+    @Column(name = "id", nullable = false)
     private long id;
 
     @Basic
     @Column(name = "probe_id")
     private String probeId;
 
+    @Transient
+    private String ensemblId;
+
  //   @ManyToMany(mappedBy ="probes",targetEntity = Platform.class)
  //   //@JoinTable(name = "platform", joinColumns = {@JoinColumn(name = "platform_id", referencedColumnName = "id")},inverseJoinColumns = {@JoinColumn(name = "probe_id", referencedColumnName = "id")}, uniqueConstraints = {@UniqueConstraint(columnNames = {
  //   //        "platform_id","probe_id"})})
  //   private List<Platform> platforms;
 
-    @ManyToOne(targetEntity = Species.class)
-    @JoinColumn(name = "species_id", referencedColumnName = "id", nullable = false)
-    private Species species;
+// @ManyToOne(targetEntity = Species.class)
+// @JoinColumn(name = "species_id", referencedColumnName = "id", nullable = false)
+// private Species species;
+    //  @ManyToOne
+    //  @JoinColumn(name = "species_id")
+    //  private Species species;
 
 
     @ManyToMany(targetEntity = Gene.class)
@@ -110,13 +116,13 @@ public class Probe extends Domain {
 //        this.platforms = platforms;
 //    }
 
-    public Species getSpecies() {
-        return species;
-    }
-
-    public void setSpecies(Species species) {
-        this.species = species;
-    }
+//  public Species getSpecies() {
+//      return species;
+//  }
+//
+//  public void setSpecies(Species species) {
+//      this.species = species;
+//  }
 
     public List<Gene> getGenes() {
         return genes;
@@ -132,5 +138,13 @@ public class Probe extends Domain {
 
     public void setData(List<Data> data) {
         this.data = data;
+    }
+
+    public String getEnsemblId() {
+        return ensemblId;
+    }
+
+    public void setEnsemblId(String ensemblId) {
+        this.ensemblId = ensemblId;
     }
 }

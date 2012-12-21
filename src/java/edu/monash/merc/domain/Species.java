@@ -52,7 +52,6 @@ public class Species extends Domain{
     @Column(name = "id", nullable = false)
     private long id;
 
-
     @Basic
     @Column(name = "species_id")
     private String species;

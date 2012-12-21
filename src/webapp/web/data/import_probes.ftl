@@ -8,7 +8,7 @@
 <body>
 <#include "../template/navsection.ftl"/>
 <div class="nav_namebar_div nav_title_gray">
-    Annotation
+    Probes
     <img border="0" src="${base}/images/grayarrow.png">
     <a href="${base}/data/showImportProbes.jspx"><@s.text name="probe.import.action.title" /></a>
 </div>
@@ -26,7 +26,7 @@
             </p>
         </div>
 
-    <@s.form action="importProbe.jspx" namespace="/data" method="post" enctype="multipart/form-data" >
+    <@s.form action="importProbes.jspx" namespace="/data" method="post" enctype="multipart/form-data" >
         <div class="data_outer_div">
             <div class="input_field_div">Please choose a probe file: </div>
             <table class="reporter_tab">

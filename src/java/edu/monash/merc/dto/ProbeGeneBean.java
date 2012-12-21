@@ -28,12 +28,8 @@
 
 package edu.monash.merc.dto;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.User;
-
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author Simon Yu
@@ -46,37 +42,13 @@ import java.util.List;
  */
 public class ProbeGeneBean implements Serializable {
 
-    private String probeName;
-
     private String ensgAccession;
 
     private String probeId;
 
-    private List<Probe> probes;
+ //   private String platform;
 
-    private User user;
-
-    private String appName;
-
-    private String serverName;
-
-    private boolean sendMailRequired;
-
-    private String fromMail;
-
-    private String toMail;
-
-//    private String platform;
-
-//    private String probeType;
-
-    public String getProbeName() {
-        return probeName;
-    }
-
-    public void setProbeName(String probeName) {
-        this.probeName = probeName;
-    }
+ //   private String probeType;
 
     public String getEnsgAccession() {
         return ensgAccession;
@@ -94,75 +66,19 @@ public class ProbeGeneBean implements Serializable {
         this.probeId = probeId;
     }
 
-    public List<Probe> getProbes() {
-        return probes;
-    }
+//    public String getPlatform() {
+//        return platform;
+//    }
 
-    public void setProbes(List<Probe> probes) {
-        this.probes = probes;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    public boolean isSendMailRequired() {
-        return sendMailRequired;
-    }
-
-    public void setSendMailRequired(boolean sendMailRequired) {
-        this.sendMailRequired = sendMailRequired;
-    }
-
-    public String getFromMail() {
-        return fromMail;
-    }
-
-    public void setFromMail(String fromMail) {
-        this.fromMail = fromMail;
-    }
-
-    public String getToMail() {
-        return toMail;
-    }
-
-    public void setToMail(String toMail) {
-        this.toMail = toMail;
-    }
-
- //   public String getPlatform() {
- //       return platform;
-  //  }
-
- //   public void setPlatform(String platform) {
+//    public void setPlatform(String platform) {
 //        this.platform = platform;
 //    }
 
 //    public String getProbeType() {
 //        return probeType;
- //   }
+//    }
 
 //    public void setProbeType(String probeType) {
- //       this.probeType = probeType;
- //   }
+//        this.probeType = probeType;
+//    }
 }
