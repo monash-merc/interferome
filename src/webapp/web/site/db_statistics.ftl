@@ -16,6 +16,47 @@
 		<div class="container_inner_left">
 	        <div class="blank_separator"></div>
 
+            <div class="parag_title_div">
+                Homo sapiens statistics
+            </div>
+            <table class="datatable" border=1>
+                <tr>
+                    <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
+                </tr>
+                <tr>
+                    <td>${"Experiments"}</td> <td>${"8"}</td>     <td>${"4"}</td> <td>${"1"}</td> <td>${"10"}</td>
+                </tr>
+                <tr>
+                    <td>${"Datasets"}</td> <td>${"23"}</td>     <td>${"6"}</td> <td>${"1"}</td> <td>${"14"}</td>
+                </tr>
+                <tr>
+                    <td>${"Genes with p-value <0.05 and fold change >=x2"}</td> <td>${"3959"}</td>     <td>${"1748"}</td> <td>${"52"}</td> <td>${"5759"}</td>
+                </tr>
+                <tr>
+                    <td>${"Genes with p-value <0.05"}</td> <td>${"24026"}</td>     <td>${"6196"}</td> <td>${"1027"}</td> <td>${"31249"}</td>
+                </tr>
+            </table>
+            <div class="parag_title_div">
+                Mus musculus statistics
+            </div>
+            <table class="datatable" border=1>
+                <tr>
+                    <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
+                </tr>
+                <tr>
+                    <td>${"Experiments"}</td> <td>${"4"}</td>     <td>${"4"}</td> <td>${"0"}</td> <td>${"6"}</td>
+                </tr>
+                <tr>
+                    <td>${"Datasets"}</td> <td>${"6"}</td>     <td>${"8"}</td> <td>${"0"}</td> <td>${"14"}</td>
+                </tr>
+                <tr>
+                    <td>${"Genes with p-value <0.05 and fold change >=x2"}</td> <td>${"5892"}</td>     <td>${"5070"}</td> <td>${"0"}</td> <td>${"10962"}</td>
+                </tr>
+                <tr>
+                    <td>${"Genes with p-value <0.05"}</td> <td>${"5205"}</td>     <td>${"7036"}</td> <td>${"0"}</td> <td>${"9417"}</td>
+                </tr>
+            </table>
+
 			<div class="data_outer_div">
                 <div class="parag_title_div">
                     How data was processed
