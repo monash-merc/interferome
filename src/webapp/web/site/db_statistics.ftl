@@ -50,10 +50,10 @@
                     <td>${"Datasets"}</td> <td>${"6"}</td>     <td>${"8"}</td> <td>${"0"}</td> <td>${"14"}</td>
                 </tr>
                 <tr>
-                    <td>${"Genes with p-value <0.05 and fold change >=x2"}</td> <td>${"5892"}</td>     <td>${"5070"}</td> <td>${"0"}</td> <td>${"10962"}</td>
+                    <td>${"Genes with p-value <0.05 and fold change >=x2"}</td> <td>${"957"}</td>     <td>${"452"}</td> <td>${"0"}</td> <td>${"1409"}</td>
                 </tr>
                 <tr>
-                    <td>${"Genes with p-value <0.05"}</td> <td>${"5205"}</td>     <td>${"7036"}</td> <td>${"0"}</td> <td>${"9417"}</td>
+                    <td>${"Genes with p-value <0.05"}</td> <td>${"5892"}</td>     <td>${"5070"}</td> <td>${"0"}</td> <td>${"10962"}</td>
                 </tr>
             </table>
 
