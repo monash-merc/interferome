@@ -26,17 +26,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.util.csv;
+package edu.monash.merc.repository;
+
 
 /**
  * Created with IntelliJ IDEA.
- * User: irinar
- * Date: 14/12/12
- * Time: 12:44 PM
+ * User: chapmanr
+ * Date: 15/01/13
+ * Time: 1:16 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface PField {
-    static final String PROBEID = "ProbeID";
-    static final String ENSEMBLID = "EnsemblId";
-    static final String SPECIES = "Species";
+public interface ISpeciesRepository {
+   // public Species getSpeciesByName(String speciesName);
 }
+
+

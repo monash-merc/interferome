@@ -28,9 +28,12 @@
 
 package edu.monash.merc.util.csv;
 
+import edu.monash.merc.dao.impl.SpeciesDAO;
+import edu.monash.merc.domain.Probe;
+import edu.monash.merc.domain.Species;
+
 import java.util.ArrayList;
 import java.util.List;
-import edu.monash.merc.domain.Probe;
 
 /**
  * Created with IntelliJ IDEA.
@@ -62,9 +65,15 @@ public class CSVProbGenerator {
                  probes.setEnsemblId(columnValue);
              }
               //TODO: Fix relations between Probe and Species domains
-             //if (columnName.equalsIgnoreCase(PField.SPECIES)) {
+             if (columnName.equalsIgnoreCase(PField.SPECIES)) {
+                 //String species = new String();
+                 SpeciesDAO speciesQuery = new SpeciesDAO();
+                 speciesQuery.getSpeciesByName(columnValue);
+                 Species species = new Species();
+                 long speciesID=species.getSpeciesId();
+                 probes.setSpecies(speciesID);
              //    probes.setSpecies(columnValue);
-            // }
+             }
 
              //TODO: Fix setGenes(null). I just fixed the syntax.
             // if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
@@ -73,4 +82,6 @@ public class CSVProbGenerator {
          }
          return probes;
     }
+
+
 }

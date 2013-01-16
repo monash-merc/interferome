@@ -51,9 +51,9 @@ import java.util.List;
 @Entity
 @Table(name = "probe")
 @org.hibernate.annotations.Table(appliesTo = "probe",
-        indexes = {@Index(name = "probeId", columnNames = {"probe_id"})
+        indexes = {@Index(name = "probeId", columnNames = {"probe_id"}),
                // @Index(name = "idx_platform", columnNames = {"platform"}),
-                //@Index(name = "idx_species", columnNames = {"species"})
+                @Index(name = "idx_species", columnNames = {"species"})
         })
 public class Probe extends Domain {
 
@@ -66,6 +66,10 @@ public class Probe extends Domain {
     @Basic
     @Column(name = "probe_id")
     private String probeId;
+
+    @Basic
+    @Column(name = "species_id")
+    private long species_id;
 
     @Transient
     private String ensemblId;
@@ -120,9 +124,9 @@ public class Probe extends Domain {
 //      return species;
 //  }
 //
-//  public void setSpecies(Species species) {
-//      this.species = species;
-//  }
+  public void setSpecies(long speciesID) {
+      this.species_id = speciesID;
+  }
 
     public List<Gene> getGenes() {
         return genes;

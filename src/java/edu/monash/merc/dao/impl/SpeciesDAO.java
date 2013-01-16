@@ -26,17 +26,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.util.csv;
+package edu.monash.merc.dao.impl;
+
+import edu.monash.merc.dao.HibernateGenericDAO;
+import edu.monash.merc.domain.Species;
+import edu.monash.merc.repository.ISpeciesRepository;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
 
 /**
  * Created with IntelliJ IDEA.
- * User: irinar
- * Date: 14/12/12
- * Time: 12:44 PM
+ * User: chapmanr
+ * Date: 15/01/13
+ * Time: 1:25 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface PField {
-    static final String PROBEID = "ProbeID";
-    static final String ENSEMBLID = "EnsemblId";
-    static final String SPECIES = "Species";
+
+@Scope("prototype")
+@Repository
+public class SpeciesDAO extends HibernateGenericDAO<Species> implements ISpeciesRepository {
+    //@Override
+    public Species getSpeciesByName(String speciesName) {
+        Criteria criteria = this.session().createCriteria(this.persistClass);
+        criteria.add(Restrictions.eq("speciesName", speciesName));
+        Species result = (Species) criteria.uniqueResult();
+        this.session().evict(result);
+        return result;
+    }
 }

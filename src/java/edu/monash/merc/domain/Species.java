@@ -35,10 +35,11 @@ import javax.persistence.*;
 
 /**
  * Created with IntelliJ IDEA.
- * User: irinar
+ * User: irina
  * Date: 6/12/12
  * Time: 12:10 PM
  * To change this template use File | Settings | File Templates.
+ * created for new schema which includes a species table
  */
 @Entity
 @Table(name = "species")
@@ -63,5 +64,10 @@ public class Species extends Domain{
     @Basic
     @Column(name = "code")
     private String speciesCode;
+
+    public long getSpeciesId() {
+        return id;
+    }
+
 
 }
