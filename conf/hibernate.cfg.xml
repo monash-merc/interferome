@@ -22,5 +22,16 @@
         <mapping class="edu.monash.merc.domain.ExperimentFactor"/>
         <mapping class="edu.monash.merc.domain.ExperimentFactorValue"/>
         <mapping class="edu.monash.merc.domain.Reporter"/>
+        <mapping class="edu.monash.merc.domain.Gene"/>
+        <mapping class="edu.monash.merc.domain.GeneOntology"/>
+        <mapping class="edu.monash.merc.domain.Ontology"/>
+        <mapping class="edu.monash.merc.domain.EvidenceCode"/>
+        <mapping class="edu.monash.merc.domain.GoDomain"/>
+        <mapping class="edu.monash.merc.domain.Probe"/>
+        <mapping class="edu.monash.merc.domain.TFSite"/>
+        <mapping class="edu.monash.merc.domain.Tissue"/>
+        <mapping class="edu.monash.merc.domain.TissueExpression"/>
+        <mapping class="edu.monash.merc.domain.Factorial"/>
+
     </session-factory>
 </hibernate-configuration>

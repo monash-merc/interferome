@@ -33,6 +33,7 @@ import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.*;
 import edu.monash.merc.util.interferome.dataset.BaseDataset;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -201,6 +202,18 @@ public interface DMService {
 
     public void importReporters(ReporterBean reporterBean);
 
+    public void saveTFSite(TFSite tfSite);
+
+    public void mergeTFSite(TFSite tfSite);
+
+    public void updateTFSite(TFSite tfSite);
+
+    public void importTFSite(TFSiteBean tfSiteBean);
+
+    public TfSiteCounter importAllTFSites(List<TFSite> tfSites);
+
+    public TFSite getTFSite(TFSite tfSite);
+
     public void saveDataset(Dataset dataset);
 
     public Dataset getDataset(long dsId);
@@ -244,4 +257,132 @@ public interface DMService {
     public void saveIFNVariation(IFNVariation ifnVariation);
 
     public List<String> getAbnormalFactors();
+
+
+    /**
+     * Get a Gene by Gene id
+     *
+     * @param id a Gene id
+     * @return a Gene object
+     */
+    Gene getGeneById(long id);
+
+    /**
+     * Save a Gene
+     *
+     * @param gene a Gene object
+     */
+    void saveGene(Gene gene);
+
+    /**
+     * Merge a Gene object
+     *
+     * @param gene a Gene object
+     */
+    void mergeGene(Gene gene);
+
+    /**
+     * Update a Gene object
+     *
+     * @param gene a Gene object
+     */
+    void updateGene(Gene gene);
+
+    /**
+     * Delete a Gene object
+     *
+     * @param gene a Gene object
+     */
+    void deleteGene(Gene gene);
+
+    /**
+     * Get the Gene by an ensembl accession id
+     *
+     * @param ensgAccession an ensembl accession id
+     * @return a Gene
+     */
+    Gene getGeneByEnsgAccession(String ensgAccession);
+
+    List<Gene> getGenesByProbesetId(String probeId);
+
+    /**
+     * import all genes
+     *
+     * @param genes a list of Genes.
+     */
+    void importGenes(List<Gene> genes, Date importedTime);
+
+    //Evidence Code
+
+    EvidenceCode getEvidenceCodeById(long id);
+
+    void saveEvidenceCode(EvidenceCode evidenceCode);
+
+    void mergeEvidenceCode(EvidenceCode evidenceCode);
+
+    void updateEvidenceCode(EvidenceCode evidenceCode);
+
+    void deleteEvidenceCode(EvidenceCode evidenceCode);
+
+    EvidenceCode getEvidenceCodeByCode(String code);
+
+    //GeneOntology
+    GeneOntology getGeneOntologyById(long id);
+
+    void saveGeneOntology(GeneOntology geneOntology);
+
+    void mergeGeneOntology(GeneOntology geneOntology);
+
+    void updateGeneOntology(GeneOntology geneOntology);
+
+    void deleteGeneOntology(GeneOntology geneOntology);
+
+    GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession);
+
+    //GoDomain
+    GoDomain getGoDomainById(long id);
+
+    void saveGoDomain(GoDomain goDomain);
+
+    void mergeGoDomain(GoDomain goDomain);
+
+    void updateGoDomain(GoDomain goDomain);
+
+    void deleteGoDomain(GoDomain goDomain);
+
+    GoDomain getGoDomainByNamespace(String namespace);
+
+    //Ontology
+    Ontology getOntologyById(long id);
+
+    void saveOntology(Ontology ontology);
+
+    void mergeOntology(Ontology ontology);
+
+    void updateOntology(Ontology ontology);
+
+    void deleteOntology(Ontology ontology);
+
+    Ontology getOntologyByGoTermAccession(String goTermAccession);
+
+    void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
+
+    //Probe
+    Probe getProbeById(long id);
+
+    void saveProbe(Probe probe);
+
+    void mergeProbe(Probe probe);
+
+    void updateProbe(Probe probe);
+
+    void deleteProbe(Probe probe);
+
+    Probe getProbeByProbeId(String probesetId);
+
+    List<Probe> getProbesByGeneAccession(String geneAccession);
+
+    List<Probe> getProbesByGeneId(long geneId);
+
+    void importProbes(List<ProbeGeneBean> probeGeneBeans);
 }

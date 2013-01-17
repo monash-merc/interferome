@@ -116,8 +116,11 @@ public class UserDAO extends HibernateGenericDAO<User> implements IUserRepositor
         if (userType == UserType.REGUSER.code()) {
             return null;
         }
-        return (User) this.session().createCriteria(this.persistClass).setComment("UserDAO.getVirtualUser")
-                .add(Restrictions.eq("userType", userType)).uniqueResult();
+        Criteria userCriteria = this.session().createCriteria(this.persistClass);
+        userCriteria.setComment("UserDAO.getVirtualUser");
+        userCriteria.add(Restrictions.eq("userType", userType));
+        userCriteria.addOrder(Order.asc("id")).setMaxResults(1);
+        return (User) userCriteria.uniqueResult();
     }
 
     @Override

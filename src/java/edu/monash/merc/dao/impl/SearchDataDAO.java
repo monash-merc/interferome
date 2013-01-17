@@ -31,6 +31,9 @@ package edu.monash.merc.dao.impl;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Ontology;
+import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -42,7 +45,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.text.DecimalFormat;
 
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
@@ -192,7 +198,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromDose > 0) && (toDose > 0) && (fromDose == toDose)) {
                 return " ds.treatmentCon = " + fromDose;
             }
-            if ((fromDose > 0) && (toDose > 0) && (fromDose > toDose)) {
+            if ((fromDose > 0) && (toDose > 0) && (fromDose < toDose)) {
                 return " ds.treatmentCon >= " + fromDose + " AND ds.treatmentCon <= " + toDose;
             }
             if ((fromDose == 0) && (toDose > 0)) {
@@ -214,7 +220,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if ((fromTime > 0) && (toTime > 0) && (fromTime == toTime)) {
                 return " ds.treatmentTime = " + fromTime;
             }
-            if ((fromTime > 0) && (toTime > 0) && (fromTime > toTime)) {
+            if ((fromTime > 0) && (toTime > 0) && (fromTime < toTime)) {
                 return " ds.treatmentTime >= " + fromTime + " AND ds.treatmentTime <= " + toTime;
             }
             if ((fromTime == 0) && (toTime > 0)) {
@@ -266,6 +272,444 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        //just for testing
+        //List<String> probes = new ArrayList<String>();
+        //probes.add("A_33_P3277674");
+        //probes.add("A_33_P3818959");
+        //probes.add("A_23_P105923");
+        //probes.add("A_23_P105923");
+
+
+        int searchCount = 0;
+        //String species = searchBean.getSpecies();
+        int gbCount = searchBean.getGenBanks().split(",|\t|\n").length;
+        int ensCount = searchBean.getEnsembls().split(",|\t|\n").length;
+        int gCount = searchBean.getGenes().split(",|\t|\n").length;
+       // if (StringUtils.equals(species, "-1")){
+        if(searchCount < gbCount || searchCount < ensCount || searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
+        //  if(searchCount < gbCount && searchCount < ensCount && searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
+        //  else if(searchCount < gbCount && searchCount < ensCount) searchCount = gbCount + ensCount;
+        //  else if(searchCount < ensCount && searchCount < gCount) searchCount = ensCount + gCount;
+        //  else if(searchCount < gbCount && searchCount < gCount) searchCount = gbCount + gCount;
+        //  else if(searchCount < gbCount) searchCount = gbCount;
+        //  else if(searchCount < ensCount) searchCount = ensCount;
+        //  else if(searchCount < gCount) searchCount = gCount;
+        //}
+        //else if (StringUtils.contains(species, "Homo sapiens") || StringUtils.contains(species, "Mus musculus")){
+         //if(searchCount < ensCount)  searchCount = ensCount;
+         //if(searchCount < gCount)  searchCount = gCount;
+         //if(searchCount < gbCount)  searchCount = gbCount;
+       // }
+
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
+        if (probes.size() > 0) {
+            //  String geneBaseHQL = "SELECT g FROM gene g INNER JOIN probe_gene pb ON g.id = pb.gene_id  INNER JOIN probe p on p.id = pb.probe_id " +
+            //         " WHERE p.probeset IN (:probes) GROUP BY g.id";
+            String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            // String geneOntologyCountHQL = "SELECT COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.gene g INNER JOIN go.ontology o INNER o.goDomain gdom WHERE g.ensgAccession IN (:ensgacs) AND gdom.namespace = :namespace";
+
+
+            Query geneCountQuery = this.session().createQuery(geneCountHQL);
+            geneCountQuery.setParameterList(("probes"), probes);
+
+            int total = ((Long) geneCountQuery.uniqueResult()).intValue();
+            if (total == 0) {
+
+                return new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
+            }
+
+            // System.out.println("================= found total genes size: " + total);
+
+            String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g." + orderBy + " " + sortBy;
+            Query geneQuery = this.session().createQuery(geneHQL);
+            geneQuery.setParameterList(("probes"), probes);
+
+            Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
+            geneQuery.setFirstResult(genePagination.getFirstResult());
+            geneQuery.setMaxResults(genePagination.getSizePerPage());
+
+
+            List<Gene> geneList = geneQuery.list();
+            //System.out.println("================= found total genes list size: " + total);
+            genePagination.setPageResults(geneList);
+            return genePagination;
+        } else {
+            return new Pagination<Gene>(startPageNo, recordPerPage, 0, searchCount);
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
+        ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
+        if (probes.size() > 0) {
+            String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g, te";
+            Query teQuery = this.session().createQuery(teHQL);
+            teQuery.setParameterList(("probes"), probes);
+            return teQuery.list();
+        } else {
+            return new ArrayList<TissueExpression>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
+        if (probes.size() > 0) {
+            String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND g.ensgAccession like 'ENSG' GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
+            Query chrQuery = this.session().createQuery(chrHQL);
+            chrQuery.setParameterList(("probes"), probes);
+
+
+            List<Object[]> chromosomeList = chrQuery.list();
+            return chromosomeList;
+        } else {
+            return new ArrayList<Object[]>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Integer[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        List<String> probes = uniqueProbesPages.getPageResults();
+        //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
+        Integer[] types = {0, 0, 0, 0, 0, 0, 0};
+        if (probes.size() > 0) {
+            //Get Type 1 Probes
+            String tp1 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE r.probeId IN (:probes) AND i.typeName = 'I'";
+            Query tp1Query = this.session().createQuery(tp1);
+            tp1Query.setParameterList(("probes"), probes);
+            List<String> t1ProbeList = tp1Query.list();
+
+            //Get Gene
+            //sam version
+            // String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:t1ProbeList) GROUP BY g";
+
+            //simon version, remove the 'GROUP BY', the 'GROUP BY' only used for counting
+            //if T1 probe list is empty. we don't need to query the genes
+            List<Gene> t1GeneList = new ArrayList<Gene>();
+            if (t1ProbeList != null && t1ProbeList.size() > 0) {
+                String tg1 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t1ProbeList) ";
+                Query tg1Query = this.session().createQuery(tg1);
+                tg1Query.setParameterList("t1ProbeList", t1ProbeList);
+                t1GeneList = tg1Query.list();
+            }
+
+            //Get Type 2 Probes
+            String tp2 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE r.probeId IN (:probes) AND i.typeName = 'II'";
+            Query tp2Query = this.session().createQuery(tp2);
+            tp2Query.setParameterList(("probes"), probes);
+            List<String> t2ProbeList = tp2Query.list();
+
+            //Get Gene
+            //sam version
+            //String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:t2ProbeList) GROUP BY g";
+
+            //simon version, remove the 'GROUP BY', the 'GROUP BY' only used for counting
+            //if T2 probe list is empty we don't need to query the genes
+            List<Gene> t2GeneList = new ArrayList<Gene>();
+            if (t2ProbeList != null && t2ProbeList.size() > 0) {
+                String tg2 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t2ProbeList) ";
+                Query tg2Query = this.session().createQuery(tg2);
+                tg2Query.setParameterList("t2ProbeList", t2ProbeList);
+                t2GeneList = tg2Query.list();
+            }
+
+            //Get Type III Probes
+            String tp3 = "SELECT distinct r.probeId  FROM Data d INNER JOIN d.reporter r INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+                    "WHERE r.probeId IN (:probes) AND i.typeName = 'III'";
+            Query tp3Query = this.session().createQuery(tp3);
+            tp3Query.setParameterList(("probes"), probes);
+            List<String> t3ProbeList = tp3Query.list();
+
+            //Get Gene
+            //sam version
+            // String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:t3ProbeList) GROUP BY g";
+
+            //simon version, remove the 'GROUP BY', the 'GROUP BY' only used for counting
+            //if the T3 probe list is empty. we don't need to query the genes
+            List<Gene> t3GeneList = new ArrayList<Gene>();
+            if (t3ProbeList != null && t3ProbeList.size() > 0) {
+                String tg3 = "SELECT distinct g  FROM Gene g INNER JOIN g.probes pbs WHERE pbs.probeId IN (:t3ProbeList) ";
+                Query tg3Query = this.session().createQuery(tg3);
+                tg3Query.setParameterList(("t3ProbeList"), t3ProbeList);
+                t3GeneList = tg3Query.list();
+            }
+            //TODO: for sam, please figure out the logic How to count the unique member of each list. I just fixed the query syntax.
+
+            //Count Unique members of each list
+            //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
+            //T1T2T3
+            types[6] = findOverlapGenes(findOverlapGenes(t1GeneList, t2GeneList), t3GeneList).size();
+            //T2T3
+            types[5] = findOverlapGenes(t2GeneList, t3GeneList).size() - types[6];
+            //T1T3
+            types[4] = findOverlapGenes(t1GeneList, t3GeneList).size() - types[6];
+            //T1T2
+            types[3] = findOverlapGenes(t1GeneList, t2GeneList).size() - types[6];
+            //T3   -> - T123 - T13 - T23
+            if (t3GeneList.size() == 0) {
+                types[2] = 0;
+            } else {
+                types[2] = t3GeneList.size() - types[6] - types[4] - types[5];
+            }
+            //T2  -> - T123 - T12 - T23
+            if (t2GeneList.size() == 0) {
+                types[1] = 0;
+            } else {
+                types[1] = t2GeneList.size() - types[6] - types[3] - types[5];
+            }
+            //T1  -> - T123 - T12 - T13
+            if (t1GeneList.size() == 0) {
+                types[0] = 0;
+            } else {
+                types[0] = t1GeneList.size() - types[6] - types[3] - types[4];
+            }
+        }
+        return types;
+    }
+
+    //simon version
+    private List<Gene> findOverlapGenes(List<Gene> geneList1, List<Gene> geneList2) {
+        List<Gene> overlapGenes = new ArrayList<Gene>();
+        //genelist1 is empty. or  //genelist2 is empty.
+        if ((geneList1 != null && geneList1.size() == 0) || (geneList2 != null && geneList2.size() == 0)) {
+            return overlapGenes;
+        }
+        //genelist1 is not empty and genelist2 is not empty
+        if (geneList1 != null && geneList1.size() > 0 && geneList2 != null && geneList2.size() > 0) {
+            for (Gene g : geneList1) {
+                if (geneList2.contains(g)) {
+                    overlapGenes.add(g);
+                }
+            }
+        }
+        return overlapGenes;
+    }
+
+    //sam version
+    //Convenience method for returning count of values overlapping from two lists.
+    private List<Gene> overlapping(List<Gene> g1, List<Gene> g2) {
+        ArrayList<Gene> overlapList = new ArrayList<Gene>();
+        for (Gene g : g1) {
+            if (g2.contains(g)) {
+                overlapList.add(g);
+            }
+        }
+        return overlapList;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
+        if (probes.size() > 0) {
+            String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) ORDER BY g.chromosome";
+            Query chrQuery = this.session().createQuery(chrHQL);
+            chrQuery.setParameterList(("probes"), probes);
+            List<Gene> chromosomeGeneList = chrQuery.list();
+            return chromosomeGeneList;
+        } else {
+            return new ArrayList<Gene>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
+        ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
+        if (probes.size() > 0) {
+            String species = searchBean.getSpecies();
+            //Get Count of all genes in db (N)
+            String geneTotalCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g";
+            Query geneTotalCountQuery = this.session().createQuery(geneTotalCountHQL);
+            Long totalGeneN = ((Long) geneTotalCountQuery.uniqueResult());
+            //Get Count of all Human genes in db (Nh)
+            String geneTotalHumanCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.species = 'Human'";
+            Query geneTotalHumanCountQuery = this.session().createQuery(geneTotalHumanCountHQL);
+            Long totalGeneNh = ((Long) geneTotalHumanCountQuery.uniqueResult());
+            //Get Count of all Mouse genes in db (Nm)
+            String geneTotalMouseCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.species = 'Mouse'";
+            Query geneTotalMouseCountQuery = this.session().createQuery(geneTotalMouseCountHQL);
+            Long totalGeneNm = ((Long) geneTotalMouseCountQuery.uniqueResult());
+
+            if (StringUtils.contains(species, "Homo sapiens"))   totalGeneN = totalGeneNh;
+            if (StringUtils.contains(species, "Mus musculus"))   totalGeneN = totalGeneNm;
+
+            //Get Count of all genes searched (n)
+            String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            Query geneCountQuery = this.session().createQuery(geneCountHQL);
+            geneCountQuery.setParameterList(("probes"), probes);
+            Long searchedGenen = ((Long) geneCountQuery.uniqueResult());
+
+            //Get Count of all GO domains (m)
+            HashMap<String, Long> countHash = new HashMap<String, Long>();
+            String goCellularTotalHQL = "SELECT o, COUNT(DISTINCT g) FROM  GeneOntology go INNER JOIN go.ontology o INNER JOIN go.gene g GROUP BY o";
+            Query goCellularTotalQuery = this.session().createQuery(goCellularTotalHQL);
+            List<Object[]> cellResult = goCellularTotalQuery.list();
+            //System.out.println("Result Size: " + cellResult.size());
+            Iterator<Object[]> totCountItr = cellResult.iterator();
+            while (totCountItr.hasNext()) {
+                Object[] ontCountRes = totCountItr.next();
+                countHash.put(((Ontology) (ontCountRes[0])).getGoTermAccession(), (Long) ontCountRes[1]);
+                // System.out.println("Adding To Hash: " + ((Ontology)(ontCountRes[0])).getGoTermAccession());
+            }
+
+
+            //************************
+            //Search Cellular
+            //************************
+            //Get the matching genes for each ontology (k)
+            String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
+            Query goCellularQuery = this.session().createQuery(goCellularHQL);
+            goCellularQuery.setParameterList(("probes"), probes);
+            List<Object[]> goCellularList = goCellularQuery.list();
+            if (goCellularList.size() > 0) {
+                goHash.add(addGOProbability(goCellularList, countHash, searchedGenen, totalGeneN));
+            }
+
+            //************************
+            //Search Molecular
+            //************************
+
+            String goMolecularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'molecular_function' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
+            Query goMolecularQuery = this.session().createQuery(goMolecularHQL);
+            goMolecularQuery.setParameterList(("probes"), probes);
+            List<Object[]> goMolecularList = goMolecularQuery.list();
+            if (goMolecularList.size() > 0) {
+                goHash.add(addGOProbability(goMolecularList, countHash, searchedGenen, totalGeneN));
+            }
+
+            //************************
+            //Search Biological
+            //************************
+
+            String goBiologicalHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes) AND gd.namespace = 'biological_process' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
+            Query goBiologicalQuery = this.session().createQuery(goBiologicalHQL);
+            goBiologicalQuery.setParameterList(("probes"), probes);
+            List<Object[]> goBiologicalList = goBiologicalQuery.list();
+            if (goBiologicalList.size() > 0) {
+                goHash.add(addGOProbability(goBiologicalList, countHash, searchedGenen, totalGeneN));
+            }
+            return goHash;
+        } else {
+            return new ArrayList<List<Object[]>>();
+        }
+    }
+
+    /**
+     * @param goList           The list of GO ids and associated count (Ontology, int) found for this search (k)
+     * @param goCategoryCounts A HashMap of GO Accession Number with a total count (m)
+     * @param geneSearched     Number of genes searched (n)
+     * @param totalPopulation  Total number of genes in database (N)
+     * @return
+     */
+    private List<Object[]> addGOProbability(List<Object[]> goList, HashMap<String, Long> goCategoryCounts, Long geneSearched, Long totalPopulation) {
+        //Assume it is more efficient to get counts for all ontologies first and use this hash in probability calculations
+        //This assumption has not been tested and may be incorrect
+        //For each GO id found with this search (goList)
+        ArrayList<Object[]> returnVal = new ArrayList<Object[]>();
+        //System.out.println(goCategoryCounts.size());
+        Iterator<Object[]> goItr = goList.iterator();
+        while (goItr.hasNext()) {
+            Object[] goVal = goItr.next();
+            //  System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
+            Long m = goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession());
+            Double pvalue = null;
+            if (m != null) {
+                pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, (Long) goVal[1]);
+            } else {
+                // System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
+                pvalue = (double) 1;
+            }
+            returnVal.add(new Object[]{goVal[0], goVal[1], pvalue});
+        }
+
+        return returnVal;
+    }
+
+    private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
+        //return "N/A";
+        Double pvalue = (binomialCoefficient(m,k)*binomialCoefficient((N-m),(n-k)))/ binomialCoefficient(N,n);
+        DecimalFormat df = new DecimalFormat("#.##E0");
+        return (Double.valueOf(df.format(pvalue)));
+        //return N*1.0;
+       // return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
+    }
+    private Double binomialCoefficient(long a, long b){
+        if (b < 0 || b > a){
+        return null;
+        }
+        if (b > (a - b))  {       // take advantage of symmetry
+        b = a - b;
+        }
+        Double coeff = 1.0;
+        for (long i = a - b + 1; i <= a; i++) {
+            coeff *= i;
+        }
+        for (long i = 1; i <= b; i++) {
+            coeff /= i;
+        }
+        return coeff;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+
+        List<String> probes = uniqueProbesPages.getPageResults();
+
+        if (probes.size() > 0) {
+            //Search Cellular
+            String goTFHQL = "SELECT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probes p WHERE p.probeId IN (:probes)";
+            Query goTFQuery = this.session().createQuery(goTFHQL);
+            goTFQuery.setParameterList(("probes"), probes);
+            List<Object[]> goTFList = goTFQuery.list();
+            return goTFList;
+        } else {
+            return new ArrayList<Object[]>();
+        }
+    }
+
+
+    @Override
+    public Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        boolean noneDsQuery = searchBean.isNoneDsCondition();
+        //no dataset level search condition, then just search data level only, otherwise we will search probe based on both data and dataset conditions
+        if (noneDsQuery) {
+            return searchProbeDataLevel(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+        } else {
+            return searchProbeDataAndDsLevel(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+        }
+    }
 
     @SuppressWarnings("unchecked")
     private Pagination<Data> searchDataWithDs(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
@@ -286,9 +730,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
         String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
 
-        boolean foldChangeUpProvided = searchBean.isUpProvided();
+        // boolean foldChangeUpProvided = searchBean.isUpProvided();
         double upValue = searchBean.getUpValue();
-        boolean foldChangeDownProvided = searchBean.isDownProvided();
+        //boolean foldChangeDownProvided = searchBean.isDownProvided();
         double downValue = searchBean.getDownValue();
 
         List<String> threeIdQuery = new ArrayList<String>();
@@ -304,12 +748,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         if (searchEnsembls.length > 0) {
             threeIdQuery.add(" rep.ensembl IN (:ensembls");
         }
-        if (foldChangeUpProvided) {
-            upDownQuery.add(" d.value >= " + upValue);
-        }
-        if (foldChangeDownProvided) {
-            upDownQuery.add(" d.value <= -" + downValue);
-        }
+
+        upDownQuery.add(" d.value >= " + upValue);
+
+        upDownQuery.add(" d.value <= -" + downValue);
+
         //create all or conditions
         List<String> orConds = createOrCondsWithDs(threeIdQuery, upDownQuery, dsIdQuery);
 
@@ -546,9 +989,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
         String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
 
-        boolean foldChangeUpProvided = searchBean.isUpProvided();
+
         double upValue = searchBean.getUpValue();
-        boolean foldChangeDownProvided = searchBean.isDownProvided();
+
         double downValue = searchBean.getDownValue();
 
         List<String> threeIdQuery = new ArrayList<String>();
@@ -562,12 +1005,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         if (searchEnsembls.length > 0) {
             threeIdQuery.add(" rep.ensembl IN (:ensembls");
         }
-        if (foldChangeUpProvided) {
-            upDownQuery.add(" d.value >= " + upValue);
-        }
-        if (foldChangeDownProvided) {
-            upDownQuery.add(" d.value <= -" + downValue);
-        }
+
+        upDownQuery.add(" d.value >= " + upValue);
+
+        upDownQuery.add(" d.value <= -" + downValue);
+
 
         //create all or conditions
         List<String> orConds = createOrCondsForDataOnly(threeIdQuery, upDownQuery);
@@ -691,6 +1133,405 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         // System.out.println("===========> data only query found total data size: " + dataPagination.getTotalRecords());
         // System.out.println("===========>  data only query found total data pages: " + dataPagination.getTotalPages());
         return dataPagination;
+    }
+
+    //Search Probe By Data level and Dataset Level conditions
+    @SuppressWarnings("unchecked")
+    private Pagination<String> searchProbeDataAndDsLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        //query the dataset first
+        List<Long> foundDsIds = queryDatasets(searchBean);
+        // System.out.println("============> ***** found dataset id list size: " + foundDsIds.size());
+
+        //just return if no dataset found
+        if (foundDsIds.size() == 0) {
+            if (recordPerPage < 0) {
+                recordPerPage = 10;
+            }
+            return new Pagination<String>(startPageNo, recordPerPage, 0);
+        }
+        //start to search data based on the found dataset list
+        String genes = searchBean.getGenes();
+        String genBanks = searchBean.getGenBanks();
+        String ensembls = searchBean.getEnsembls();
+
+        String[] searchGenes = MercUtil.splitByDelims(genes, ",", "\t", "\n");
+        String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
+        String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
+
+
+        double upValue = searchBean.getUpValue();
+
+        double downValue = searchBean.getDownValue();
+
+        List<String> threeIdQuery = new ArrayList<String>();
+        List<String> upDownQuery = new ArrayList<String>();
+        String dsIdQuery = " ds.id IN (:dsIDs";
+
+        if (searchGenes.length > 0) {
+            threeIdQuery.add(" rep.geneSymbol IN (:geneNames");
+        }
+        if (searchGenBanks.length > 0) {
+            threeIdQuery.add(" rep.genBankAccession IN (:genBanks");
+        }
+        if (searchEnsembls.length > 0) {
+            threeIdQuery.add(" rep.ensembl IN (:ensembls");
+        }
+        upDownQuery.add(" d.value >= " + upValue);
+        upDownQuery.add(" d.value <= -" + downValue);
+
+        //create all or conditions
+        List<String> orConds = createOrCondsWithDs(threeIdQuery, upDownQuery, dsIdQuery);
+
+
+        //count data query
+        StringBuilder countQL = new StringBuilder();
+        String countBaseHQL = "SELECT count(distinct rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        countQL.append(countBaseHQL);
+
+        //probe pagination query
+        StringBuilder probeQL = new StringBuilder();
+        String probeBaseHQL = "SELECT distinct(rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        probeQL.append(probeBaseHQL);
+
+        if (orConds.size() > 0) {
+            countQL.append(" WHERE");
+            probeQL.append(" WHERE");
+            int i = 0;
+            for (String orClause : orConds) {
+                countQL.append(" (").append(orClause).append(")");
+                probeQL.append(" (").append(orClause).append(")");
+                if (i < orConds.size() - 1) {
+                    countQL.append(" OR");
+                    probeQL.append(" OR");
+                }
+                i++;
+            }
+        }
+
+
+        //create query
+        String countQLStr = countQL.toString();
+        //  System.out.println("=================================> ds level probe cout ql string: " + countQLStr);
+        Query probeCountQuery = this.session().createQuery(countQLStr);
+        String orderByCond = createOrderBy(orderBy, sortBy);
+        if (StringUtils.isNotBlank(orderByCond)) {
+            probeQL.append(orderByCond);
+        }
+        String probeQLStr = probeQL.toString();
+        //System.out.println("=================================> ds level probe query ql string: " + probeQLStr);
+        Query probeQuery = this.session().createQuery(probeQLStr);
+
+        if (searchGenes.length > 0) {
+            if (countQLStr.indexOf("(:geneNames)") != -1) {
+                probeCountQuery.setParameterList("geneNames", searchGenes);
+            }
+            if (probeQLStr.indexOf("(:geneNames)") != -1) {
+                probeQuery.setParameterList("geneNames", searchGenes);
+            }
+
+            if (countQLStr.indexOf("(:geneNames0)") != -1) {
+                probeCountQuery.setParameterList("geneNames0", searchGenes);
+            }
+            if (probeQLStr.indexOf("(:geneNames0)") != -1) {
+                probeQuery.setParameterList("geneNames0", searchGenes);
+            }
+
+            if (countQLStr.indexOf("(:geneNames1)") != -1) {
+                probeCountQuery.setParameterList("geneNames1", searchGenes);
+            }
+            if (probeQLStr.indexOf("(:geneNames1)") != -1) {
+                probeQuery.setParameterList("geneNames1", searchGenes);
+            }
+        }
+
+        if (searchGenBanks.length > 0) {
+            if (countQLStr.indexOf("(:genBanks)") != -1) {
+                probeCountQuery.setParameterList("genBanks", searchGenBanks);
+            }
+            if (probeQLStr.indexOf("(:genBanks)") != -1) {
+                probeQuery.setParameterList("genBanks", searchGenBanks);
+            }
+
+            if (countQLStr.indexOf("(:genBanks0)") != -1) {
+                probeCountQuery.setParameterList("genBanks0", searchGenBanks);
+            }
+            if (probeQLStr.indexOf("(:genBanks0)") != -1) {
+                probeQuery.setParameterList("genBanks0", searchGenBanks);
+            }
+
+            if (countQLStr.indexOf("(:genBanks1)") != -1) {
+                probeCountQuery.setParameterList("genBanks1", searchGenBanks);
+            }
+            if (probeQLStr.indexOf("(:genBanks1)") != -1) {
+                probeQuery.setParameterList("genBanks1", searchGenBanks);
+            }
+        }
+
+        if (searchEnsembls.length > 0) {
+            if (countQLStr.indexOf("(:ensembls)") != -1) {
+                probeCountQuery.setParameterList("ensembls", searchEnsembls);
+            }
+            if (probeQLStr.indexOf("(:ensembls)") != -1) {
+                probeQuery.setParameterList("ensembls", searchEnsembls);
+            }
+
+            if (countQLStr.indexOf("(:ensembls0)") != -1) {
+                probeCountQuery.setParameterList("ensembls0", searchEnsembls);
+            }
+            if (probeQLStr.indexOf("(:ensembls0)") != -1) {
+                probeQuery.setParameterList("ensembls0", searchEnsembls);
+            }
+
+            if (countQLStr.indexOf("(:ensembls1)") != -1) {
+                probeCountQuery.setParameterList("ensembls1", searchEnsembls);
+            }
+            if (probeQLStr.indexOf("(:ensembls1)") != -1) {
+                probeQuery.setParameterList("ensembls1", searchEnsembls);
+            }
+        }
+
+        //set for dataset ids
+        if (foundDsIds.size() > 0) {
+            //set parameter list for dsIDS
+            if (countQLStr.indexOf("(:dsIDs)") != -1) {
+                probeCountQuery.setParameterList("dsIDs", foundDsIds);
+            }
+            if (probeQLStr.indexOf("(:dsIDs)") != -1) {
+                probeQuery.setParameterList("dsIDs", foundDsIds);
+            }
+
+            //set parameter list for dsIDS0
+            if (countQLStr.indexOf("(:dsIDs0)") != -1) {
+                probeCountQuery.setParameterList("dsIDs0", foundDsIds);
+            }
+            if (probeQLStr.indexOf("(:dsIDs0)") != -1) {
+                probeQuery.setParameterList("dsIDs0", foundDsIds);
+            }
+
+            //set parameter list for dsIDS1
+            if (countQLStr.indexOf("(:dsIDs1)") != -1) {
+                probeCountQuery.setParameterList("dsIDs1", foundDsIds);
+            }
+            if (probeQLStr.indexOf("(:dsIDs1)") != -1) {
+                probeQuery.setParameterList("dsIDs1", foundDsIds);
+            }
+
+            //set parameter list for dsIDS2
+            if (countQLStr.indexOf("(:dsIDs2)") != -1) {
+                probeCountQuery.setParameterList("dsIDs2", foundDsIds);
+            }
+            if (probeQLStr.indexOf("(:dsIDs2)") != -1) {
+                probeQuery.setParameterList("dsIDs2", foundDsIds);
+            }
+
+            //set parameter list for dsIDS3
+            if (countQLStr.indexOf("(:dsIDs3)") != -1) {
+                probeCountQuery.setParameterList("dsIDs3", foundDsIds);
+            }
+            if (probeQLStr.indexOf("(:dsIDs3)") != -1) {
+                probeQuery.setParameterList("dsIDs3", foundDsIds);
+            }
+
+            //set parameter list for dsIDS4
+            if (countQLStr.indexOf("(:dsIDs4)") != -1) {
+                probeCountQuery.setParameterList("dsIDs4", foundDsIds);
+            }
+            if (probeQLStr.indexOf("(:dsIDs4)") != -1) {
+                probeQuery.setParameterList("dsIDs4", foundDsIds);
+            }
+
+            //set parameter list for dsIDS5
+            if (countQLStr.indexOf("(:dsIDs5)") != -1) {
+                probeCountQuery.setParameterList("dsIDs5", foundDsIds);
+            }
+            if (probeQLStr.indexOf("(:dsIDs5)") != -1) {
+                probeQuery.setParameterList("dsIDs5", foundDsIds);
+            }
+        }
+
+        int total = ((Long) probeCountQuery.uniqueResult()).intValue();
+        if (total == 0) {
+
+            if (recordPerPage < 0) {
+                recordPerPage = 10;
+            }
+            return new Pagination<String>(startPageNo, recordPerPage, total);
+        }
+
+        if (recordPerPage < 0) {
+            recordPerPage = total;
+        }
+        Pagination<String> probePagination = new Pagination<String>(startPageNo, recordPerPage, total);
+        probeQuery.setFirstResult(probePagination.getFirstResult());
+        probeQuery.setMaxResults(probePagination.getSizePerPage());
+        List<String> probeList = probeQuery.list();
+        probePagination.setPageResults(probeList);
+        // System.out.println("===========> ds level found total probe size: " + probePagination.getTotalRecords());
+        // System.out.println("===========> ds level found total probe pages: " + probePagination.getTotalPages());
+        return probePagination;
+    }
+
+    //Search Probe By Data level conditions
+    @SuppressWarnings("unchecked")
+    private Pagination<String> searchProbeDataLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        String genes = searchBean.getGenes();
+        String genBanks = searchBean.getGenBanks();
+        String ensembls = searchBean.getEnsembls();
+
+        String[] searchGenes = MercUtil.splitByDelims(genes, ",", "\t", "\n");
+        String[] searchGenBanks = MercUtil.splitByDelims(genBanks, ",", "\t", "\n");
+        String[] searchEnsembls = MercUtil.splitByDelims(ensembls, ",", "\t", "\n");
+
+        double upValue = searchBean.getUpValue();
+
+        double downValue = searchBean.getDownValue();
+
+        List<String> threeIdQuery = new ArrayList<String>();
+        List<String> upDownQuery = new ArrayList<String>();
+        if (searchGenes.length > 0) {
+            threeIdQuery.add(" rep.geneSymbol IN (:geneNames");
+        }
+        if (searchGenBanks.length > 0) {
+            threeIdQuery.add(" rep.genBankAccession IN (:genBanks");
+        }
+        if (searchEnsembls.length > 0) {
+            threeIdQuery.add(" rep.ensembl IN (:ensembls");
+        }
+
+        upDownQuery.add(" d.value >= " + upValue);
+
+        upDownQuery.add(" d.value <= -" + downValue);
+
+        //create all or conditions
+        List<String> orConds = createOrCondsForDataOnly(threeIdQuery, upDownQuery);
+
+        //count report DISTINCT query
+        StringBuilder countQL = new StringBuilder();
+        String countBase = "SELECT count(distinct rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds";
+        countQL.append(countBase);
+
+        //probe pagination query
+        StringBuilder probeQL = new StringBuilder();
+        String pQueryBase = "SELECT distinct(rep.probeId) FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        probeQL.append(pQueryBase);
+
+        if (orConds.size() > 0) {
+            countQL.append(" WHERE");
+            probeQL.append(" WHERE");
+            int i = 0;
+            for (String orClause : orConds) {
+                countQL.append(" (").append(orClause).append(")");
+                probeQL.append(" (").append(orClause).append(")");
+                if (i < orConds.size() - 1) {
+                    countQL.append(" OR");
+                    probeQL.append(" OR");
+                }
+                i++;
+            }
+        }
+
+        //create count query
+        String countQLStr = countQL.toString();
+        //System.out.println("=================================> data level only probe count string: " + countQLStr);
+        Query probeCountQuery = this.session().createQuery(countQLStr);
+
+        String orderByCond = createOrderBy(orderBy, sortBy);
+        if (StringUtils.isNotBlank(orderByCond)) {
+            probeQL.append(orderByCond);
+        }
+        //create pagination query
+        String probeQLStr = probeQL.toString();
+        //  System.out.println("=================================> data level only probe query string: " + probeQLStr);
+        Query probeQuery = this.session().createQuery(probeQLStr);
+
+        if (searchGenes.length > 0) {
+            if (countQLStr.indexOf("(:geneNames)") != -1) {
+                probeCountQuery.setParameterList("geneNames", searchGenes);
+            }
+            if (probeQLStr.indexOf("(:geneNames)") != -1) {
+                probeQuery.setParameterList("geneNames", searchGenes);
+            }
+
+            if (countQLStr.indexOf("(:geneNames0)") != -1) {
+                probeCountQuery.setParameterList("geneNames0", searchGenes);
+            }
+            if (probeQLStr.indexOf("(:geneNames0)") != -1) {
+                probeQuery.setParameterList("geneNames0", searchGenes);
+            }
+
+            if (countQLStr.indexOf("(:geneNames1)") != -1) {
+                probeCountQuery.setParameterList("geneNames1", searchGenes);
+            }
+            if (probeQLStr.indexOf("(:geneNames1)") != -1) {
+                probeQuery.setParameterList("geneNames1", searchGenes);
+            }
+        }
+
+        if (searchGenBanks.length > 0) {
+            if (countQLStr.indexOf("(:genBanks)") != -1) {
+                probeCountQuery.setParameterList("genBanks", searchGenBanks);
+            }
+            if (probeQLStr.indexOf("(:genBanks)") != -1) {
+                probeQuery.setParameterList("genBanks", searchGenBanks);
+            }
+
+            if (countQLStr.indexOf("(:genBanks0)") != -1) {
+                probeCountQuery.setParameterList("genBanks0", searchGenBanks);
+            }
+            if (probeQLStr.indexOf("(:genBanks0)") != -1) {
+                probeQuery.setParameterList("genBanks0", searchGenBanks);
+            }
+
+            if (countQLStr.indexOf("(:genBanks1)") != -1) {
+                probeCountQuery.setParameterList("genBanks1", searchGenBanks);
+            }
+            if (probeQLStr.indexOf("(:genBanks1)") != -1) {
+                probeQuery.setParameterList("genBanks1", searchGenBanks);
+            }
+        }
+
+        if (searchEnsembls.length > 0) {
+            if (countQLStr.indexOf("(:ensembls)") != -1) {
+                probeCountQuery.setParameterList("ensembls", searchEnsembls);
+            }
+            if (probeQLStr.indexOf("(:ensembls)") != -1) {
+                probeQuery.setParameterList("ensembls", searchEnsembls);
+            }
+
+            if (countQLStr.indexOf("(:ensembls0)") != -1) {
+                probeCountQuery.setParameterList("ensembls0", searchEnsembls);
+            }
+            if (probeQLStr.indexOf("(:ensembls0)") != -1) {
+                probeQuery.setParameterList("ensembls0", searchEnsembls);
+            }
+
+            if (countQLStr.indexOf("(:ensembls1)") != -1) {
+                probeCountQuery.setParameterList("ensembls1", searchEnsembls);
+            }
+            if (probeQLStr.indexOf("(:ensembls1)") != -1) {
+                probeQuery.setParameterList("ensembls1", searchEnsembls);
+            }
+        }
+
+        int total = ((Long) probeCountQuery.uniqueResult()).intValue();
+        if (total == 0) {
+            if (recordPerPage < 0) {
+                recordPerPage = 10;
+            }
+            return new Pagination<String>(startPageNo, recordPerPage, total);
+        }
+        //if the recordPerPage is less than zero, we say it will return all results in a single page.
+        if (recordPerPage < 0) {
+            recordPerPage = total;
+        }
+        Pagination<String> probPagination = new Pagination<String>(startPageNo, recordPerPage, total);
+        probeQuery.setFirstResult(probPagination.getFirstResult());
+        probeQuery.setMaxResults(probPagination.getSizePerPage());
+        List<String> dataList = probeQuery.list();
+        probPagination.setPageResults(dataList);
+        // System.out.println("===========> data level only query found total probe size: " + probPagination.getTotalRecords());
+        // System.out.println("===========>  data level only query found total probe pages: " + probPagination.getTotalPages());
+        return probPagination;
     }
 
     private List<String> createOrCondsForDataOnly(List<String> threeIdQuery, List<String> upDownQuery) {

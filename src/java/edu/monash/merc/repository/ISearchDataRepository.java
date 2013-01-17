@@ -31,7 +31,16 @@ package edu.monash.merc.repository;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Factorial;
+import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.TissueExpression;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.SearchBean;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * ISearchDataRepository DAO Interface
@@ -41,5 +50,21 @@ import edu.monash.merc.dto.SearchBean;
  */
 public interface ISearchDataRepository {
 
-    public Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    Object[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+
+    List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 }
