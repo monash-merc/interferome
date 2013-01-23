@@ -41,8 +41,8 @@ import edu.monash.merc.util.interferome.dataset.BaseDataset;
 import edu.monash.merc.util.interferome.dataset.ExpFactor;
 import edu.monash.merc.util.interferome.dataset.IFNTypeFactor;
 import edu.monash.merc.util.interferome.dataset.VarFactor;
-import edu.monash.merc.util.reporter.ImportReporterThread;
 import edu.monash.merc.util.probe.ImportProbeThread;
+import edu.monash.merc.util.reporter.ImportReporterThread;
 import edu.monash.merc.util.tfsite.ImportTFSiteThread;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1150,6 +1150,7 @@ public class DMServiceImpl implements DMService {
                         geneList.add(gene);
                     }
                     probe.setGenes(geneList);
+                    //System.out.println("DBG MESSAGE from DMServiceImpl:" + probe.getGenes());
                     //check if primary key id is zero which means new entity,
                     if (probe.getId() == 0) {
                         this.saveProbe(probe);

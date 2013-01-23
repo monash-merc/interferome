@@ -31,8 +31,6 @@ package edu.monash.merc.repository;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.Species;
 
 import java.util.List;
 
