@@ -28,6 +28,7 @@
 
 package edu.monash.merc.dto;
 
+
 import java.io.Serializable;
 
 /**
@@ -45,9 +46,9 @@ public class ProbeGeneBean implements Serializable {
 
     private String probeId;
 
-    private String platform;
+ //   private String platform;
 
-    private String probeType;
+    private String speciesName;
 
     public String getEnsgAccession() {
         return ensgAccession;
@@ -65,19 +66,27 @@ public class ProbeGeneBean implements Serializable {
         this.probeId = probeId;
     }
 
-    public String getPlatform() {
-        return platform;
+    public String getSpeciesName() {
+        return speciesName;
     }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
+   public void setSpeciesName(String speciesName) {
+        this.speciesName = speciesName;
     }
 
-    public String getProbeType() {
-        return probeType;
-    }
+//    public String getPlatform() {
+//        return platform;
+//    }
 
-    public void setProbeType(String probeType) {
-        this.probeType = probeType;
-    }
+//    public void setPlatform(String platform) {
+//        this.platform = platform;
+//    }
+
+//    public String getProbeType() {
+//        return probeType;
+//    }
+
+//    public void setProbeType(String probeType) {
+//        this.probeType = probeType;
+//    }
 }

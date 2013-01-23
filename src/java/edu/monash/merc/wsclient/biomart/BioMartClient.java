@@ -230,7 +230,7 @@ public class BioMartClient {
         return geneOntologyBeans;
     }
 
-    public List<ProbeGeneBean> importProbes(String probeType) {
+    public List<ProbeGeneBean> importProbes(String speciesName) {
         if (!configured) {
             throw new WSException("The configure method must be called first.");
         }
@@ -248,19 +248,19 @@ public class BioMartClient {
                 for (int i = 0; i < columnsLines.length; i++) {
                     probeGeneBeanCreator.getColumns().add(new CSVColumn(columnsLines[i], columnValuesLines[i]));
                 }
-                String platformColumnName = ProbeGeneField.PLATFORM;
-                String platformColumnValue = columnsLines[1];
+               // String platformColumnName = ProbeGeneField.PLATFORM;
+               // String platformColumnValue = columnsLines[1];
                 String probeSpeciesColumnName = ProbeGeneField.SPECIES;
-                String probeSpeciesColumnValue = probeType;
+                String probeSpeciesColumnValue = speciesName;
 
-                probeGeneBeanCreator.getColumns().add(new CSVColumn(platformColumnName, platformColumnValue));
+               // probeGeneBeanCreator.getColumns().add(new CSVColumn(platformColumnName, platformColumnValue));
                 probeGeneBeanCreator.getColumns().add(new CSVColumn(probeSpeciesColumnName, probeSpeciesColumnValue));
                 ProbeGeneBean probeGeneBean = probeGeneBeanCreator.createProbeGeneBean();
                 if (StringUtils.isNotBlank(probeGeneBean.getEnsgAccession()) && StringUtils.isNotBlank(probeGeneBean.getProbeId())) {
                     probeGeneBeans.add(probeGeneBean);
                 }
             }
-            //TODO:
+           //TODO:
             //Check the probeGeneBeans list size, if size is zero,
             //then check the response whether it contains Query ERROR:
         } catch (Exception ex) {
@@ -318,6 +318,7 @@ public class BioMartClient {
     }
 
     public String probeQueryString(String species, String platform) {
+    //public String probeQueryString(String species) {
         StringBuilder query = new StringBuilder();
         query.append("<?xml version='1.0' encoding='UTF-8'?>");
         query.append("<!DOCTYPE Query>");
@@ -395,12 +396,13 @@ public class BioMartClient {
 //        System.out.println("=====> The total GeneOntology process time: " + (goEndTime - goStartTime) / 1000 + "seconds");
 
 
-        bioMartClient.configure(wsUrl, species, "efg_agilent_wholegenome_4x44k_v1");
-        List<ProbeGeneBean> probeGeneBeans = bioMartClient.importProbes("Human");
+//        bioMartClient.configure(wsUrl, species, "efg_agilent_wholegenome_4x44k_v1");
+//        List<ProbeGeneBean> probeGeneBeans = bioMartClient.importProbes("Human");
 
-        for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
-            System.out.println(probeGeneBean.getEnsgAccession() + " - " + probeGeneBean.getProbeId() + " - " + probeGeneBean.getPlatform() + " - " + probeGeneBean.getProbeType());
-
-        }
+//        for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
+//            //System.out.println(probeGeneBean.getEnsgAccession() + " - " + probeGeneBean.getProbeId() + " - " + probeGeneBean.getPlatform() + " - " + probeGeneBean.getProbeType());
+//            System.out.println( probeGeneBean.getProbeId() + " - " + probeGeneBean.getEnsgAccession()+ " - " + probeGeneBean.getSpeciesName());
+//
+//        }
     }
 }

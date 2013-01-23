@@ -114,8 +114,11 @@ public class Gene extends Domain {
     @Column(name = "imported_time")
     private Date importedTime;
 
+   // @OneToMany(targetEntity = Probe.class)
+   // @JoinColumn(name = "probe_id", referencedColumnName = "id", nullable = false)
+   // private List<Probe> probe;
     @ManyToMany(mappedBy = "genes")
-    private List<Probe> probes;
+    private List<Probe> probe;
 
     public long getId() {
         return id;
@@ -229,11 +232,12 @@ public class Gene extends Domain {
         this.importedTime = importedTime;
     }
 
-    public List<Probe> getProbes() {
-        return probes;
+    public List<Probe> getProbe() {
+        return probe;
     }
 
-    public void setProbes(List<Probe> probes) {
-        this.probes = probes;
+    public void setProbe(List<Probe> probe) {
+        this.probe = probe;
     }
+
 }

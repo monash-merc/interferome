@@ -34,6 +34,8 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
@@ -45,37 +47,44 @@ import java.util.List;
  *        Date: 28/06/12
  *        Time: 2:20 PM
  */
+
 @Entity
 @Table(name = "probe")
 @org.hibernate.annotations.Table(appliesTo = "probe",
-        indexes = {@Index(name = "idx_probeset", columnNames = {"probeset"}),
-                @Index(name = "idx_platform", columnNames = {"platform"}),
-                @Index(name = "idx_species", columnNames = {"species"})
+        indexes = {@Index(name = "probeId", columnNames = {"probe_id"})
+               // @Index(name = "idx_platform", columnNames = {"platform"}),
+                //@Index(name = "idx_species", columnNames = {"species"})
         })
 public class Probe extends Domain {
 
     @Id
     @GeneratedValue(generator = "probe_pk_seq")
     @GenericGenerator(name = "probe_pk_seq", strategy = "seqhilo")
+    @Column(name = "id", nullable = false)
     private long id;
 
     @Basic
-    @Column(name = "probeset")
+    @Column(name = "probe_id")
     private String probeId;
 
-    @Basic
-    @Column(name = "platform")
-    private String platform;
+    @Transient
+    private String ensemblId;
 
-    @Basic
-    @Column(name = "species")
-    private String species;
+    @Transient
+    private String speciesName;
+
+    @ManyToOne
+    @JoinColumn(name = "species_id")
+    private Species species;
 
     @ManyToMany(targetEntity = Gene.class)
     @JoinTable(name = "probe_gene", joinColumns = {@JoinColumn(name = "probe_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "gene_id", referencedColumnName = "id")}, uniqueConstraints = {@UniqueConstraint(columnNames = {
             "probe_id", "gene_id"})})
     @LazyCollection(LazyCollectionOption.TRUE)
     private List<Gene> genes;
+
+    @OneToMany(targetEntity = Data.class,mappedBy = "probe")
+    private List<Data> data;
 
     public long getId() {
         return id;
@@ -93,20 +102,20 @@ public class Probe extends Domain {
         this.probeId = probeId;
     }
 
-    public String getPlatform() {
-        return platform;
+    public Species getSpecies() {
+      return species;
     }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
+    public void setSpecies(Species species) {
+      this.species = species;
     }
 
-    public String getSpecies() {
-        return species;
+    public String getSpeciesName() {
+        return speciesName;
     }
 
-    public void setSpecies(String species) {
-        this.species = species;
+    public void setSpeciesName(String speciesName) {
+        this.speciesName = speciesName;
     }
 
     public List<Gene> getGenes() {
@@ -115,5 +124,21 @@ public class Probe extends Domain {
 
     public void setGenes(List<Gene> genes) {
         this.genes = genes;
+    }
+
+    public List<Data> getData() {
+        return data;
+    }
+
+    public void setData(List<Data> data) {
+        this.data = data;
+    }
+
+    public String getEnsemblId() {
+        return ensemblId;
+    }
+
+    public void setEnsemblId(String ensemblId) {
+        this.ensemblId = ensemblId;
     }
 }

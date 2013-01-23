@@ -28,6 +28,8 @@
 
 package edu.monash.merc.service;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Gene;
 
 import java.util.List;
@@ -85,7 +87,10 @@ public interface GeneService {
      * @param ensgAccession an ensembl accession id
      * @return a Gene
      */
-    Gene getGeneByEnsgAccession(String ensgAccession);
+    public Gene getGeneByEnsgAccession(String ensgAccession);
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    public List<Gene> getGenesByProbeId(String probeId);
+   // public Gene getGenesByProbeId(String probeId);
+
+    public Pagination<Gene> getGenes(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
 }

@@ -41,8 +41,8 @@ public interface ProbeGeneField {
 
     static final String ENSG_ACCESSION = "Ensembl Gene ID";
 
-    static final String PLATFORM = "Platform Name";
+//    static final String PLATFORM = "Platform Name";
 
-    static final String SPECIES = "Species";
+   static final String SPECIES = "Species";
 
 }

@@ -64,18 +64,21 @@ public class ProbeGeneBeanCreator {
             if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.ENSG_ACCESSION)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
                     probeGeneBean.setEnsgAccession(columnValue);
+                  //  System.out.println("DBG MESSAGE - EnsgAccession from ProbeGeneBeanCreator: '"+columnValue+"'");
                 }
-            } else if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.PLATFORM)) {
-                if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    probeGeneBean.setPlatform(columnValue);
-                }
+            //} else if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.PLATFORM)) {
+            //    if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
+            //        probeGeneBean.setPlatform(columnValue);
+            //    }
             } else if (StringUtils.equalsIgnoreCase(columnName, ProbeGeneField.SPECIES)) {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
-                    probeGeneBean.setProbeType(columnValue);
+                    probeGeneBean.setSpeciesName(columnValue);
+                 //   System.out.println("DBG MESSAGE - SPECIES from ProbeGeneBeanCreator: '"+columnValue+"'");
                 }
             } else {
                 if (StringUtils.isNotBlank(columnValue) && !StringUtils.equals("\t", columnValue)) {
                     probeGeneBean.setProbeId(columnValue);
+                  //  System.out.println("DBG MESSAGE - ProbeId from ProbeGeneBeanCreator: '"+columnValue+"'");
                 }
             }
         }

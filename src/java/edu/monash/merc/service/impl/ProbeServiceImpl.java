@@ -28,6 +28,8 @@
 
 package edu.monash.merc.service.impl;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.dao.impl.ProbeDAO;
 import edu.monash.merc.domain.Probe;
 import edu.monash.merc.service.ProbeService;
@@ -71,6 +73,16 @@ public class ProbeServiceImpl implements ProbeService {
     }
 
     @Override
+    public int saveProbes(List<Probe> probes) {
+        return this.probeDao.saveAll(probes);
+    }
+
+    @Override
+    public int updateProbes(List<Probe> probes) {
+        return this.probeDao.updateAll(probes);
+    }
+
+    @Override
     public void mergeProbe(Probe probe) {
         this.probeDao.merge(probe);
     }
@@ -86,8 +98,8 @@ public class ProbeServiceImpl implements ProbeService {
     }
 
     @Override
-    public Probe getProbeByProbeId(String probesetId) {
-        return this.probeDao.getProbeByProbeId(probesetId);
+    public Probe getProbeByProbeId(String probeId) {
+        return this.probeDao.getProbeByProbeId(probeId);
     }
 
     @Override
@@ -95,8 +107,18 @@ public class ProbeServiceImpl implements ProbeService {
         return this.probeDao.getProbesByGeneAccession(geneAccession);
     }
 
+   @Override
+    public List<Probe> getProbeBySpecies(String speciesName) {
+        return this.probeDao.getProbeBySpecies(speciesName);
+    }
+
     @Override
     public List<Probe> getProbesByGeneId(long geneId) {
-        return this.probeDao.getProbesByGeneId(geneId);
+       return this.probeDao.getProbesByGeneId(geneId);
+    }
+
+    @Override
+    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys) {
+       return this.probeDao.getProbes(startPageNo, recordsPerPage, orderBys);
     }
 }

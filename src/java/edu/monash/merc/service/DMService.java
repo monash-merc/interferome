@@ -202,6 +202,32 @@ public interface DMService {
 
     public void importReporters(ReporterBean reporterBean);
 
+    //Probe
+    Probe getProbeById(long id);
+
+    public List<Probe> getProbesByGeneAccession(String geneAccession);
+
+    public List<Probe> getProbeBySpecies(String speciesName);
+
+    public List<Probe> getProbesByGeneId(long geneId);
+
+    public void saveProbe(Probe probe);
+
+    public void mergeProbe(Probe probe);
+
+    public void updateProbe(Probe probe);
+
+    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
+
+    public Probe getProbeByProbeId(String probeId);
+
+    public ProbCounter importAllProbes(List<Probe> probes);
+
+    public void importProbe(ProbeBean probeBeans);
+
+    public void importProbes(List<ProbeGeneBean> probeGeneBeans);
+
+    // TFSite
     public void saveTFSite(TFSite tfSite);
 
     public void mergeTFSite(TFSite tfSite);
@@ -214,6 +240,27 @@ public interface DMService {
 
     public TFSite getTFSite(TFSite tfSite);
 
+    //Species
+
+    public Species getSpeciesById(long id);
+
+    public void saveSpecies(Species species);
+
+    public void mergeSpecies(Species species);
+
+    public void updateSpecies(Species species);
+
+//  public void importSpecies(SpeciesBean speciesBean);
+
+//    public SpeciesCounter importAllSpecies(List<Species> species);
+
+    public Species getSpeciesByName(String speciesName);
+
+//    public Species getSpeciesBySpeciesId(String speciesId);
+
+    public Pagination<Species> getSpecies(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
+
+    //Dataset
     public void saveDataset(Dataset dataset);
 
     public Dataset getDataset(long dsId);
@@ -265,35 +312,35 @@ public interface DMService {
      * @param id a Gene id
      * @return a Gene object
      */
-    Gene getGeneById(long id);
+    public Gene getGeneById(long id);
 
     /**
      * Save a Gene
      *
      * @param gene a Gene object
      */
-    void saveGene(Gene gene);
+    public void saveGene(Gene gene);
 
     /**
      * Merge a Gene object
      *
      * @param gene a Gene object
      */
-    void mergeGene(Gene gene);
+    public void mergeGene(Gene gene);
 
     /**
      * Update a Gene object
      *
      * @param gene a Gene object
      */
-    void updateGene(Gene gene);
+    public void updateGene(Gene gene);
 
     /**
      * Delete a Gene object
      *
      * @param gene a Gene object
      */
-    void deleteGene(Gene gene);
+    public void deleteGene(Gene gene);
 
     /**
      * Get the Gene by an ensembl accession id
@@ -301,9 +348,9 @@ public interface DMService {
      * @param ensgAccession an ensembl accession id
      * @return a Gene
      */
-    Gene getGeneByEnsgAccession(String ensgAccession);
+    public Gene getGeneByEnsgAccession(String ensgAccession);
 
-    List<Gene> getGenesByProbesetId(String probeId);
+    public List<Gene> getGenesByProbeId(String probeId);
 
     /**
      * import all genes
@@ -367,22 +414,4 @@ public interface DMService {
 
     void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
 
-    //Probe
-    Probe getProbeById(long id);
-
-    void saveProbe(Probe probe);
-
-    void mergeProbe(Probe probe);
-
-    void updateProbe(Probe probe);
-
-    void deleteProbe(Probe probe);
-
-    Probe getProbeByProbeId(String probesetId);
-
-    List<Probe> getProbesByGeneAccession(String geneAccession);
-
-    List<Probe> getProbesByGeneId(long geneId);
-
-    void importProbes(List<ProbeGeneBean> probeGeneBeans);
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011, Monash e-Research Centre
  * (Monash University, Australia)
  * All rights reserved.
- *                                                       S
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright
@@ -40,9 +40,6 @@ import edu.monash.merc.exception.DCConfigException;
 import edu.monash.merc.exception.DCException;
 import edu.monash.merc.service.SearchDataService;
 import edu.monash.merc.util.MercUtil;
-import edu.monash.merc.util.captcha.ImageUtil;
-import edu.monash.merc.util.captcha.ImgCaptcha;
-import edu.monash.merc.util.captcha.TransparentBackgroundProducer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +47,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -219,6 +214,9 @@ public class SearchAction extends DMBaseAction {
      * search result gene
      */
     private Pagination<Gene> genePagination;
+
+
+    private Pagination<Probe> probePagination;
 
     /**
      * TFSite Search Results
@@ -759,7 +757,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFile(searchBean, dataPagination);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_DataSearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_DataSearchResults.csv" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -769,7 +767,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -805,7 +803,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileGene(searchBean, genePagination);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_GeneSearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_GeneSearchResults.csv" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -815,7 +813,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -850,7 +848,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileOntology(searchBean, ontologyList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_OntologySearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_OntologySearchResults.csv" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -860,7 +858,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -913,7 +911,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileTFanalysis(searchBean, tfSiteList);
             String FileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + FileName + "_TFanalysisSearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + FileName + "_TFanalysisSearchResults.csv" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -923,7 +921,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -960,7 +958,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileChromosome(searchBean, chromosomeGeneList, chromosomeList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_ChromosomeSearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_ChromosomeSearchResults.csv" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -970,7 +968,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -1006,7 +1004,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileSubtypes(searchBean, subtypeList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_SubtypesSearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_SubtypesSearchResults.csv" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -1016,7 +1014,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -1064,7 +1062,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileTissueExpression(searchBean, tissueExpressionList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_TissueExpressionSearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_TissueExpressionSearchResults.csv" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -1074,7 +1072,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -1355,15 +1353,39 @@ public class SearchAction extends DMBaseAction {
                 String searchIfnType = dataset.getIfnType().getTypeName();
                 double treatmentTime = dataset.getTreatmentTime();
 
-                //report
-                Reporter reporter = data.getReporter();
-                String geneSymbol = reporter.getGeneSymbol();
-                String geneDesc = reporter.getGeneTitle();
-                String genBankId = reporter.getGenBankAccession();
-                String ensemblId = reporter.getEnsembl();
-                String probeId = reporter.getProbeId();
-                //write the csv into OutputStream
+                //get Probe /reporter
+                Probe probe = data.getProbe();
+                String probeId = probe.getProbeId();
+                //get Gene Aliases
+                List<Gene> geneList = probe.getGenes();
+                for (Gene gene : geneList) {
+                String geneSymbol = gene.getGeneName();
+               // int al=0;
+               // String geneAliasTemp = "";
+               // List<GeneAlias> geneAliasLists = gene.getGeneAlias();
+               //     for (GeneAlias geneAliasList : geneAliasLists) {
+               //         String geneAlias = geneAliasList.getAliasName();
+               //         geneAliasTemp += geneAlias;
+              //          if (!StringUtils.equals(geneAlias, "-1")) {
+               //             if (al < geneAliasLists.size() - 1) {
+               //                 geneAliasTemp += SEMICOLON;
+               //             }
+               //         }
+               //         al ++;
+               //     }
+               //     if (StringUtils.equals("-1", geneAliasTemp)) {
+               //         geneAliasTemp = geneSymbol;
+               //     } else {
+               //         geneAliasTemp= geneSymbol+SEMICOLON + geneAliasTemp;
+               //     }
+
+                String geneDesc = gene.getDescription();
+                String genBankId = gene.getGenbankId();
+                String ensemblId = gene.getEnsgAccession();
+
                 csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneSymbol, geneDesc, genBankId, ensemblId, probeId});
+                }//write the csv into OutputStream
+               //csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneAliasTemp, geneDesc, genBankId, ensemblId, probeId});
             }
             //flush out
             csvWriter.flush();
@@ -1790,7 +1812,7 @@ public class SearchAction extends DMBaseAction {
                     double pvalue = (Double) objarray[2];
                     this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
                     //write total records
-                    csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), String.valueOf(pvalue)});
+                    csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), "N/A"});
                 }
                 //write empty line
                 csvWriter.writeNext(new String[]{""});
@@ -2195,13 +2217,12 @@ public class SearchAction extends DMBaseAction {
                 csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
             }
             //write new empty line
-
-            if (StringUtils.contains(species, "Homo sapiens")|| StringUtils.equals(species, "-1")) {
-                csvWriter.writeNext(new String[]{""});
+            csvWriter.writeNext(new String[]{""});
             csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
             csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
             //write data result
             List<String> finishedHGenes = new ArrayList<String>();
+
             for (Gene chr : chromosomeGeneList) {
                 String ensembl = chr.getEnsgAccession();
                 if (!finishedHGenes.contains(ensembl)) {
@@ -2216,10 +2237,7 @@ public class SearchAction extends DMBaseAction {
                     finishedHGenes.add(ensembl);
                 }
             }
-            }
-
-            if (StringUtils.contains(species, "Mus musculus")|| StringUtils.equals(species, "-1")) {
-                csvWriter.writeNext(new String[]{""});
+            csvWriter.writeNext(new String[]{""});
             csvWriter.writeNext(new String[]{"Mouse Chromosomal Location"});
             csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
             List<String> finishedMGenes = new ArrayList<String>();
@@ -2237,14 +2255,13 @@ public class SearchAction extends DMBaseAction {
                     finishedMGenes.add(ensemblM);
                 }
             }
+            csvWriter.writeNext(new String[]{""});
+            csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
+            for (Object[] obja : chromosomeList) {
+                String chrom = (String) obja[0];
+                long genecounter = (Long) obja[1];
+                csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
             }
-    //        csvWriter.writeNext(new String[]{""});
-    //        csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
-    //        for (Object[] obja : chromosomeList) {
-    //            String chrom = (String) obja[0];
-    //            long genecounter = (Long) obja[1];
-    //            csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
-    //        }
 
             //flush out
             csvWriter.flush();
@@ -3044,6 +3061,14 @@ public class SearchAction extends DMBaseAction {
 
     public void setDataOrderByMap(Map<String, String> dataOrderByMap) {
         this.dataOrderByMap = dataOrderByMap;
+    }
+
+    public Pagination<Probe> getProbePagination() {
+        return probePagination;
+    }
+
+    public void setProbePagination(Pagination<Probe> probePagination) {
+        this.probePagination = probePagination;
     }
 
     public Pagination<Gene> getGenePagination() {

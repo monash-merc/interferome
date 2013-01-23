@@ -28,10 +28,14 @@
 
 package edu.monash.merc.dao.impl;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.Probe;
 import edu.monash.merc.repository.IProbeRepository;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
@@ -51,12 +55,52 @@ import java.util.List;
 @Repository
 public class ProbeDAO extends HibernateGenericDAO<Probe> implements IProbeRepository {
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Probe getProbeByProbeId(String probesetId) {
-        Criteria gCriteria = this.session().createCriteria(this.persistClass);
-        gCriteria.add(Restrictions.eq("probeId", probesetId).ignoreCase());
-        return (Probe) gCriteria.uniqueResult();
+     public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys) {
+         // count total
+         Criteria criteria = this.session().createCriteria(this.persistClass);
+         criteria.setProjection(Projections.rowCount());
+         int total = ((Long) criteria.uniqueResult()).intValue();
+         Pagination<Probe> p = new Pagination<Probe>(startPageNo, recordsPerPage, total);
+
+         // query reporter by size-per-page
+         Criteria queryCriteria = this.session().createCriteria(this.persistClass);
+         // add orders
+         if (orderBys != null && orderBys.length > 0)
+
+         {
+             for (int i = 0; i < orderBys.length; i++) {
+                 Order order = orderBys[i].getOrder();
+                 if (order != null) {
+                     queryCriteria.addOrder(order);
+                 }
+             }
+         } else
+
+         {
+             queryCriteria.addOrder(Order.desc("probeId"));
+         }
+
+         // calculate the first result from the pagination and set this value into the start search index
+         queryCriteria.setFirstResult(p.getFirstResult());
+         // set the max results (size-per-page)
+         queryCriteria.setMaxResults(p.getSizePerPage());
+         queryCriteria.setComment("getProbes");
+         List<Probe> probeList = queryCriteria.list();
+         p.setPageResults(probeList);
+         return p;
+     }
+
+    @Override
+    public Probe getProbeByProbeId(String probeId) {
+        Criteria criteria = this.session().createCriteria(this.persistClass);
+        criteria.add(Restrictions.eq("probeId", probeId));
+        Probe result = (Probe) criteria.uniqueResult();
+        this.session().evict(result);
+        return result;
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -71,10 +115,20 @@ public class ProbeDAO extends HibernateGenericDAO<Probe> implements IProbeReposi
     @SuppressWarnings("unchecked")
     @Override
     public List<Probe> getProbesByGeneId(long geneId) {
-        Criteria criteria = this.session().createCriteria(this.persistClass);
-        // create the alias for genes
-        Criteria geneCrit = criteria.createAlias("genes", "genes");
-        geneCrit.add(Restrictions.eq("genes.id", geneId));
+         Criteria criteria = this.session().createCriteria(this.persistClass);
+         // create the alias for genes
+         Criteria geneCrit = criteria.createAlias("genes", "genes");
+         geneCrit.add(Restrictions.eq("genes.id", geneId));
+         return criteria.list();
+     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Probe> getProbeBySpecies(String speciesName) {
+         Criteria criteria = this.session().createCriteria(this.persistClass);
+        // create the alias for species
+         Criteria probeCriteria = criteria.createAlias("species","species");
+         probeCriteria.add(Restrictions.eq("species.speciesName", speciesName));
         return criteria.list();
     }
 }
