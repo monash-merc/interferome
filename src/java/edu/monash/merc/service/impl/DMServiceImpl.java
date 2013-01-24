@@ -1058,28 +1058,36 @@ public class DMServiceImpl implements DMService {
 
                 // find out if the probe is already in the database
                 Probe existedProbe = this.getProbeByProbeId(probe.getProbeId());
-                Dbg.debug("PROBE ID: "+probe.getProbeId());
+                Dbg.debug("PROBE ID: "+probe.getProbeId(), Dbg.Section.IMPORT_CSV);
 
                 // set the species ID from the name
                 Species speciesN =this.getSpeciesByName(probe.getSpeciesName());
                 probe.setSpecies(speciesN);
 
                 // get the gene ID (many-to-many) - set it after including existing gene list
+
                 Gene gene = this.getGeneByEnsgAccession(probe.getEnsemblId());
-                Dbg.debug("PROBE MATCHED GENE: "+gene);
+                if (gene != null) {
+                    Dbg.debug("PROBE MATCHED GENE: "+gene.getGeneName(), Dbg.Section.IMPORT_CSV);
+                    Dbg.debug("geneID: "+gene.getId(), Dbg.Section.IMPORT_CSV);
+                } else {
+                    Dbg.debug("GENE IS NULL", Dbg.Section.IMPORT_CSV);
+                }
 
                 if (existedProbe != null) {
                     probe.setId(existedProbe.getId());
+                    probe.getGenes();
                     List<Gene> geneList = this.getGenesByProbeId(probe.getProbeId());
-                    Dbg.debug("geneList: "+StringUtils.join(geneList, "\n"));
 
-                    if (!geneList.contains(gene)) {
+                    if (gene != null && !geneList.contains(gene)) {
                         geneList.add(gene);
                     }
 
-                    // set the gene ID, update.
-
+                    // set the gene ID,
                     probe.setGenes(geneList);
+
+                    // update.
+
                     this.mergeProbe(probe);
                     this.updateProbe(probe);
                     //count how many probes have been updated
@@ -1088,8 +1096,10 @@ public class DMServiceImpl implements DMService {
                     probe = new Probe();
 
                     ArrayList<Gene> geneList = new ArrayList<Gene>();
-                    geneList.add(gene);
-                    probe.setGenes(geneList);
+                    if (gene != null) {
+                        geneList.add(gene);
+                        probe.setGenes(geneList);
+                    }
 
                     this.saveProbe(probe);
 

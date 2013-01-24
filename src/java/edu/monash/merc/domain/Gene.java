@@ -240,4 +240,20 @@ public class Gene extends Domain {
         this.probe = probe;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Gene)) return false;
+
+        Gene gene = (Gene) o;
+
+        if (id != gene.id) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
 }
