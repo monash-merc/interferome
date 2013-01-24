@@ -20,7 +20,7 @@
                 <div class="data_each_row">
                     <div class="citation_img"><img src="${base}/images/dot_grey.png" align="top" border="0" /></div>
                     <div class="citation_title">
-                        <a href="http://nar.oxfordjournals.org/content/41/suppl_1/D1040" target="_blank">
+                        <a href="http://nar.oxfordjournals.org/content/41/D1/D1040.full" target="_blank">
                             Rusinova, I.; Forster, S.; Yu, S.; Kannan, A.; Masse, M.; Cumming, H.; Chapman, R.; Hertzog, P.J.<br /> INTERFEROME v2. 0: an updated database of annotated interferon-regulated genes.  <br />Nucleic Acids Research. 2013 January;  41 (database issue):   D1040-D1046.
                         </a>
                     </div>
