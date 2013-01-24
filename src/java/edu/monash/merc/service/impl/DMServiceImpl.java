@@ -37,6 +37,7 @@ import edu.monash.merc.dto.*;
 import edu.monash.merc.exception.DCException;
 import edu.monash.merc.service.*;
 import edu.monash.merc.util.MercUtil;
+import edu.monash.merc.util.debug.Dbg;
 import edu.monash.merc.util.interferome.dataset.BaseDataset;
 import edu.monash.merc.util.interferome.dataset.ExpFactor;
 import edu.monash.merc.util.interferome.dataset.IFNTypeFactor;
@@ -1052,38 +1053,51 @@ public class DMServiceImpl implements DMService {
 
         for (Probe probe : probes) {
             if (StringUtils.isNotBlank(probe.getProbeId())) {
+
+                // fill species ID, ensembl ID then save
+
+                // find out if the probe is already in the database
                 Probe existedProbe = this.getProbeByProbeId(probe.getProbeId());
+                Dbg.debug("PROBE ID: "+probe.getProbeId());
+
+                // set the species ID from the name
                 Species speciesN =this.getSpeciesByName(probe.getSpeciesName());
-                //probe.setSpecies(this.getSpeciesByName(probe.getSpeciesName()));
-               // Gene gene = this.getGeneByEnsgAccession(probe.getEnsemblId());
-              //  List<Gene> geneList = this.getGenesByProbeId(probe.getProbeId());
-              //  System.out.println("DBG MESSAGE - geneList:"+geneList.get(0).getEnsgAccession());
+                probe.setSpecies(speciesN);
+
+                // get the gene ID (many-to-many) - set it after including existing gene list
+                Gene gene = this.getGeneByEnsgAccession(probe.getEnsemblId());
+                Dbg.debug("PROBE MATCHED GENE: "+gene);
+
                 if (existedProbe != null) {
                     probe.setId(existedProbe.getId());
-                    probe.setSpecies(speciesN);
-//                if (!geneList.contains(gene)) {
-//                   geneList.add(gene);
-//                }
-//                probe.setGenes(geneList);
+                    List<Gene> geneList = this.getGenesByProbeId(probe.getProbeId());
+                    Dbg.debug("geneList: "+StringUtils.join(geneList, "\n"));
+
+                    if (!geneList.contains(gene)) {
+                        geneList.add(gene);
+                    }
+
+                    // set the gene ID, update.
+
+                    probe.setGenes(geneList);
                     this.mergeProbe(probe);
                     this.updateProbe(probe);
                     //count how many probes have been updated
                     countUpdated++;
                 } else {
-//              probe = new Probe();
-//
-//              if (geneList == null) {
-//                   geneList = new ArrayList<Gene>();
-//                  geneList.add(gene);
-//               }
-//               probe.setGenes(geneList);
-//
-                    probe.setSpecies(speciesN);
+                    probe = new Probe();
+
+                    ArrayList<Gene> geneList = new ArrayList<Gene>();
+                    geneList.add(gene);
+                    probe.setGenes(geneList);
+
                     this.saveProbe(probe);
 
                     //count how many probes are new
                     countNew++;
                 }
+            } else {
+                Dbg.error("No ID found for "+probe);
             }
         }
         counter.setTotalUpdated(countUpdated);
@@ -1108,7 +1122,7 @@ public class DMServiceImpl implements DMService {
         return this.probeService.getProbesByGeneAccession(geneAccession);
     }
 
-   @Override
+    @Override
     public List<Probe> getProbeBySpecies(String speciesName){
         return this.probeService.getProbeBySpecies(speciesName);
     }
@@ -1135,9 +1149,9 @@ public class DMServiceImpl implements DMService {
                         probe = new Probe();
                         probe.setProbeId(probeId);
                         probe.setSpecies(speciesN);
-                 //       System.out.println("DBG MESSAGE from DMServiceImpl:" + probe.getProbeId() + " - " + probe.getSpeciesName());
-                       // probe.setPlatform(platform);
-                       // probe.setSpecies(probeType);
+                        //       System.out.println("DBG MESSAGE from DMServiceImpl:" + probe.getProbeId() + " - " + probe.getSpeciesName());
+                        // probe.setPlatform(platform);
+                        // probe.setSpecies(probeType);
                     }
 
                     List<Gene> geneList = this.getGenesByProbeId(probe.getProbeId());
@@ -1281,7 +1295,7 @@ public class DMServiceImpl implements DMService {
 //                    countUpdated++;
 //                } else {
 //                    this.saveSpecies(species);
-                    //count how many reporters are new
+    //count how many reporters are new
 //                    countNew++;
 //                }
 //            }
