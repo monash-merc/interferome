@@ -20,8 +20,8 @@
                 <div class="data_each_row">
                     <div class="citation_img"><img src="${base}/images/dot_grey.png" align="top" border="0" /></div>
                     <div class="citation_title">
-                        <a href="http://nar.oxfordjournals.org/content/37/suppl_1/D852" target="_blank">
-                            SA Samarajiwa, S Forster, K Auchetll, PJ Hertzog; INTERFEROME: the database of interferon regulated genes.<br />Nucleic Acids Res. 2009 January; 37(Database issue): D852–D857.
+                        <a href="http://nar.oxfordjournals.org/content/41/suppl_1/D1040" target="_blank">
+                            Rusinova, I.; Forster, S.; Yu, S.; Kannan, A.; Masse, M.; Cumming, H.; Chapman, R.; Hertzog, P.J.<br /> INTERFEROME v2. 0: an updated database of annotated interferon-regulated genes.  <br />Nucleic Acids Research. 2013 January;  41 (database issue):   D1040-D1046.
                         </a>
                     </div>
                     <div style="clear:both"></div>
