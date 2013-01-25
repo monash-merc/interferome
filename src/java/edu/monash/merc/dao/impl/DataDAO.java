@@ -85,7 +85,7 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
             return " ORDER BY d.id " + sortBy;
         }
 
-        if (StringUtils.equalsIgnoreCase(orderBy, "genesymbol")) {
+        if (StringUtils.equalsIgnoreCase(orderBy, "geneName")) {
             return " ORDER BY g.geneName " + sortBy;
         }
 

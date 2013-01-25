@@ -91,10 +91,10 @@ public class INFDataProcessor implements DataProcessor {
         Date importedTime = GregorianCalendar.getInstance().getTime();
 
         //Gene for HUMAN
- //       importEnsemblGenes(HUMAN, importedTime);
+//        importEnsemblGenes(HUMAN, importedTime);
 
         //Gene for MOUSE
- //       importEnsemblGenes(MOUSE, importedTime);
+//       importEnsemblGenes(MOUSE, importedTime);
         long endTime = System.currentTimeMillis();
 
         //import human and mouse probes
@@ -161,9 +161,8 @@ public class INFDataProcessor implements DataProcessor {
             client.configure(wsUrl, species_gene, platform);
             List<ProbeGeneBean> probeGeneBeans = client.importProbes(species);
             logger.info("============> total probes  size for  " + species_gene + " - " + species + " : " + probeGeneBeans.size());
-
-            //this.dmService.importProbes(probeGeneBeans);
-            this.dmService.importProbes(null);
+            this.dmService.importProbes(probeGeneBeans);
+            //this.dmService.importProbes(null);
             logger.info("======== imported the probes into database successfully");
         } catch (Exception ex) {
             logger.error(ex);
@@ -236,13 +235,13 @@ public class INFDataProcessor implements DataProcessor {
     //        probeSearch.add("affy_mg_u74av2");
     //        probeSearch.add("affy_mg_u74b");
     //        probeSearch.add("affy_mg_u74bv2");
-   // //        probeSearch.add("affy_mg_u74c");
+    //        probeSearch.add("affy_mg_u74c");
    //         probeSearch.add("affy_mg_u74cv2");
-            probeSearch.add("affy_moe430a");
+    //        probeSearch.add("affy_moe430a");
     //        probeSearch.add("affy_moe430b");
     //        probeSearch.add("affy_moex_1_0_st_v1");
    //         probeSearch.add("affy_mogene_1_0_st_v1");
-    //        probeSearch.add("affy_mouse430_2");
+            probeSearch.add("affy_mouse430_2");
     //        probeSearch.add("affy_mouse430a_2");
    //         probeSearch.add("affy_mu11ksuba");
     //        probeSearch.add("affy_mu11ksubb");

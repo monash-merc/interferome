@@ -18,8 +18,8 @@
                     <td align="center">FoldChange</td>
                     <td align="center">Interferon Type</td>
                     <td align="center">Treatment Time</td>
-                    <td align="center">Gene Symbol</td>
-                    <td align="center" width="180">Gene Description</td>
+                    <td align="center">Gene Name</td>
+                    <td align="center" width="180">Description</td>
                     <td align="center">GenBank ID</td>
                     <td align="center">Ensembl ID</td>
                     <td align="center">Probe ID</td>
@@ -32,29 +32,29 @@
                     <td><@s.property value="#dataResult.value" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.ifnType.typeName" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.treatmentTime" /></td>
-                    <td><@s.property value="#dataResult.reporter.geneSymbol" /></td>
-                    <td width="180"><@s.property value="#dataResult.reporter.geneTitle" /></td>
+                    <td><@s.property value="#dataResult.gene.geneName" /></td>
+                    <td width="180"><@s.property value="#dataResult.gene.description" /></td>
                     <td>
-                        <@s.if test="%{#dataResult.reporter.genBankAccession != '---'}">
+                        <@s.if test="%{#dataResult.gene.genBankAccession != '---'}">
                         <div class="s_ds_link">
-                            <a href="${genBankLink}${dataResult.reporter.genBankAccession}" target="_blank"><@s.property value="#dataResult.reporter.genBankAccession" /></a>
+                            <a href="${genBankLink}${dataResult.gene.genBankAccession}" target="_blank"><@s.property value="#dataResult.gene.genBankAccession" /></a>
                         </div>
                         </@s.if>
                         <@s.else>
-                           <@s.property value="#dataResult.reporter.genBankAccession" />
+                           <@s.property value="#dataResult.gene.genBankAccession" />
                         </@s.else>
                     </td>
                     <td>
-                        <@s.if test="%{#dataResult.reporter.ensembl != '---'}">
+                        <@s.if test="%{#dataResult.gene.ensembl != '---'}">
                         <div class="s_ds_link">
-                            <a href="${ensemblLink}${dataResult.reporter.ensembl}" target="_blank"><@s.property value="#dataResult.reporter.ensembl" /></a>
+                            <a href="${ensemblLink}${dataResult.gene.ensembl}" target="_blank"><@s.property value="#dataResult.gene.ensembl" /></a>
                         </div>
                         </@s.if>
                         <@s.else>
-                           <@s.property value="#dataResult.reporter.ensembl" />
+                           <@s.property value="#dataResult.gene.ensembl" />
                         </@s.else>
                     </td>
-                    <td><@s.property value="#dataResult.reporter.probeId" /></td>
+                    <td><@s.property value="#dataResult.probe.probeId" /></td>
                 </tr>
                </@s.iterator>
             </tbody>

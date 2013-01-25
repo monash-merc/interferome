@@ -31,7 +31,7 @@ package edu.monash.merc.repository;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Data;
-import edu.monash.merc.domain.Factorial;
+import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.GeneExpressionRecord;

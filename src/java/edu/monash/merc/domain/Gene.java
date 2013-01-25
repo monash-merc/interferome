@@ -48,7 +48,7 @@ import java.util.List;
 @Table(name = "gene")
 @org.hibernate.annotations.Table(appliesTo = "gene",
         indexes = {@Index(name = "idx_ensg_accession", columnNames = {"ensg_accession"}),
-                @Index(name = "idx_display_name", columnNames = {"display_name"}),
+                @Index(name = "idx_gene_name", columnNames = {"gene_name"}),
                 @Index(name = "idx_chromosome", columnNames = {"chromosome"}),
                 @Index(name = "idx_refseq_dna", columnNames = {"refseq_dna"}),
                 @Index(name = "idx_unigene", columnNames = {"unigene"}),
@@ -63,7 +63,7 @@ public class Gene extends Domain {
     private long id;
 
     @Basic
-    @Column(name = "display_name")
+    @Column(name = "gene_name")
     private String geneName;
 
     @Basic
@@ -248,12 +248,28 @@ public class Gene extends Domain {
         Gene gene = (Gene) o;
 
         if (id != gene.id) return false;
+        if (chromosome != null ? !chromosome.equals(gene.chromosome) : gene.chromosome != null) return false;
+        if (ensgAccession != null ? !ensgAccession.equals(gene.ensgAccession) : gene.ensgAccession != null)
+            return false;
+        if (entrezId != null ? !entrezId.equals(gene.entrezId) : gene.entrezId != null) return false;
+        if (genbankId != null ? !genbankId.equals(gene.genbankId) : gene.genbankId != null) return false;
+        if (geneName != null ? !geneName.equals(gene.geneName) : gene.geneName != null) return false;
+        if (refseq_dna != null ? !refseq_dna.equals(gene.refseq_dna) : gene.refseq_dna != null) return false;
+        if (unigene != null ? !unigene.equals(gene.unigene) : gene.unigene != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (geneName != null ? geneName.hashCode() : 0);
+        result = 31 * result + (ensgAccession != null ? ensgAccession.hashCode() : 0);
+        result = 31 * result + (chromosome != null ? chromosome.hashCode() : 0);
+        result = 31 * result + (refseq_dna != null ? refseq_dna.hashCode() : 0);
+        result = 31 * result + (unigene != null ? unigene.hashCode() : 0);
+        result = 31 * result + (genbankId != null ? genbankId.hashCode() : 0);
+        result = 31 * result + (entrezId != null ? entrezId.hashCode() : 0);
+        return result;
     }
 }

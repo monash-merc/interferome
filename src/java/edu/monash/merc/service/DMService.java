@@ -227,6 +227,10 @@ public interface DMService {
 
     public void importProbes(List<ProbeGeneBean> probeGeneBeans);
 
+    List<Probe> getProbeImportErrors();
+
+    List<String> getProbeImportErrorMessages();
+
     // TFSite
     public void saveTFSite(TFSite tfSite);
 
@@ -414,7 +418,4 @@ public interface DMService {
 
     void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
 
-    List<Probe> getProbeImportErrors();
-
-    List<String> getProbeImportErrorMessages();
 }
