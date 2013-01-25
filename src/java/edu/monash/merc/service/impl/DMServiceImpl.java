@@ -37,7 +37,6 @@ import edu.monash.merc.dto.*;
 import edu.monash.merc.exception.DCException;
 import edu.monash.merc.service.*;
 import edu.monash.merc.util.MercUtil;
-import edu.monash.merc.util.debug.Dbg;
 import edu.monash.merc.util.interferome.dataset.BaseDataset;
 import edu.monash.merc.util.interferome.dataset.ExpFactor;
 import edu.monash.merc.util.interferome.dataset.IFNTypeFactor;
@@ -46,6 +45,7 @@ import edu.monash.merc.util.probe.ImportProbeThread;
 import edu.monash.merc.util.reporter.ImportReporterThread;
 import edu.monash.merc.util.tfsite.ImportTFSiteThread;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -147,6 +147,7 @@ public class DMServiceImpl implements DMService {
 
     @Autowired
     private ProbeService probeService;
+    private Logger logger = Logger.getLogger("importProbe");  //this.getClass().getName()
 
     public void setProfileService(ProfileService profileService) {
         this.profileService = profileService;
@@ -1020,6 +1021,8 @@ public class DMServiceImpl implements DMService {
     //Probes
     @Override
     public void saveProbe(Probe probe) {
+        logger.debug("IN SAVE PROBE: "+probe.getProbeId());
+        logger.debug("IN SAVE PROBE: "+probe.getEnsemblId());
         this.probeService.saveProbe(probe);
     }
 
@@ -1058,20 +1061,26 @@ public class DMServiceImpl implements DMService {
 
                 // find out if the probe is already in the database
                 Probe existedProbe = this.getProbeByProbeId(probe.getProbeId());
-                Dbg.debug("PROBE ID: "+probe.getProbeId(), Dbg.Section.IMPORT_CSV);
+                logger.debug("PROBE ID: "+probe.getProbeId());
+
 
                 // set the species ID from the name
                 Species speciesN =this.getSpeciesByName(probe.getSpeciesName());
                 probe.setSpecies(speciesN);
+                logger.debug("PROBE SPECIES: "+probe.getSpecies().getSpeciesName());
 
                 // get the gene ID (many-to-many) - set it after including existing gene list
 
                 Gene gene = this.getGeneByEnsgAccession(probe.getEnsemblId());
+
+                // if there is no matching gene, log the error and skip this probe
                 if (gene != null) {
-                    Dbg.debug("PROBE MATCHED GENE: "+gene.getGeneName(), Dbg.Section.IMPORT_CSV);
-                    Dbg.debug("geneID: "+gene.getId(), Dbg.Section.IMPORT_CSV);
+                    logger.debug("PROBE MATCHED GENE: "+gene.getGeneName());
+                    logger.debug("geneID: "+gene.getId());
                 } else {
-                    Dbg.debug("GENE IS NULL", Dbg.Section.IMPORT_CSV);
+                    logger.debug("GENE IS NULL");
+                    importError(probe, "No matching gene in database");
+                    continue;
                 }
 
                 if (existedProbe != null) {
@@ -1093,13 +1102,16 @@ public class DMServiceImpl implements DMService {
                     //count how many probes have been updated
                     countUpdated++;
                 } else {
-                    probe = new Probe();
+                    //probe = new Probe();
 
                     ArrayList<Gene> geneList = new ArrayList<Gene>();
                     if (gene != null) {
+                        logger.debug("Adding gene to geneList");
                         geneList.add(gene);
                         probe.setGenes(geneList);
                     }
+
+
 
                     this.saveProbe(probe);
 
@@ -1107,13 +1119,36 @@ public class DMServiceImpl implements DMService {
                     countNew++;
                 }
             } else {
-                Dbg.error("No ID found for "+probe);
+                importError(probe, "Blank ID column");
             }
         }
         counter.setTotalUpdated(countUpdated);
         counter.setTotalNew(countNew);
         return counter;
     }
+
+    /**
+        Message the user through email that this probe can not be created, as the gene it references isn't in our
+        database.
+     */
+    private void importError(Probe probe, String msg) {
+        logger.warn("The following probe failed to import, with message '"+msg+"': " + probe.getProbeId());
+        importErrors.add(probe);
+        importErrorMessages.add(msg);
+    }
+
+    @Override
+    public List<Probe> getProbeImportErrors() {
+        return importErrors;
+    }
+
+    @Override
+    public List<String> getProbeImportErrorMessages(){
+        return importErrorMessages;
+    }
+
+    private List<Probe> importErrors = new ArrayList<Probe>();
+    private List<String> importErrorMessages = new ArrayList<String>() ;
 
     @Override
     public void importProbe(ProbeBean probeBean) {
@@ -1153,8 +1188,8 @@ public class DMServiceImpl implements DMService {
                 Gene gene = this.getGeneByEnsgAccession(ensgAc);
                 Species speciesN = this.getSpeciesByName(speciesName);
                 //probe.setSpecies(this.getSpeciesByName(probe.getSpeciesName()));
+                Probe probe = this.getProbeByProbeId(probeId);
                 if (gene != null) {
-                    Probe probe = this.getProbeByProbeId(probeId);
                     if (probe == null) {
                         probe = new Probe();
                         probe.setProbeId(probeId);
@@ -1181,6 +1216,9 @@ public class DMServiceImpl implements DMService {
                     } else {
                         this.mergeProbe(probe);
                     }
+                } else {
+                      // message user that the probe cannot be loaded
+                      importError(probe, "No matching gene in database");
                 }
             }
 

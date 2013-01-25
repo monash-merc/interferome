@@ -414,4 +414,7 @@ public interface DMService {
 
     void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
 
+    List<Probe> getProbeImportErrors();
+
+    List<String> getProbeImportErrorMessages();
 }

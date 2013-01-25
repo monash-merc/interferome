@@ -90,6 +90,7 @@ public class ImportProbeThread implements Runnable{
                     if (probes != null && probes.size() > 0) {
                         ProbCounter probeCounter = this.dmService.importAllProbes(probes);
                         eventMsg = genEventMsg(probeCounter);
+                        eventMsg += probeImportErrors();
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -113,6 +114,27 @@ public class ImportProbeThread implements Runnable{
                 logger.error("Another probes importing process working in progress");
             }
         }
+    }
+
+    /**
+     * @return    A error message string representing any probes that didn't import successfully, or the empty string
+     * if no errors occurred.
+     */
+    private String probeImportErrors() {
+        List<Probe> failedProbes = dmService.getProbeImportErrors();
+        List<String> failureMessages = dmService.getProbeImportErrorMessages();
+        String err = "";
+        if (failedProbes.size() > 0) {
+            err = "The following probes failed to import: \n\n";
+            err += "ProbeID, EnsemblId, Species, Reason for failure";
+            for (int i=0; i<failedProbes.size(); i++){
+                Probe failure = failedProbes.get(i);
+                String failureMessage = failureMessages.get(i);
+                err += "\n"+failure.getProbeId() +", "+failure.getEnsemblId()+", "+failure.getSpeciesName()+", "+failureMessage;
+            }
+            err += "\n";
+        }
+        return err;
     }
 
     private boolean registerProcess(long processId) {
