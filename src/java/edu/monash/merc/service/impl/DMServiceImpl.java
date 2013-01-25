@@ -1402,7 +1402,7 @@ public class DMServiceImpl implements DMService {
     }
 
     @Override
-    public Dataset importExpDataset(Experiment experiment, BaseDataset txtDataset) {
+    public String importExpDataset(Experiment experiment, BaseDataset txtDataset) {
 
         long starttime = System.currentTimeMillis();
 
@@ -1498,22 +1498,23 @@ public class DMServiceImpl implements DMService {
         String[] probes = txtDataset.getProbes();
         String[] data_arr = txtDataset.getData();
 
-        // First, check that all the probes are present in the database.
-        // If any are missing, abort and inform user of list of missing probes.
-        List<String> probesNotFound = probesNotInDatabase(probes);
-        if (!probesNotFound.isEmpty())  {
-            String missingProbes = "\n";
-            for (String probeId : probesNotFound){
-                missingProbes += probeId+", ";
-            }
-            throw new DCException("The following "+probesNotFound.size()+" probes were not found in the database: " + missingProbes);
-        }
-
         List<Data> dataList = new ArrayList<Data>();
+        String missingProbes = "";
+        int successCount = 0;
+        int failCount = 0;
         for (int i = 0; i < data_arr.length; i++) {
             String data_val = data_arr[i];
             String probeId = probes[i];
+
             Probe probe = this.getProbeByProbeId(probeId);
+            if (probe == null){
+                failCount++;
+                missingProbes += probeId + ", ";
+                continue;
+            } else {
+                successCount++;
+            }
+
             Data data = new Data();
             data.setDataset(dataset);
             data.setProbe(probe);
@@ -1521,28 +1522,21 @@ public class DMServiceImpl implements DMService {
             dataList.add(data);
         }
         dataset.setData(dataList);
-        //save dataset, and save the all data as well
+        //save dataset, and save the all data as we
+        logger.info("About to save dataset. Datalist size: " + dataList.size());
+        logger.debug("dataset: "+dataList.get(0).getDataset());
+        logger.debug("probe: "+dataList.get(0).getProbe());
+        logger.debug("value: "+dataList.get(0).getValue());
         this.saveDataset(dataset);
-        long endtime = System.currentTimeMillis();
-        return dataset;
-    }
 
-    /**
-     * Returns a list of any probeIds in the argument that don't match any
-     * probe in the database
-     *
-     * @param probeIds Probe IDs to check
-     */
-    private List<String> probesNotInDatabase(String[] probeIds) {
-        List<String> missingProbes = new ArrayList<String>();
-        Probe probe;
-        for (String probeId : probeIds) {
-            probe = this.getProbeByProbeId(probeId);
-            if (probe == null) {
-                missingProbes.add(probeId);
-            }
+        // If any probes were not found, throw error containing list of missing probes and success count.
+        String msg = "" ;
+        if (failCount > 0)  {
+            msg = " - well, " +successCount + " out of "+data_arr.length+" data units were imported successfully, but the following "+failCount+" probes were not found in the database: " + missingProbes;
         }
-        return missingProbes;
+
+        long endtime = System.currentTimeMillis();
+        return msg;
     }
 
     @Override

@@ -277,7 +277,7 @@ public interface DMService {
 
     public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
 
-    public Dataset importExpDataset(Experiment experiment, BaseDataset txtDataset);
+    public String importExpDataset(Experiment experiment, BaseDataset txtDataset);
 
     public void saveFactorValue(ExperimentFactorValue efv);
 

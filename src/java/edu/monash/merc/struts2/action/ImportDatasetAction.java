@@ -140,11 +140,15 @@ public class ImportDatasetAction extends DMBaseAction {
             List<String> dataLines = DCFileUtils.readLines(upload);
             BaseDataset txtDataset = new TxtDataset(uploadFileName, dataLines);
             //save the file
-            this.dmService.importExpDataset(experiment, txtDataset);
+            String resultMsg = this.dmService.importExpDataset(experiment, txtDataset);
 
-            //return success message
-            responseData.put("success", "true");
-            responseData.put("message", getText("dataset.import.success.message", new String[]{uploadFileName}));
+            if (resultMsg.contains("not found")){
+                responseData.put("success", "false");
+            } else {
+                responseData.put("success", "true");
+            }
+
+            responseData.put("message", getText("dataset.import.success.message", new String[]{uploadFileName})+resultMsg);
 
             //record the audit info
             recordAuditEventForImport(experiment, uploadFileName, user);
