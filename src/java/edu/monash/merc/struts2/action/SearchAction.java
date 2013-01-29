@@ -1343,7 +1343,7 @@ public class SearchAction extends DMBaseAction {
             //write empty line
             csvWriter.writeNext(new String[]{""});
             //write a search results data column headers
-            csvWriter.writeNext(new String[]{"Dataset ID", "Fold Change", "Inteferome Type", "Treatment Time", "Gene Symbol", "Gene Description", "GenBank Accession", "Ensembl ID", "Probe ID"});
+            csvWriter.writeNext(new String[]{"Dataset ID", "Fold Change", "Inteferome Type", "Treatment Time", "Gene Name", "Description", "GenBank Accession", "Ensembl ID", "Probe ID"});
             List<Data> dataList = dPagination.getPageResults();
             for (Data data : dataList) {
                 //get dataset
@@ -1974,7 +1974,7 @@ public class SearchAction extends DMBaseAction {
             String genes = searchBean.getGenes();
             if (StringUtils.isNotBlank(genes)) {
                 String newDelimGenes = MercUtil.replaceAllDelimsByNewDelim(genes, SEMICOLON, new String[]{",", "\t", "\n"});
-                csvWriter.writeNext(new String[]{"Gene Symbol List", newDelimGenes});
+                csvWriter.writeNext(new String[]{"Gene Name List", newDelimGenes});
             }
             //gen bank ids
             String genBanks = searchBean.getGenBanks();
@@ -2731,7 +2731,7 @@ public class SearchAction extends DMBaseAction {
         orderByMap.put("foldchange", "fold change");
         orderByMap.put("ifntype", "interferon type");
         orderByMap.put("ttime", "treatment time");
-        orderByMap.put("genesymbol", "gene symbol");
+        orderByMap.put("geneName", "geneName");
         orderByMap.put("genbank", "genbank id");
         orderByMap.put("ensemblid", "ensembl id");
         orderByMap.put("probeid", "probe id");
@@ -2741,7 +2741,7 @@ public class SearchAction extends DMBaseAction {
     protected void initGenePagination() {
         // orderby values
         orderByMap.clear();
-        orderByMap.put("geneName", "gene symbol");
+        orderByMap.put("geneName", "geneName");
         orderByMap.put("ensgAccession", "ensembl id");
     }
 

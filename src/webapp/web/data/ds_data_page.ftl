@@ -32,26 +32,26 @@
                     <td><@s.property value="#dataResult.value" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.ifnType.typeName" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.treatmentTime" /></td>
-                    <td><@s.property value="#dataResult.gene.geneName" /></td>
+                    <td><@s.property value="#dataResult.gene.geneNames" /></td>
                     <td width="180"><@s.property value="#dataResult.gene.description" /></td>
                     <td>
-                        <@s.if test="%{#dataResult.gene.genBankAccession != '---'}">
+                        <@s.if test="%{#dataResult.gene.genbankId != '---'}">
                         <div class="s_ds_link">
-                            <a href="${genBankLink}${dataResult.gene.genBankAccession}" target="_blank"><@s.property value="#dataResult.gene.genBankAccession" /></a>
+                            <a href="${genBankLink}${dataResult.gene.genbankId}" target="_blank"><@s.property value="#dataResult.gene.genbankId" /></a>
                         </div>
                         </@s.if>
                         <@s.else>
-                           <@s.property value="#dataResult.gene.genBankAccession" />
+                           <@s.property value="#dataResult.gene.genbankId" />
                         </@s.else>
                     </td>
                     <td>
-                        <@s.if test="%{#dataResult.gene.ensembl != '---'}">
+                        <@s.if test="%{#dataResult.gene.ensgAccession != '---'}">
                         <div class="s_ds_link">
-                            <a href="${ensemblLink}${dataResult.gene.ensembl}" target="_blank"><@s.property value="#dataResult.gene.ensembl" /></a>
+                            <a href="${ensemblLink}${dataResult.gene.ensgAccession}" target="_blank"><@s.property value="#dataResult.gene.ensgAccession" /></a>
                         </div>
                         </@s.if>
                         <@s.else>
-                           <@s.property value="#dataResult.gene.ensembl" />
+                           <@s.property value="#dataResult.gene.ensgAccession" />
                         </@s.else>
                     </td>
                     <td><@s.property value="#dataResult.probe.probeId" /></td>

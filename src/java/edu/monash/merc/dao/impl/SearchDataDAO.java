@@ -758,12 +758,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count data query
         StringBuilder countQL = new StringBuilder();
-        String countBaseHQL = "SELECT count(d) FROM Data d INNER JOIN d.probe p LEFT JOIN d.dataset ds";
+        String countBaseHQL = "SELECT count(d) FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds";
         countQL.append(countBaseHQL);
 
         //data pagination query
         StringBuilder dataQL = new StringBuilder();
-        String dataBaseHQL = "SELECT g, d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        String dataBaseHQL = "SELECT d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         dataQL.append(dataBaseHQL);
 
         if (orConds.size() > 0) {
@@ -1016,11 +1016,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count data query
         StringBuilder countQL = new StringBuilder();
-        String countBase = "SELECT count(d) FROM Data d INNER JOIN d.probe p LEFT JOIN d.dataset ds";
+        String countBase = "SELECT count(d) FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds";
         countQL.append(countBase);
         //data pagination query
         StringBuilder dataQL = new StringBuilder();
-        String pQueryBase = "SELECT g, d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        String pQueryBase = "SELECT d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         dataQL.append(pQueryBase);
 
         if (orConds.size() > 0) {
@@ -1185,7 +1185,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count data query
         StringBuilder countQL = new StringBuilder();
-        String countBaseHQL = "SELECT count(distinct p.probeId) FROM Data d INNER JOIN d.probe p LEFT JOIN d.dataset ds";
+        String countBaseHQL = "SELECT count(distinct p.probeId) FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds";
         countQL.append(countBaseHQL);
 
         //probe pagination query
@@ -1407,7 +1407,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //count report DISTINCT query
         StringBuilder countQL = new StringBuilder();
-        String countBase = "SELECT count(distinct p.probeId) FROM Data d INNER JOIN d.probe p LEFT JOIN d.dataset ds";
+        String countBase = "SELECT count(distinct p.probeId) FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds";
         countQL.append(countBase);
 
         //probe pagination query
@@ -1578,7 +1578,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             return " ORDER BY ds.treatmentTime " + sortBy;
         }
 
-        if (StringUtils.equalsIgnoreCase(orderBy, "geneName")) {
+        if (StringUtils.equalsIgnoreCase(orderBy, "geneNames")) {
             return " ORDER BY g.geneName " + sortBy;
         }
 
