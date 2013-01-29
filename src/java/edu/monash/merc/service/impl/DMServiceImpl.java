@@ -1514,12 +1514,27 @@ public class DMServiceImpl implements DMService {
             } else {
                 successCount++;
             }
+//
+//        //probe.getGenes();
+//
+//
+//        List<Gene> geneTab = this.getGenesByProbeId(probeId);
+//
+//        for (Gene genes : geneTab) {
+//        String geneName = genes.getGeneName();
+//        String geneDesc = genes.getDescription();
+//        String genBankId = genes.getGenbankId();
+//        String ensemblId = genes.getEnsgAccession();
+//        }
+//        probe.setGenes(geneTab);
+//
 
             Data data = new Data();
             data.setDataset(dataset);
             data.setProbe(probe);
             data.setValue(Double.valueOf(data_val));
             dataList.add(data);
+
         }
         dataset.setData(dataList);
         //save dataset, and save the all data as we

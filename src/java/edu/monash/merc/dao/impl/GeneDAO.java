@@ -118,7 +118,7 @@ public class GeneDAO extends HibernateGenericDAO<Gene> implements IGeneRepositor
         Criteria criteria = this.session().createCriteria(this.persistClass);
         // create the alias for genes
         Criteria geneCrit = criteria.createAlias("probe", "probes");
-        geneCrit.add(Restrictions.eq("probes.probeId", probeId));
+        geneCrit.add(Restrictions.eq("probe.probeId", probeId));
         return criteria.list();
     }
 }

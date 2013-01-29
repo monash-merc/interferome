@@ -31,6 +31,7 @@ package edu.monash.merc.dao.impl;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.Ontology;
 import edu.monash.merc.domain.TissueExpression;

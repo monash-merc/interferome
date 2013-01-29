@@ -60,8 +60,8 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
     @SuppressWarnings("unchecked")
     @Override
     public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
-        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.probes prob INNER JOIN prob.genes g LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
-    String dataHql = "SELECT d FROM Data d INNER JOIN d.probes prob INNER JOIN prob.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType WHERE ds.id =:dsId";
+        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.probe prob INNER JOIN prob.genes g LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
+    String dataHql = "SELECT d FROM Data d INNER JOIN d.probe prob INNER JOIN prob.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType WHERE ds.id =:dsId";
         Query countQuery = this.session().createQuery(countHql);
         countQuery.setParameter("dsId", dsId);
         int total = ((Long) countQuery.uniqueResult()).intValue();

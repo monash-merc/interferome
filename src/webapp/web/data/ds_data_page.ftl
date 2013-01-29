@@ -32,7 +32,7 @@
                     <td><@s.property value="#dataResult.value" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.ifnType.typeName" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.treatmentTime" /></td>
-                    <td><@s.property value="#dataResult.gene.geneNames" /></td>
+                    <td><@s.property value="#dataResult.gene.geneName" /></td>
                     <td width="180"><@s.property value="#dataResult.gene.description" /></td>
                     <td>
                         <@s.if test="%{#dataResult.gene.genbankId != '---'}">

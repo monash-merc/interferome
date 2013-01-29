@@ -96,7 +96,7 @@ public class DatasetAction extends DMBaseAction {
         // orderby values
         orderByMap.put("dataId", "id");
         orderByMap.put("foldchange", "fold change");
-        orderByMap.put("genesymbol", "gene symbol");
+        orderByMap.put("genename", "gene name");
         orderByMap.put("genbank", "genbank id");
         orderByMap.put("ensemblid", "ensembl id");
         orderByMap.put("probeid", "probe id");
