@@ -32,6 +32,11 @@ import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Dataset;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.Probe;
+import org.hibernate.Query;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -54,4 +59,21 @@ public class SearchResultRow {
         this.gene = g;
     }
 
+    /**
+     * Produces a list of search result rows from an appropriate Hibernate query.
+     *
+     * The query should return data, dataset, probe and gene in order for each row.
+     *
+     * @param query
+     * @return
+     */
+    public static List<SearchResultRow> listFromQuery(Query query) {
+        ArrayList<SearchResultRow> searchResultRowArrayList = new ArrayList<SearchResultRow>();
+        Iterator rows = query.iterate();
+        while (rows.hasNext()) {
+            Object[] row = (Object[]) rows.next();
+            searchResultRowArrayList.add(new SearchResultRow((Data) row[0], (Dataset) row[1], (Probe) row[2], (Gene) row[3]));
+        }
+        return searchResultRowArrayList;
+    }
 }
