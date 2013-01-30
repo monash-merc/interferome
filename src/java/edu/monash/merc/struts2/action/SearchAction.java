@@ -30,6 +30,7 @@ package edu.monash.merc.struts2.action;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.GeneExpressionRecord;
@@ -152,7 +153,7 @@ public class SearchAction extends DMBaseAction {
     /**
      * search result dataset
      */
-    private Pagination<Data> dataPagination;
+    private Pagination<SearchResultRow> dataPagination;
 
     private String viewDsAct;
 
@@ -474,7 +475,6 @@ public class SearchAction extends DMBaseAction {
             //set the searched flag as true
             searched = true;
             searchType = DATA_TYPE;
-            List<Data> dataList = dataPagination.getPageResults();
 
             //sub type post process
             subTypePostProcess();
@@ -754,7 +754,9 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             dataPagination = this.searchDataService.search(searchBean, 1, maxRecords, orderBy, orderByType);
+            System.out.println("dataPagination: "+dataPagination);
             this.csvInputStream = createCSVFile(searchBean, dataPagination);
+            System.out.println("file created");
             String csvFileName = MercUtil.genCurrentTimestamp();
 
             this.contentDisposition = "attachment;filename=\"" + csvFileName + "_DataSearchResults.txt" + "\"";
@@ -1164,7 +1166,7 @@ public class SearchAction extends DMBaseAction {
         return true;
     }
 
-    private InputStream createCSVFile(SearchBean searchBean, Pagination<Data> dPagination) {
+    private InputStream createCSVFile(SearchBean searchBean, Pagination<SearchResultRow> dPagination) {
         CSVWriter csvWriter = null;
         try {
             ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
@@ -1344,17 +1346,17 @@ public class SearchAction extends DMBaseAction {
             csvWriter.writeNext(new String[]{""});
             //write a search results data column headers
             csvWriter.writeNext(new String[]{"Dataset ID", "Fold Change", "Inteferome Type", "Treatment Time", "Gene Name", "Description", "GenBank Accession", "Ensembl ID", "Probe ID"});
-            List<Data> dataList = dPagination.getPageResults();
-            for (Data data : dataList) {
+            List<SearchResultRow> dataList = dPagination.getPageResults();
+            for (SearchResultRow searchResultRow : dataList) {
                 //get dataset
-                Dataset dataset = data.getDataset();
+                Dataset dataset = searchResultRow.dataset;
                 long datasetId = dataset.getId();
-                double foldChange = data.getValue();
+                double foldChange = searchResultRow.data.getValue();
                 String searchIfnType = dataset.getIfnType().getTypeName();
                 double treatmentTime = dataset.getTreatmentTime();
 
                 //get Probe /reporter
-                Probe probe = data.getProbe();
+                Probe probe = searchResultRow.probe;
                 String probeId = probe.getProbeId();
                 //get Gene Aliases
                 List<Gene> geneList = probe.getGenes();
@@ -2916,11 +2918,11 @@ public class SearchAction extends DMBaseAction {
         this.searched = searched;
     }
 
-    public Pagination<Data> getDataPagination() {
+    public Pagination<SearchResultRow> getDataPagination() {
         return dataPagination;
     }
 
-    public void setDataPagination(Pagination<Data> dataPagination) {
+    public void setDataPagination(Pagination<SearchResultRow> dataPagination) {
         this.dataPagination = dataPagination;
     }
 

@@ -26,43 +26,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.service;
+package edu.monash.merc.common.results;
 
-import edu.monash.merc.common.page.Pagination;
-import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Dataset;
 import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.dto.SearchBean;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import edu.monash.merc.domain.Probe;
 
 /**
- * SearchDataService Service Interface
- *
- * @author Simon Yu - Xiaoming.Yu@monash.edu
- * @version 2.0
+ * Created with IntelliJ IDEA.
+ * User: alex
+ * Date: 1/29/13
+ * Time: 2:33 PM
+ * To change this template use File | Settings | File Templates.
  */
-public interface SearchDataService {
-    Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+public class SearchResultRow {
 
-    Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    public Data data;
+    public Dataset dataset;
+    public Probe probe;
+    public Gene gene;
 
-    Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
-
-    //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
-    Object[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    public SearchResultRow (Data d, Dataset ds, Probe p, Gene g){
+        this.data = d;
+        this.dataset = ds;
+        this.probe = p;
+        this.gene = g;
+    }
 
 }

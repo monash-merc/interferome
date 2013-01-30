@@ -29,8 +29,8 @@
 package edu.monash.merc.service.impl;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.dao.impl.SearchDataDAO;
-import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.SearchBean;
@@ -40,8 +40,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -63,7 +61,7 @@ public class SearchDataServiceImpl implements SearchDataService {
     }
 
     @Override
-    public Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         return this.searchDataDao.search(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
     }
 

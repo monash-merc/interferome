@@ -28,13 +28,10 @@
 
 package edu.monash.merc.dao.impl;
 
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
-import edu.monash.merc.domain.Data;
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.Ontology;
-import edu.monash.merc.domain.TissueExpression;
+import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -263,7 +260,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     }
 
     @Override
-    public Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         boolean noneDsQuery = searchBean.isNoneDsCondition();
         //no dataset level search condition, then just search data only, otherwise we will search data based on dataset conditions
         if (noneDsQuery) {
@@ -713,14 +710,14 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     }
 
     @SuppressWarnings("unchecked")
-    private Pagination<Data> searchDataWithDs(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    private Pagination<SearchResultRow> searchDataWithDs(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         //query the dataset first
         List<Long> foundDsIds = queryDatasets(searchBean);
         // System.out.println("============> ***** found dataset id list size: " + foundDsIds.size());
 
         //just return if no dataset found
         if (foundDsIds.size() == 0) {
-            return new Pagination<Data>(startPageNo, recordPerPage, 0);
+            return new Pagination<SearchResultRow>(startPageNo, recordPerPage, 0);
         }
         //start to search data based on the found dataset list
         String genes = searchBean.getGenes();
@@ -764,7 +761,8 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //data pagination query
         StringBuilder dataQL = new StringBuilder();
-        String dataBaseHQL = "SELECT d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        // TODO  CORRECT THIS QUERY
+        String dataBaseHQL = "SELECT g, d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         dataQL.append(dataBaseHQL);
 
         if (orConds.size() > 0) {
@@ -925,12 +923,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         int total = ((Long) dataCountQuery.uniqueResult()).intValue();
         if (total == 0) {
-            return new Pagination<Data>(startPageNo, recordPerPage, total);
+            return new Pagination<SearchResultRow>(startPageNo, recordPerPage, total);
         }
-        Pagination<Data> dataPagination = new Pagination<Data>(startPageNo, recordPerPage, total);
+        Pagination<SearchResultRow> dataPagination = new Pagination<SearchResultRow>(startPageNo, recordPerPage, total);
         dataQuery.setFirstResult(dataPagination.getFirstResult());
         dataQuery.setMaxResults(dataPagination.getSizePerPage());
-        List<Data> dataList = dataQuery.list();
+        List<SearchResultRow> dataList = dataQuery.list();
         dataPagination.setPageResults(dataList);
         // System.out.println("===========> ds level found total data size: " + dataPagination.getTotalRecords());
         //System.out.println("===========> ds level found total data pages: " + dataPagination.getTotalPages());
@@ -981,7 +979,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
 
     @SuppressWarnings("unchecked")
-    private Pagination<Data> searchDataOnly(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    private Pagination<SearchResultRow> searchDataOnly(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         String genes = searchBean.getGenes();
         String genBanks = searchBean.getGenBanks();
         String ensembls = searchBean.getEnsembls();
@@ -1021,7 +1019,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         countQL.append(countBase);
         //data pagination query
         StringBuilder dataQL = new StringBuilder();
-        String pQueryBase = "SELECT d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+        String pQueryBase = "SELECT  d, ds, p, g FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
         dataQL.append(pQueryBase);
 
         if (orConds.size() > 0) {
@@ -1071,6 +1069,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if (countQLStr.indexOf("(:geneNames1)") != -1) {
                 dataCountQuery.setParameterList("geneNames1", searchGenes);
             }
+
             if (dataQLStr.indexOf("(:geneNames1)") != -1) {
                 dataQuery.setParameterList("geneNames1", searchGenes);
             }
@@ -1124,13 +1123,27 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         int total = ((Long) dataCountQuery.uniqueResult()).intValue();
         if (total == 0) {
-            return new Pagination<Data>(startPageNo, recordPerPage, total);
+            return new Pagination<SearchResultRow>(startPageNo, recordPerPage, total);
         }
-        Pagination<Data> dataPagination = new Pagination<Data>(startPageNo, recordPerPage, total);
+        Pagination<SearchResultRow> dataPagination = new Pagination<SearchResultRow>(startPageNo, recordPerPage, total);
+        //Pagination<Data> dataPagination = new Pagination<Data>(startPageNo, recordPerPage, total);
+
         dataQuery.setFirstResult(dataPagination.getFirstResult());
         dataQuery.setMaxResults(dataPagination.getSizePerPage());
-        List<Data> dataList = dataQuery.list();
-        dataPagination.setPageResults(dataList);
+        //System.out.println("LIST 0: "+((Gene) dataQuery.list().get(0)).getGeneName());
+        //System.out.println("LIST 1: "+dataQuery.list().get(1).getClass());
+
+        ArrayList<SearchResultRow> searchResultRowArrayList = new ArrayList<SearchResultRow>();
+        Iterator rows = dataQuery.iterate();
+        while (rows.hasNext()) {
+            Object[] row = (Object[]) rows.next();
+            searchResultRowArrayList.add(new SearchResultRow((Data) row[0], (Dataset) row[1], (Probe) row[2], (Gene) row[3]));
+        }
+
+        dataPagination.setPageResults(searchResultRowArrayList);
+
+        //List<Data> dataList = dataQuery.list();
+        //dataPagination.setPageResults(dataList);
         // System.out.println("===========> data only query found total data size: " + dataPagination.getTotalRecords());
         // System.out.println("===========>  data only query found total data pages: " + dataPagination.getTotalPages());
         return dataPagination;
@@ -1579,7 +1592,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             return " ORDER BY ds.treatmentTime " + sortBy;
         }
 
-        if (StringUtils.equalsIgnoreCase(orderBy, "geneNames")) {
+        if (StringUtils.equalsIgnoreCase(orderBy, "geneName")) {
             return " ORDER BY g.geneName " + sortBy;
         }
 

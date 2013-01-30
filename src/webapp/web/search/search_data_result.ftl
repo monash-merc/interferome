@@ -28,8 +28,8 @@
             <td align="center">FoldChange</td>
             <td align="center">Interferon Type</td>
             <td align="center">Treatment Time</td>
-            <td align="center">Gene Name</td>
-            <td align="center" width="180">Description</td>
+            <td align="center">Gene Symbol</td>
+            <td align="center" width="180">Gene Description</td>
             <td align="center">GenBank ID</td>
             <td align="center">Ensembl ID</td>
             <td align="center">Probe ID</td>
@@ -43,7 +43,7 @@
                         href="${base}/${viewDsAct}?experiment.id=<@s.property value='#dataResult.dataset.experiment.id' />&dataset.id=<@s.property value='#dataResult.dataset.id' />"><@s.property value="#dataResult.dataset.id" /></a>
                 </div>
             </td>
-            <td><@s.property value="#dataResult.value" /></td>
+            <td><@s.property value="#dataResult.data.value" /></td>
             <td align="center"><@s.property value="#dataResult.dataset.ifnType.typeName" /></td>
             <td align="center"><@s.property value="#dataResult.dataset.treatmentTime" /></td>
             <td><@s.property value="#dataResult.gene.geneName" /></td>
@@ -51,7 +51,7 @@
             <td>
                 <@s.if test="%{#dataResult.gene.genbankId != '---'}">
                     <div class="s_ds_link">
-                        <a href="${geneBankLink}${dataResult.gene.genbankId}"
+                        <a href="${geneBankLink}%{dataResult.gene.genbankId}"
                            target="_blank"><@s.property value="#dataResult.gene.genbankId" /></a>
                     </div>
                 </@s.if>
@@ -62,7 +62,7 @@
             <td>
                 <@s.if test="%{#dataResult.gene.ensgAccession != '---'}">
                     <div class="s_ds_link">
-                        <a href="${ensemblLink}${dataResult.gene.ensgAccession}"
+                        <a href="${ensemblLink}%{dataResult.gene.ensgAccession}"
                            target="_blank"><@s.property value="#dataResult.gene.ensgAccession" /></a>
                     </div>
                 </@s.if>
