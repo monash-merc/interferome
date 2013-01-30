@@ -761,8 +761,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //data pagination query
         StringBuilder dataQL = new StringBuilder();
-        // TODO  CORRECT THIS QUERY
-        String dataBaseHQL = "SELECT g, d FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+
+        String dataBaseHQL = "SELECT  d, ds, p, g FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType";
+
         dataQL.append(dataBaseHQL);
 
         if (orConds.size() > 0) {
@@ -928,8 +929,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         Pagination<SearchResultRow> dataPagination = new Pagination<SearchResultRow>(startPageNo, recordPerPage, total);
         dataQuery.setFirstResult(dataPagination.getFirstResult());
         dataQuery.setMaxResults(dataPagination.getSizePerPage());
-        List<SearchResultRow> dataList = dataQuery.list();
-        dataPagination.setPageResults(dataList);
+
+        dataPagination.setPageResults(SearchResultRow.listFromQuery(dataQuery));
+
         // System.out.println("===========> ds level found total data size: " + dataPagination.getTotalRecords());
         //System.out.println("===========> ds level found total data pages: " + dataPagination.getTotalPages());
         return dataPagination;
@@ -1126,24 +1128,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             return new Pagination<SearchResultRow>(startPageNo, recordPerPage, total);
         }
         Pagination<SearchResultRow> dataPagination = new Pagination<SearchResultRow>(startPageNo, recordPerPage, total);
-        //Pagination<Data> dataPagination = new Pagination<Data>(startPageNo, recordPerPage, total);
 
         dataQuery.setFirstResult(dataPagination.getFirstResult());
         dataQuery.setMaxResults(dataPagination.getSizePerPage());
-        //System.out.println("LIST 0: "+((Gene) dataQuery.list().get(0)).getGeneName());
-        //System.out.println("LIST 1: "+dataQuery.list().get(1).getClass());
 
-        ArrayList<SearchResultRow> searchResultRowArrayList = new ArrayList<SearchResultRow>();
-        Iterator rows = dataQuery.iterate();
-        while (rows.hasNext()) {
-            Object[] row = (Object[]) rows.next();
-            searchResultRowArrayList.add(new SearchResultRow((Data) row[0], (Dataset) row[1], (Probe) row[2], (Gene) row[3]));
-        }
+        dataPagination.setPageResults(SearchResultRow.listFromQuery(dataQuery));
 
-        dataPagination.setPageResults(searchResultRowArrayList);
-
-        //List<Data> dataList = dataQuery.list();
-        //dataPagination.setPageResults(dataList);
         // System.out.println("===========> data only query found total data size: " + dataPagination.getTotalRecords());
         // System.out.println("===========>  data only query found total data pages: " + dataPagination.getTotalPages());
         return dataPagination;
