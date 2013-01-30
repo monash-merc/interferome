@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
@@ -1171,6 +1172,9 @@ public class SearchAction extends DMBaseAction {
         try {
             ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
             csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
+
+            System.out.println("Ready to write CSV");
+
             //write the conditions
             csvWriter.writeNext(new String[]{"Search Conditions"});
             //write new empty line
@@ -1346,6 +1350,11 @@ public class SearchAction extends DMBaseAction {
             csvWriter.writeNext(new String[]{""});
             //write a search results data column headers
             csvWriter.writeNext(new String[]{"Dataset ID", "Fold Change", "Inteferome Type", "Treatment Time", "Gene Name", "Description", "GenBank Accession", "Ensembl ID", "Probe ID"});
+
+            System.out.println("Headers done, ready to print some rows!");
+
+
+
             List<SearchResultRow> dataList = dPagination.getPageResults();
             for (SearchResultRow searchResultRow : dataList) {
                 //get dataset
@@ -1355,20 +1364,42 @@ public class SearchAction extends DMBaseAction {
                 String searchIfnType = dataset.getIfnType().getTypeName();
                 double treatmentTime = dataset.getTreatmentTime();
 
+                System.out.println("got dataset...");
                 //get Probe /reporter
                 Probe probe = searchResultRow.probe;
                 String probeId = probe.getProbeId();
+
+                System.out.println("got probe...");
+                Gene gene = searchResultRow.gene;
+                System.out.println("got gene ...");
+
+
+                /*
                 //get Gene Aliases
                 List<Gene> geneList = probe.getGenes();
+                System.out.println("got genes method 2...");
+
+
+                // why a loop?
                 for (Gene gene : geneList) {
+                    System.out.println("Line 0");
+                    String geneName = gene.getGeneName();
+                    System.out.println("Line 1");
+                    String geneDesc = gene.getDescription();
+                    System.out.println("Line 2");
+                    String genBankId = gene.getGenbankId();
+                    System.out.println("Line 3");
+                    String ensemblId = gene.getEnsgAccession();
+                    System.out.println("Line 4");
+
+                    csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneName, geneDesc, genBankId, ensemblId, probeId});
+                }//write the csv into OutputStream
+                */
                 String geneName = gene.getGeneName();
                 String geneDesc = gene.getDescription();
                 String genBankId = gene.getGenbankId();
                 String ensemblId = gene.getEnsgAccession();
-
-                csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneName, geneDesc, genBankId, ensemblId, probeId});
-                }//write the csv into OutputStream
-               //csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneAliasTemp, geneDesc, genBankId, ensemblId, probeId});
+               csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneName, geneDesc, genBankId, ensemblId, probeId});
             }
             //flush out
             csvWriter.flush();
