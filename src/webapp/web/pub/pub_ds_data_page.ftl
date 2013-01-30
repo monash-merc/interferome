@@ -28,8 +28,8 @@
             <tbody>
                 <@s.iterator status="dataStat" value="dataPagination.pageResults" id="dataResult" >
                 <tr>
-                    <td align="center"><div class="s_ds_link"><@s.property value="#dataResult.id" /></div></td>
-                    <td><@s.property value="#dataResult.value" /></td>
+                    <td align="center"><div class="s_ds_link"><@s.property value="#dataResult.data.id" /></div></td>
+                    <td><@s.property value="#dataResult.data.value" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.ifnType.typeName" /></td>
                     <td align="center"><@s.property value="#dataResult.dataset.treatmentTime" /></td>
                     <td><@s.property value="#dataResult.gene.geneName" /></td>
@@ -37,7 +37,7 @@
                     <td>
                         <@s.if test="%{#dataResult.gene.genbankId != '---'}">
                         <div class="s_ds_link">
-                            <a href="${genBankLink}${dataResult.gene.genbankId}" target="_blank"><@s.property value="#dataResult.gene.genbankId" /></a>
+                            <a href="${genBankLink}<@s.property value="#dataResult.gene.genbankId" />" target="_blank"><@s.property value="#dataResult.gene.genbankId" /></a>
                         </div>
                         </@s.if>
                         <@s.else>
@@ -47,7 +47,7 @@
                     <td>
                         <@s.if test="%{#dataResult.gene.ensgAccession != '---'}">
                         <div class="s_ds_link">
-                            <a href="${ensemblLink}${dataResult.gene.ensgAccession}" target="_blank"><@s.property value="#dataResult.gene.ensgAccession" /></a>
+                            <a href="${ensemblLink}<@s.property value="#dataResult.gene.ensgAccession" />" target="_blank"><@s.property value="#dataResult.gene.ensgAccession" /></a>
                         </div>
                         </@s.if>
                         <@s.else>

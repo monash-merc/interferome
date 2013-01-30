@@ -302,9 +302,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
          //if(searchCount < gbCount)  searchCount = gbCount;
        // }
 
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             //  String geneBaseHQL = "SELECT g FROM gene g INNER JOIN probe_gene pb ON g.id = pb.gene_id  INNER JOIN probe p on p.id = pb.probe_id " +
@@ -346,9 +346,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {
@@ -364,9 +364,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) AND g.ensgAccession like 'ENSG' GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
@@ -384,8 +384,8 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public Integer[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-        List<String> probes = uniqueProbesPages.getPageResults();
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        List<Probe> probes = uniqueProbesPages.getPageResults();
         //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
         Integer[] types = {0, 0, 0, 0, 0, 0, 0};
         if (probes.size() > 0) {
@@ -519,9 +519,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) ORDER BY g.chromosome";
@@ -537,9 +537,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         ArrayList<List<Object[]>> goHash = new ArrayList<List<Object[]>>();
         if (probes.size() > 0) {
@@ -681,9 +681,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        Pagination<String> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
+        Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
-        List<String> probes = uniqueProbesPages.getPageResults();
+        List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
             //Search Cellular
@@ -699,7 +699,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
 
     @Override
-    public Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         boolean noneDsQuery = searchBean.isNoneDsCondition();
         //no dataset level search condition, then just search data level only, otherwise we will search probe based on both data and dataset conditions
         if (noneDsQuery) {
@@ -1141,7 +1141,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     //Search Probe By Data level and Dataset Level conditions
     @SuppressWarnings("unchecked")
-    private Pagination<String> searchProbeDataAndDsLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    private Pagination<Probe> searchProbeDataAndDsLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         //query the dataset first
         List<Long> foundDsIds = queryDatasets(searchBean);
         // System.out.println("============> ***** found dataset id list size: " + foundDsIds.size());
@@ -1151,7 +1151,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if (recordPerPage < 0) {
                 recordPerPage = 10;
             }
-            return new Pagination<String>(startPageNo, recordPerPage, 0);
+            return new Pagination<Probe>(startPageNo, recordPerPage, 0);
         }
         //start to search data based on the found dataset list
         String genes = searchBean.getGenes();
@@ -1359,16 +1359,16 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if (recordPerPage < 0) {
                 recordPerPage = 10;
             }
-            return new Pagination<String>(startPageNo, recordPerPage, total);
+            return new Pagination<Probe>(startPageNo, recordPerPage, total);
         }
 
         if (recordPerPage < 0) {
             recordPerPage = total;
         }
-        Pagination<String> probePagination = new Pagination<String>(startPageNo, recordPerPage, total);
+        Pagination<Probe> probePagination = new Pagination<Probe>(startPageNo, recordPerPage, total);
         probeQuery.setFirstResult(probePagination.getFirstResult());
         probeQuery.setMaxResults(probePagination.getSizePerPage());
-        List<String> probeList = probeQuery.list();
+        List<Probe> probeList = probeQuery.list();
         probePagination.setPageResults(probeList);
         // System.out.println("===========> ds level found total probe size: " + probePagination.getTotalRecords());
         // System.out.println("===========> ds level found total probe pages: " + probePagination.getTotalPages());
@@ -1377,7 +1377,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     //Search Probe By Data level conditions
     @SuppressWarnings("unchecked")
-    private Pagination<String> searchProbeDataLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    private Pagination<Probe> searchProbeDataLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         String genes = searchBean.getGenes();
         String genBanks = searchBean.getGenBanks();
         String ensembls = searchBean.getEnsembls();
@@ -1522,16 +1522,16 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             if (recordPerPage < 0) {
                 recordPerPage = 10;
             }
-            return new Pagination<String>(startPageNo, recordPerPage, total);
+            return new Pagination<Probe>(startPageNo, recordPerPage, total);
         }
         //if the recordPerPage is less than zero, we say it will return all results in a single page.
         if (recordPerPage < 0) {
             recordPerPage = total;
         }
-        Pagination<String> probPagination = new Pagination<String>(startPageNo, recordPerPage, total);
+        Pagination<Probe> probPagination = new Pagination<Probe>(startPageNo, recordPerPage, total);
         probeQuery.setFirstResult(probPagination.getFirstResult());
         probeQuery.setMaxResults(probPagination.getSizePerPage());
-        List<String> dataList = probeQuery.list();
+        List<Probe> dataList = probeQuery.list();
         probPagination.setPageResults(dataList);
         // System.out.println("===========> data level only query found total probe size: " + probPagination.getTotalRecords());
         // System.out.println("===========>  data level only query found total probe pages: " + probPagination.getTotalPages());

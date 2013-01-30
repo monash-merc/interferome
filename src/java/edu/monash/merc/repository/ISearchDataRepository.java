@@ -53,7 +53,7 @@ public interface ISearchDataRepository {
 
     Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
-    Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
     Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 

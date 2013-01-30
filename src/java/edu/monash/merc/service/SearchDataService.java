@@ -32,6 +32,7 @@ import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.dto.SearchBean;
 
@@ -48,7 +49,7 @@ import java.util.List;
 public interface SearchDataService {
     Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
-    Pagination<String> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
     Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
