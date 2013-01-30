@@ -51,8 +51,8 @@
             <td>
                 <@s.if test="%{#dataResult.gene.genbankId != '---'}">
                     <div class="s_ds_link">
-                        <a href="${geneBankLink}%{dataResult.gene.genbankId}"
-                           target="_blank"><@s.property value="#dataResult.gene.genbankId" /></a>
+                        <a href="${geneBankLink}<@s.property value="#dataResult.gene.genbankId" />" target="_blank">
+                        <@s.property value="#dataResult.gene.genbankId" /></a>
                     </div>
                 </@s.if>
                 <@s.else>
@@ -62,7 +62,7 @@
             <td>
                 <@s.if test="%{#dataResult.gene.ensgAccession != '---'}">
                     <div class="s_ds_link">
-                        <a href="${ensemblLink}%{dataResult.gene.ensgAccession}"
+                        <a href="${ensemblLink}<@s.property value="#dataResult.gene.ensgAccession" />"
                            target="_blank"><@s.property value="#dataResult.gene.ensgAccession" /></a>
                     </div>
                 </@s.if>

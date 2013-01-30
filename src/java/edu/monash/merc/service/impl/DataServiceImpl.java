@@ -29,6 +29,7 @@
 package edu.monash.merc.service.impl;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.dao.impl.DataDAO;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.service.DataService;
@@ -88,7 +89,7 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
+    public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
         return this.dataDao.getDataByDatasetId(dsId, startPageNo, recordsPerPage, orderBy, sortBy);
     }
 }

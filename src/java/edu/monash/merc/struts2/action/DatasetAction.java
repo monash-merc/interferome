@@ -29,6 +29,7 @@
 package edu.monash.merc.struts2.action;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Dataset;
@@ -59,7 +60,7 @@ public class DatasetAction extends DMBaseAction {
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private Pagination<Data> dataPagination;
+    private Pagination<SearchResultRow> dataPagination;
 
     /**
      * genbank link
@@ -295,11 +296,11 @@ public class DatasetAction extends DMBaseAction {
         this.viewExpActName = viewExpActName;
     }
 
-    public Pagination<Data> getDataPagination() {
+    public Pagination<SearchResultRow> getDataPagination() {
         return dataPagination;
     }
 
-    public void setDataPagination(Pagination<Data> dataPagination) {
+    public void setDataPagination(Pagination<SearchResultRow> dataPagination) {
         this.dataPagination = dataPagination;
     }
 

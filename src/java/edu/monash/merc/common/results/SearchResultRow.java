@@ -32,6 +32,7 @@ import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Dataset;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.Probe;
+import edu.monash.merc.struts2.action.DMBaseAction;
 import org.hibernate.Query;
 
 import java.util.ArrayList;
@@ -51,6 +52,22 @@ public class SearchResultRow {
     public Dataset dataset;
     public Probe probe;
     public Gene gene;
+
+    public Data getData() {
+        return data;
+    }
+
+    public Dataset getDataset() {
+        return dataset;
+    }
+
+    public Probe getProbe() {
+        return probe;
+    }
+
+    public Gene getGene() {
+        return gene;
+    }
 
     public SearchResultRow (Data d, Dataset ds, Probe p, Gene g){
         this.data = d;

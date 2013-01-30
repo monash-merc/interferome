@@ -28,6 +28,7 @@
 package edu.monash.merc.service.impl;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.common.service.file.FileSystemSerivce;
 import edu.monash.merc.common.service.mail.MailService;
 import edu.monash.merc.common.service.rifcs.RIFCSService;
@@ -1397,7 +1398,7 @@ public class DMServiceImpl implements DMService {
     }
 
     @Override
-    public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
+    public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
         return this.dataService.getDataByDatasetId(dsId, startPageNo, recordsPerPage, orderBy, sortBy);
     }
 

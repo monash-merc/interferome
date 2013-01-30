@@ -28,6 +28,7 @@
 package edu.monash.merc.service;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.*;
@@ -279,7 +280,7 @@ public interface DMService {
 
     public int getTotalDatasetsNumber(long expId);
 
-    public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
+    public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
 
     public String importExpDataset(Experiment experiment, BaseDataset txtDataset);
 

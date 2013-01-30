@@ -29,6 +29,7 @@
 package edu.monash.merc.service;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.domain.Data;
 
 import java.util.List;
@@ -53,5 +54,5 @@ public interface DataService {
 
     public int saveAllData(List<Data> dataList);
 
-    public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
+    public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
 }
