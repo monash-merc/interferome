@@ -1364,20 +1364,21 @@ public class SearchAction extends DMBaseAction {
                 String searchIfnType = dataset.getIfnType().getTypeName();
                 double treatmentTime = dataset.getTreatmentTime();
 
-                System.out.println("got dataset...");
                 //get Probe /reporter
                 Probe probe = searchResultRow.probe;
                 String probeId = probe.getProbeId();
 
-                System.out.println("got probe...");
                 Gene gene = searchResultRow.gene;
-                System.out.println("got gene ...");
 
+
+                //The following code causes a "session closed" error. However, it seems
+                //to be unnecessary, as all of the genes should at some stage be returned
+                //in a row of the results table.
 
                 /*
+
                 //get Gene Aliases
                 List<Gene> geneList = probe.getGenes();
-                System.out.println("got genes method 2...");
 
 
                 // why a loop?
@@ -1395,6 +1396,7 @@ public class SearchAction extends DMBaseAction {
                     csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneName, geneDesc, genBankId, ensemblId, probeId});
                 }//write the csv into OutputStream
                 */
+
                 String geneName = gene.getGeneName();
                 String geneDesc = gene.getDescription();
                 String genBankId = gene.getGenbankId();
