@@ -42,7 +42,7 @@ public class Pagination<T> extends SimplePagination implements java.io.Serializa
 	protected List<T> pageResults = new LinkedList<T>();
 
     protected int searchedRecords = 0;
-    protected double searchSuccessPercentage = 0;
+    //protected double searchSuccessPercentage = 0;
 
 	public Pagination() {
 
@@ -51,7 +51,7 @@ public class Pagination<T> extends SimplePagination implements java.io.Serializa
     public Pagination(int pageNo, int sizePerPage, int totalRecords, int searchedRecords){
         super(pageNo, sizePerPage, totalRecords);
         this.searchedRecords = searchedRecords;
-        this.searchSuccessPercentage = ((double)totalRecords/(double)searchedRecords)*100;
+        //this.searchSuccessPercentage = ((double)totalRecords/(double)searchedRecords)*100;
     }
 
 	public Pagination(int pageNo, int sizePerPage, int totalRecords) {
@@ -79,8 +79,8 @@ public class Pagination<T> extends SimplePagination implements java.io.Serializa
         return searchedRecords;
     }
 
-    public double getSearchSuccessPercentage(){
-        DecimalFormat df = new DecimalFormat("#.#");
-        return Double.valueOf(df.format(searchSuccessPercentage));
-    }
+//    public double getSearchSuccessPercentage(){
+//        DecimalFormat df = new DecimalFormat("#.#");
+//        return Double.valueOf(df.format(searchSuccessPercentage));
+//    }
 }

@@ -281,13 +281,26 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //probes.add("A_23_P105923");
 
 
-        int searchCount = 0;
-        //String species = searchBean.getSpecies();
-        int gbCount = searchBean.getGenBanks().split(",|\t|\n").length;
-        int ensCount = searchBean.getEnsembls().split(",|\t|\n").length;
-        int gCount = searchBean.getGenes().split(",|\t|\n").length;
-       // if (StringUtils.equals(species, "-1")){
-        if(searchCount < gbCount || searchCount < ensCount || searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
+        int searchCount=0, gbCount=0, ensCount=0, gCount = 0;
+        String species = searchBean.getSpecies();
+        if (StringUtils.equals(species, "-1")||StringUtils.contains(species, "Homo sapiens") || StringUtils.contains(species, "Mus musculus")){
+        if (searchBean.getGenBanks().length() > 0){
+            gbCount = searchBean.getGenBanks().split(",|\t|\n").length;
+            searchCount += gbCount;
+        }
+        if (searchBean.getEnsembls().length() > 0){
+            ensCount = searchBean.getEnsembls().split(",|\t|\n").length;
+            searchCount += ensCount;
+        }
+        if (searchBean.getGenes().length() > 0){
+            gCount = searchBean.getGenes().split(",|\t|\n").length;
+            searchCount += gCount;
+        }
+        System.out.println("found genes size: " + searchCount);
+        System.out.println("found genes size: " + gCount+" found Ens size: "+ensCount+" found GeneBank size: "+gbCount);
+        System.out.println("found genes string: " + searchBean.getGenes()+" found Ens string: "+searchBean.getEnsembls()+" found GeneBank string: "+searchBean.getGenBanks());
+
+       // if(searchCount < gbCount || searchCount < ensCount || searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
         //  if(searchCount < gbCount && searchCount < ensCount && searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
         //  else if(searchCount < gbCount && searchCount < ensCount) searchCount = gbCount + ensCount;
         //  else if(searchCount < ensCount && searchCount < gCount) searchCount = ensCount + gCount;
@@ -300,7 +313,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
          //if(searchCount < ensCount)  searchCount = ensCount;
          //if(searchCount < gCount)  searchCount = gCount;
          //if(searchCount < gbCount)  searchCount = gbCount;
-       // }
+        }
 
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
