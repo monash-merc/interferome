@@ -25,16 +25,16 @@
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>
                     <tr>
-                        <td>Experiments</td> <td>8</td>     <td>4</td> <td>1</td> <td>10</td>
+                        <td>Experiments</td> <td><@s.property value="stats.human.experimentsI" /></td>     <td><@s.property value="stats.human.experimentsII" /></td> <td><@s.property value="stats.human.experimentsIII" /></td> <td><@s.property value="stats.human.experiments" /></td>
                     </tr>
                     <tr>
-                        <td>Datasets</td> <td>23</td>     <td>6</td> <td>1</td> <td>14</td>
+                        <td>Datasets</td> <td><@s.property value="stats.human.datasetsI" /></td>     <td><@s.property value="stats.human.datasetsII" /></td> <td><@s.property value="stats.human.datasetsIII" /></td> <td><@s.property value="stats.human.datasets" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05 and fold change &gt;=x2</td> <td>3959</td>     <td>1748</td> <td>52</td> <td>5759</td>
+                        <td>Genes with p-value &lt;0.05 and fold change &gt;=x2</td> <td><@s.property value="stats.human.fcI" /></td>     <td><@s.property value="stats.human.fcII" /></td> <td><@s.property value="stats.human.fcIII" /></td> <td><@s.property value="stats.human.fc" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05</td> <td>24026</td>     <td>6196</td> <td>1027</td> <td>31249</td>
+                        <td>Genes with p-value &lt;0.05</td> <td><@s.property value="stats.human.allDataI" /></td>     <td><@s.property value="stats.human.allDataII" /></td> <td><@s.property value="stats.human.allDataIII" /></td> <td><@s.property value="stats.human.allData" /></td>
                     </tr>
                     </tbody></table>
                 <div class="parag_title_div">
@@ -45,16 +45,16 @@
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>
                     <tr>
-                        <td>Experiments</td> <td>4</td>     <td>4</td> <td>0</td> <td>6</td>
+                        <td>Experiments</td> <td><@s.property value="stats.mouse.experimentsI" /></td>     <td><@s.property value="stats.mouse.experimentsII" /></td> <td><@s.property value="stats.mouse.experimentsIII" /></td> <td><@s.property value="stats.mouse.experiments" /></td>
                     </tr>
                     <tr>
-                        <td>Datasets</td> <td>6</td>     <td>8</td> <td>0</td> <td>14</td>
+                        <td>Datasets</td> <td><@s.property value="stats.mouse.datasetsI" /></td>     <td><@s.property value="stats.mouse.datasetsII" /></td> <td><@s.property value="stats.mouse.datasetsIII" /></td> <td><@s.property value="stats.mouse.datasets" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05 and fold change &gt;=x2</td> <td>957</td>     <td>452</td> <td>0</td> <td>1409</td>
+                        <td>Genes with p-value &lt;0.05 and fold change &gt;=x2</td> <td><@s.property value="stats.mouse.fcI" /></td>     <td><@s.property value="stats.mouse.fcI" /></td> <td><@s.property value="stats.mouse.fcI" /></td> <td><@s.property value="stats.mouse.fcI" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05</td> <td>5892</td>     <td>5070</td> <td>0</td> <td>10962</td>
+                        <td>Genes with p-value &lt;0.05</td> <td><@s.property value="stats.mouse.allDataI" /></td>     <td><@s.property value="stats.mouse.allDataII" /></td> <td><@s.property value="stats.mouse.allDataIII" /></td> <td><@s.property value="stats.mouse.allData" /></td>
                     </tr>
                 </tbody></table>
             </div>

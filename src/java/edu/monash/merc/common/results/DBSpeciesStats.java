@@ -26,54 +26,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.struts2.action;
-
-import edu.monash.merc.common.results.DBStats;
-import edu.monash.merc.service.DBStatisticsService;
-import edu.monash.merc.service.impl.DBStatisticsServiceImpl;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
+package edu.monash.merc.common.results;
 
 /**
- * @author: Simon Yu
- * @email: Xiaoming.Yu@monash.edu
- *
- * Date: 20/02/12
- * Time: 10:33 AM
- * @version: 1.0
+ * Created with IntelliJ IDEA.
+ * User: alex
+ * Date: 1/31/13
+ * Time: 3:57 PM
+ * To change this template use File | Settings | File Templates.
  */
-
-@Scope("prototype")
-@Controller("site.dbStatAction")
-public class DBStatisticAction extends DMBaseAction {
-
-    private Logger logger = Logger.getLogger(this.getClass().getName());
-
-    @Autowired
-    private DBStatisticsService dbStatisticsService;
-    private DBStats stats;
-
-    public void setDbStatisticsService(DBStatisticsService dbStatisticsService) {
-        this.dbStatisticsService = dbStatisticsService;
-    }
-
-    public DBStats getStats() {
-        return stats;
-    }
-
-    public String dbStat() {
-        try {
-            user = getCurrentUser();
-            stats = dbStatisticsService.getDBStatistics();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            //logger.error(ex);
-            addActionError(getText("interferome.site.show.db.statistic.failed"));
-            return ERROR;
-        }
-        return SUCCESS;
-    }
-
+public class DBSpeciesStats {
+    public long experimentsI;
+    public long experimentsII;
+    public long experimentsIII;
+    public long datasetsI;
+    public long datasetsII;
+    public long datasetsIII;
+    public long fcI;
+    public long fcII;
+    public long fcIII;
+    public long allDataI;
+    public long allDataII;
+    public long allDataIII;
+    public long experiments;
+    public long datasets;
+    public long fc;
+    public long allData;
 }

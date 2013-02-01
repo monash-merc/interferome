@@ -26,54 +26,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.struts2.action;
+package edu.monash.merc.service.impl;
 
 import edu.monash.merc.common.results.DBStats;
+import edu.monash.merc.dao.impl.DBStatisticsDAO;
 import edu.monash.merc.service.DBStatisticsService;
-import edu.monash.merc.service.impl.DBStatisticsServiceImpl;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * @author: Simon Yu
- * @email: Xiaoming.Yu@monash.edu
- *
- * Date: 20/02/12
- * Time: 10:33 AM
- * @version: 1.0
+ * Created with IntelliJ IDEA.
+ * User: alex
+ * Date: 1/31/13
+ * Time: 12:42 PM
+ * To change this template use File | Settings | File Templates.
  */
-
 @Scope("prototype")
-@Controller("site.dbStatAction")
-public class DBStatisticAction extends DMBaseAction {
-
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+@Service
+@Transactional
+public class DBStatisticsServiceImpl implements DBStatisticsService {
 
     @Autowired
-    private DBStatisticsService dbStatisticsService;
-    private DBStats stats;
+    private DBStatisticsDAO dbStatisticsDAO;
 
-    public void setDbStatisticsService(DBStatisticsService dbStatisticsService) {
-        this.dbStatisticsService = dbStatisticsService;
-    }
-
-    public DBStats getStats() {
-        return stats;
-    }
-
-    public String dbStat() {
-        try {
-            user = getCurrentUser();
-            stats = dbStatisticsService.getDBStatistics();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            //logger.error(ex);
-            addActionError(getText("interferome.site.show.db.statistic.failed"));
-            return ERROR;
-        }
-        return SUCCESS;
+    @Override
+    public DBStats getDBStatistics() {
+        return this.dbStatisticsDAO.getDBStatistics();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 }
