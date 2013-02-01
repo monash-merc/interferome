@@ -5,7 +5,7 @@
 </div>
 <div style="clear:both"></div> 
 <div class="navcontainer">
-    <script type="text/javascript">       ;
+    <script type="text/javascript">
         $(document).ready(function(){$(".navlist li a").each(function(index){
             var curPage = document.URL;
             curPage = curPage.substr(curPage.lastIndexOf("/")) ;
