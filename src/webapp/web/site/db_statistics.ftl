@@ -20,7 +20,7 @@
                 <div class="parag_title_div">
                     Homo sapiens statistics
                 </div>
-                <table class="datatable" border="1">
+                <table class="datatable" border="1" style="margin-left: auto; margin-right: auto;">
                     <tbody><tr>
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>
@@ -40,7 +40,7 @@
                 <div class="parag_title_div">
                     Mus musculus statistics
                 </div>
-                <table class="datatable" border="1">
+                <table class="datatable" border="1" style="margin-left: auto; margin-right: auto;">
                     <tbody><tr>
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>
