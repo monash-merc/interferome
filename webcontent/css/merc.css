@@ -187,6 +187,10 @@ body {
     font-weight: bold;
 }
 
+.current_link {
+    background: #b8d4de !important;
+}
+
 /** === START of Error Setction ==== **/
 .action_msg_section {
     margin-left: 10px;

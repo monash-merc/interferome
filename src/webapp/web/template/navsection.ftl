@@ -5,6 +5,17 @@
 </div>
 <div style="clear:both"></div> 
 <div class="navcontainer">
+    <script type="text/javascript">       ;
+        $(document).ready(function(){$(".navlist li a").each(function(index){
+            var curPage = document.URL;
+            curPage = curPage.substr(curPage.lastIndexOf("/")) ;
+            var linkPage = $(this).attr("href");
+            linkPage = linkPage.substr(linkPage.lastIndexOf("/"));
+            if (curPage == linkPage){
+                $(this).addClass("current_link") ;
+            }
+        })});
+    </script>
 	<ul class="navlist">
 		<li><a href="${base}/home.jspx">Home</a></li>
 		<@s.if test="%{#session.authentication_flag =='authenticated'}">
