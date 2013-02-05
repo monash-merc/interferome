@@ -1064,7 +1064,6 @@ public class DMServiceImpl implements DMService {
                 Probe existedProbe = this.getProbeByProbeId(probe.getProbeId());
                 logger.debug("PROBE ID: "+probe.getProbeId());
 
-
                 // set the species ID from the name
                 Species speciesN =this.getSpeciesByName(probe.getSpeciesName());
                 probe.setSpecies(speciesN);
@@ -1111,8 +1110,6 @@ public class DMServiceImpl implements DMService {
                         geneList.add(gene);
                         probe.setGenes(geneList);
                     }
-
-
 
                     this.saveProbe(probe);
 
