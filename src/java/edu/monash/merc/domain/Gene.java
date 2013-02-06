@@ -248,12 +248,15 @@ public class Gene extends Domain {
         Gene gene = (Gene) o;
 
         if (id != gene.id) return false;
-
+        if (ensgAccession != null ? !ensgAccession.equals(gene.ensgAccession) : gene.ensgAccession != null)
+            return false;
         return true;
     }
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (ensgAccession != null ? ensgAccession.hashCode() : 0);
+        return result;
     }
 }

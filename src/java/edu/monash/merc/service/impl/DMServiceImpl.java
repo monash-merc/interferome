@@ -1022,8 +1022,6 @@ public class DMServiceImpl implements DMService {
     //Probes
     @Override
     public void saveProbe(Probe probe) {
-        logger.debug("IN SAVE PROBE: "+probe.getProbeId());
-        logger.debug("IN SAVE PROBE: "+probe.getEnsemblId());
         this.probeService.saveProbe(probe);
     }
 
@@ -1192,11 +1190,10 @@ public class DMServiceImpl implements DMService {
                         probe = new Probe();
                         probe.setProbeId(probeId);
                         probe.setSpecies(speciesN);
-                        //       System.out.println("DBG MESSAGE from DMServiceImpl:" + probe.getProbeId() + " - " + probe.getSpeciesName());
                         // probe.setPlatform(platform);
                         // probe.setSpecies(probeType);
                     }
-
+                    probe.getGenes();
                     List<Gene> geneList = this.getGenesByProbeId(probe.getProbeId());
                     if (geneList != null) {
                         if (!geneList.contains(gene)) {
@@ -1214,9 +1211,9 @@ public class DMServiceImpl implements DMService {
                     } else {
                         this.mergeProbe(probe);
                     }
-                } else {
-                      // message user that the probe cannot be loaded
-                      importError(probe, "No matching gene in database");
+            //    } else {
+            //          // message user that the probe cannot be loaded
+            //          importError(probes, "No matching gene in database");
                 }
             }
 

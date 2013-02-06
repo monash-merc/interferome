@@ -91,37 +91,37 @@ public class INFDataProcessor implements DataProcessor {
         Date importedTime = GregorianCalendar.getInstance().getTime();
 
         //Gene for HUMAN
-        importEnsemblGenes(HUMAN, importedTime);
+     //   importEnsemblGenes(HUMAN, importedTime);
 
         //Gene for MOUSE
-       importEnsemblGenes(MOUSE, importedTime);
+     //  importEnsemblGenes(MOUSE, importedTime);
         long endTime = System.currentTimeMillis();
 
         //import human and mouse probes
         importProbes();
 
         //GeneOntology for HUMAN
-        long goStartTime = System.currentTimeMillis();
-        importGeneOntology(HUMAN);
+     //   long goStartTime = System.currentTimeMillis();
+     //   importGeneOntology(HUMAN);
 
         //import the geneontology for mouse
-        importGeneOntology(MOUSE);
-        long goEndTime = System.currentTimeMillis();
+     //   importGeneOntology(MOUSE);
+     //   long goEndTime = System.currentTimeMillis();
 
         logger.info("=====> The total process time for Gene: " + (endTime - startTime) / 1000 + "seconds");
 
-        logger.info("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
+    //    logger.info("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
 
-        logger.info("=====> The total process time for gene and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
+    //    logger.info("=====> The total process time for gene and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
     }
 
-    private void importEnsemblGenes(String species_gene, Date importedTime) {
+    private void importEnsemblGenes(String species, Date importedTime) {
         BioMartClient client = null;
         try {
             String wsURL = this.appSetting.getPropValue(AppPropSettings.BIOMART_RESTFUL_WS_URL);
 
             client = new BioMartClient();
-            client.configure(wsURL, species_gene, null);
+            client.configure(wsURL, species, null);
             List<Gene> geneList = client.importGenes();
 
             logger.info("============> total genes size : " + geneList.size());
@@ -154,13 +154,13 @@ public class INFDataProcessor implements DataProcessor {
         }
     }
 
-    private void importProbesByType(String wsUrl, String species_gene, String platform, String species) {
+    private void importProbesByType(String wsUrl, String species, String platform, String probeType) {
         BioMartClient client = null;
         try {
             client = new BioMartClient();
-            client.configure(wsUrl, species_gene, platform);
-            List<ProbeGeneBean> probeGeneBeans = client.importProbes(species);
-            logger.info("============> total probes  size for  " + species_gene + " - " + species + " : " + probeGeneBeans.size());
+            client.configure(wsUrl, species, platform);
+            List<ProbeGeneBean> probeGeneBeans = client.importProbes(probeType);
+            logger.info("============> total probes  size for  " + species + " - " + probeType + " : " + probeGeneBeans.size());
             this.dmService.importProbes(probeGeneBeans);
             //this.dmService.importProbes(null);
             logger.info("======== imported the probes into database successfully");
@@ -173,13 +173,13 @@ public class INFDataProcessor implements DataProcessor {
         }
     }
 
-    private void importGeneOntology(String species_gene) {
+    private void importGeneOntology(String species) {
         BioMartClient client = null;
         try {
             String wsURL = this.appSetting.getPropValue(AppPropSettings.BIOMART_RESTFUL_WS_URL);
 
             client = new BioMartClient();
-            client.configure(wsURL, species_gene, null);
+            client.configure(wsURL, species, null);
             List<GeneOntologyBean> geneOntologyBeans = client.importGeneOntology();
 
             logger.info("============> total geneontology size : " + geneOntologyBeans.size());
@@ -194,62 +194,62 @@ public class INFDataProcessor implements DataProcessor {
         }
     }
 
-    private List<String> getProbePlateforms(String species) {
+    private List<String> getProbePlateforms(String type) {
         List<String> probeSearch = new ArrayList<java.lang.String>();
-        if (StringUtils.equals(species, PROBE_HUMAN_TYPE)) {
+        if (StringUtils.equals(type, PROBE_HUMAN_TYPE)) {
             probeSearch.clear();
-            probeSearch.add("efg_agilent_sureprint_g3_ge_8x60k");
-            probeSearch.add("efg_agilent_wholegenome_4x44k_v1");
-            probeSearch.add("efg_agilent_wholegenome_4x44k_v2");
-            probeSearch.add("affy_hc_g110");
-            probeSearch.add("affy_hg_u133_plus_2");
-            probeSearch.add("affy_hg_focus");
-            probeSearch.add("affy_hg_u133a_2");
-            probeSearch.add("affy_hg_u133a");
-            probeSearch.add("affy_hg_u95av2");
-            probeSearch.add("affy_hg_u133b");
-            probeSearch.add("affy_hg_u95b");
-            probeSearch.add("affy_hg_u95c");
-            probeSearch.add("affy_hg_u95d");
-            probeSearch.add("phalanx_onearray");
-            probeSearch.add("illumina_humanht_12");
-            probeSearch.add("illumina_humanwg_6_v3");
-            probeSearch.add("illumina_humanwg_6_v2");
-            probeSearch.add("illumina_humanwg_6_v1");
-            probeSearch.add("codelink");
-            probeSearch.add("agilent_cgh_44b");
-            probeSearch.add("affy_u133_x3p");
-            probeSearch.add("affy_hugene_1_0_st_v1");
-            probeSearch.add("affy_huex_1_0_st_v2");
-            probeSearch.add("affy_hugenefl");
-            probeSearch.add("affy_hg_u95a");
-            probeSearch.add("affy_hg_u95e");
+        probeSearch.add("efg_agilent_sureprint_g3_ge_8x60k");
+     //   probeSearch.add("efg_agilent_wholegenome_4x44k_v1");
+        probeSearch.add("efg_agilent_wholegenome_4x44k_v2");
+        probeSearch.add("affy_hc_g110");
+        probeSearch.add("affy_hg_u133_plus_2");
+        probeSearch.add("affy_hg_focus");
+        probeSearch.add("affy_hg_u133a_2");
+        probeSearch.add("affy_hg_u133a");
+        probeSearch.add("affy_hg_u95av2");
+        probeSearch.add("affy_hg_u133b");
+        probeSearch.add("affy_hg_u95b");
+        probeSearch.add("affy_hg_u95c");
+        probeSearch.add("affy_hg_u95d");
+        probeSearch.add("phalanx_onearray");
+        probeSearch.add("illumina_humanht_12");
+        probeSearch.add("illumina_humanwg_6_v3");
+        probeSearch.add("illumina_humanwg_6_v2");
+        probeSearch.add("illumina_humanwg_6_v1");
+        probeSearch.add("codelink");
+        probeSearch.add("agilent_cgh_44b");
+        probeSearch.add("affy_u133_x3p");
+        probeSearch.add("affy_hugene_1_0_st_v1");
+        probeSearch.add("affy_huex_1_0_st_v2");
+        probeSearch.add("affy_hugenefl");
+        probeSearch.add("affy_hg_u95a");
+        probeSearch.add("affy_hg_u95e");
 
         }
-        if (StringUtils.equals(species, PROBE_MOUSE_TYPE)) {
+        if (StringUtils.equals(type, PROBE_MOUSE_TYPE)) {
             probeSearch.clear();
-            probeSearch.add("efg_agilent_sureprint_g3_ge_8x60k");
-            probeSearch.add("efg_agilent_wholegenome_4x44k_v1");
-            probeSearch.add("efg_agilent_wholegenome_4x44k_v2");
-            probeSearch.add("affy_mg_u74a");
-            probeSearch.add("affy_mg_u74av2");
-            probeSearch.add("affy_mg_u74b");
-            probeSearch.add("affy_mg_u74bv2");
-            probeSearch.add("affy_mg_u74c");
-            probeSearch.add("affy_mg_u74cv2");
-            probeSearch.add("affy_moe430a");
-            probeSearch.add("affy_moe430b");
-            probeSearch.add("affy_moex_1_0_st_v1");
-            probeSearch.add("affy_mogene_1_0_st_v1");
-            probeSearch.add("affy_mouse430_2");
-            probeSearch.add("affy_mouse430a_2");
-            probeSearch.add("affy_mu11ksuba");
-            probeSearch.add("affy_mu11ksubb");
-            probeSearch.add("codelink");
-            probeSearch.add("illumina_mousewg_6_v1");
-            probeSearch.add("illumina_mousewg_6_v2");
-            probeSearch.add("phalanx_onearray");
-        }
+        probeSearch.add("efg_agilent_sureprint_g3_ge_8x60k");
+        probeSearch.add("efg_agilent_wholegenome_4x44k_v1");
+        probeSearch.add("efg_agilent_wholegenome_4x44k_v2");
+        probeSearch.add("affy_mg_u74a");
+        probeSearch.add("affy_mg_u74av2");
+        probeSearch.add("affy_mg_u74b");
+        probeSearch.add("affy_mg_u74bv2");
+        probeSearch.add("affy_mg_u74c");
+        probeSearch.add("affy_mg_u74cv2");
+        probeSearch.add("affy_moe430a");
+        probeSearch.add("affy_moe430b");
+        probeSearch.add("affy_moex_1_0_st_v1");
+        probeSearch.add("affy_mogene_1_0_st_v1");
+        probeSearch.add("affy_mouse430_2");
+        probeSearch.add("affy_mouse430a_2");
+        probeSearch.add("affy_mu11ksuba");
+        probeSearch.add("affy_mu11ksubb");
+        probeSearch.add("codelink");
+        probeSearch.add("illumina_mousewg_6_v1");
+        probeSearch.add("illumina_mousewg_6_v2");
+        probeSearch.add("phalanx_onearray");
+      }
         return probeSearch;
     }
 }
