@@ -296,9 +296,9 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             gCount = searchBean.getGenes().split(",|\t|\n").length;
             searchCount += gCount;
         }
-        System.out.println("found genes size: " + searchCount);
-        System.out.println("found genes size: " + gCount+" found Ens size: "+ensCount+" found GeneBank size: "+gbCount);
-        System.out.println("found genes string: " + searchBean.getGenes()+" found Ens string: "+searchBean.getEnsembls()+" found GeneBank string: "+searchBean.getGenBanks());
+       // System.out.println("found genes size: " + searchCount);
+       // System.out.println("found genes size: " + gCount+" found Ens size: "+ensCount+" found GeneBank size: "+gbCount);
+       // System.out.println("found genes string: " + searchBean.getGenes()+" found Ens string: "+searchBean.getEnsembls()+" found GeneBank string: "+searchBean.getGenBanks());
 
        // if(searchCount < gbCount || searchCount < ensCount || searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
         //  if(searchCount < gbCount && searchCount < ensCount && searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
@@ -363,7 +363,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         List<Probe> probes = uniqueProbesPages.getPageResults();
 
-        ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
+       // ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {
             String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) ORDER BY g, te";
             Query teQuery = this.session().createQuery(teHQL);
@@ -562,11 +562,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query geneTotalCountQuery = this.session().createQuery(geneTotalCountHQL);
             Long totalGeneN = ((Long) geneTotalCountQuery.uniqueResult());
             //Get Count of all Human genes in db (Nh)
-            String geneTotalHumanCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 1";
+            String geneTotalHumanCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 'Human'";
             Query geneTotalHumanCountQuery = this.session().createQuery(geneTotalHumanCountHQL);
             Long totalGeneNh = ((Long) geneTotalHumanCountQuery.uniqueResult());
             //Get Count of all Mouse genes in db (Nm)
-            String geneTotalMouseCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 2";
+            String geneTotalMouseCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 'Mouse'";
             Query geneTotalMouseCountQuery = this.session().createQuery(geneTotalMouseCountHQL);
             Long totalGeneNm = ((Long) geneTotalMouseCountQuery.uniqueResult());
 

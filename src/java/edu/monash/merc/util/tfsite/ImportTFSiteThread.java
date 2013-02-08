@@ -31,7 +31,6 @@ package edu.monash.merc.util.tfsite;
 import edu.monash.merc.domain.AuditEvent;
 import edu.monash.merc.domain.TFSite;
 import edu.monash.merc.domain.User;
-import edu.monash.merc.dto.RepCounter;
 import edu.monash.merc.dto.TFSiteBean;
 import edu.monash.merc.dto.TfSiteCounter;
 import edu.monash.merc.service.DMService;
@@ -158,7 +157,7 @@ public class ImportTFSiteThread implements Runnable {
         String tfSiteName = this.tfSiteBean.getTfSiteName();
         Map<String, String> templateMap = new HashMap<String, String>();
         templateMap.put("RegisteredUser", userName);
-        templateMap.put("Transcription Factor Site Name", tfSiteName);
+        templateMap.put("tfSiteName", tfSiteName);
         templateMap.put("ImportingMsg", msg);
         templateMap.put("SiteName", serverName);
         templateMap.put("AppName", appName);

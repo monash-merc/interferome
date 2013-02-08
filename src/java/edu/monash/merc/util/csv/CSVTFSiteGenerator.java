@@ -28,9 +28,11 @@
 
 package edu.monash.merc.util.csv;
 
+import edu.monash.merc.domain.TFSite;
+
 import java.util.ArrayList;
 import java.util.List;
-import edu.monash.merc.domain.TFSite;
+
 
 
 /**
@@ -50,7 +52,7 @@ public class CSVTFSiteGenerator {
     public void setColumns(List<TFSiteColumn> columns) {
         this.columns = columns;
     }
-    public TFSite genReport() {
+    public TFSite genTFSite() {
         TFSite tfSite = new TFSite();
         for (TFSiteColumn tfSiteColumncolumn : columns) {
             String columnName = tfSiteColumncolumn.getColumnName();

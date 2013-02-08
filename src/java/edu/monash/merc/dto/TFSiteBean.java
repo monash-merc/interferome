@@ -31,6 +31,7 @@ package edu.monash.merc.dto;
 import edu.monash.merc.domain.TFSite;
 import edu.monash.merc.domain.User;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -40,7 +41,8 @@ import java.util.List;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class TFSiteBean {
+public class TFSiteBean implements Serializable {
+
     private String tfSiteName;
 
     private List<TFSite> tfSites;

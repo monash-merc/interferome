@@ -22,6 +22,9 @@
                 The probes import is a backend singleton process, which will take a while to import a whole file.
             </p>
             <p>
+                The input file should be in the format:&nbsp;&nbsp;&nbsp;Probe ID, Ensembl Id, Species
+            </p>
+            <p>
                 The probes file can be imported one-by-one at a time. The importing results will be available by email or in the events after the importing is finished
             </p>
         </div>

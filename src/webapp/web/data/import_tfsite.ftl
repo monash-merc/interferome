@@ -8,7 +8,7 @@
 <body>
 <#include "../template/navsection.ftl"/>
 <div class="nav_namebar_div nav_title_gray">
-    Annotation
+    TFBSite
     <img border="0" src="${base}/images/grayarrow.png">
     <a href="${base}/data/showImportTFSite.jspx"><@s.text name="tfsite.import.action.title" /></a>
 </div>
@@ -23,6 +23,9 @@
             </p>
             <p>
                 The input file should be in the format:&nbsp;&nbsp;&nbsp;Ensembl Gene Id, Factor, Start, End, Core Match, Matrix Match
+            </p>
+            <p>
+                The TFBSite file can be imported one-by-one at a time. The importing results will be available by email or in the events after the importing is finished
             </p>
         </div>
 

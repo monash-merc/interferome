@@ -93,7 +93,7 @@ public class ImportTFSiteAction extends DMBaseAction {
 
     public String importTFSite() {
         try {
-            //get the current user, only the admins who can import the report into system
+            //get the current user, only the admins who can import the tfsite into system
             user = getCurrentUser();
 
             if ((user.getUserType() != UserType.ADMIN.code()) && (user.getUserType() != UserType.SUPERADMIN.code())) {
@@ -116,7 +116,7 @@ public class ImportTFSiteAction extends DMBaseAction {
             //set the success message
             String successMsg = getText("tfsite.import.start.success.msg");
             if (sendMailRequired) {
-                successMsg = getText("experiment.annotation.import.start.success.with.mail.msg");
+                successMsg = getText("tfsite.import.start.success.with.mail.msg");
             }
             setSuccessActMsg(successMsg);
         } catch (Exception ex) {
@@ -148,7 +148,7 @@ public class ImportTFSiteAction extends DMBaseAction {
                     for (int i = 0; i < columnsLine.length; i++) {
                         tfSiteGenerator.getColumns().add(new TFSiteColumn(columnsLine[i], columnValuesLine[i]));
                     }
-                    tfSite = tfSiteGenerator.genReport();
+                    tfSite = tfSiteGenerator.genTFSite();
                     tfSiteList.add(tfSite);
                 }
             }
@@ -176,6 +176,7 @@ public class ImportTFSiteAction extends DMBaseAction {
         String adminEmail = appSetting.getPropValue(AppPropSettings.SYSTEM_ADMIN_EMAIL);
         tfSiteBean.setServerName(serverQName);
         tfSiteBean.setAppName(appName);
+        tfSiteBean.setSendMailRequired(sendMailRequired);
         tfSiteBean.setFromMail(adminEmail);
         tfSiteBean.setUser(user);
         tfSiteBean.setToMail(user.getEmail());
@@ -184,7 +185,7 @@ public class ImportTFSiteAction extends DMBaseAction {
         return tfSiteBean;
     }
 
-    public void validateImportRep() {
+    public void validateImportTFSite() {
         if (StringUtils.isBlank(getUploadFileName())) {
             addFieldError("uploadFileName", getText("tfsite.import.file.name.must.be.provided"));
             //call get user
@@ -231,6 +232,14 @@ public class ImportTFSiteAction extends DMBaseAction {
 
     public void setUploadFileName(String uploadFileName) {
         this.uploadFileName = uploadFileName;
+    }
+
+    public boolean isSendMailRequired() {
+        return sendMailRequired;
+    }
+
+    public void setSendMailRequired(boolean sendMailRequired) {
+        this.sendMailRequired = sendMailRequired;
     }
 
 }

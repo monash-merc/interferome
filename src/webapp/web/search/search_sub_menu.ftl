@@ -1,12 +1,12 @@
 <br/>
-<script type="text/javascript">
+<script type="text/javascript">       ;
 $(document).ready(function(){$(".search_menu_link a").each(function(index){
     var curPage = document.URL;
     curPage = curPage.substr(curPage.lastIndexOf("/")) ;
     var linkPage = $(this).attr("href");
     linkPage = linkPage.substr(linkPage.lastIndexOf("/"));
     if (curPage == linkPage){
-        $(this).addClass("current_link") ;
+        $(this).addClass("current_link") ;//$(this).css("background", "#90BADE") ;
     }
 })});
 </script>
