@@ -2234,11 +2234,11 @@ public class SearchAction extends DMBaseAction {
             }
             //write new empty line
             csvWriter.writeNext(new String[]{""});
+            if (StringUtils.equals(species, "-1")) {
             csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
             csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
             //write data result
             List<String> finishedHGenes = new ArrayList<String>();
-
             for (Gene chr : chromosomeGeneList) {
                 String ensembl = chr.getEnsgAccession();
                 if (!finishedHGenes.contains(ensembl)) {
@@ -2271,14 +2271,55 @@ public class SearchAction extends DMBaseAction {
                     finishedMGenes.add(ensemblM);
                 }
             }
-            csvWriter.writeNext(new String[]{""});
-            csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
-            for (Object[] obja : chromosomeList) {
-                String chrom = (String) obja[0];
-                long genecounter = (Long) obja[1];
-                csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
+            } else {
+                if (StringUtils.contains(species, "Homo sapiens")){
+                    csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
+                    csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
+                    //write data result
+                    List<String> finishedHGenes = new ArrayList<String>();
+                    for (Gene chr : chromosomeGeneList) {
+                        String ensembl = chr.getEnsgAccession();
+                        if (!finishedHGenes.contains(ensembl)) {
+                            if (StringUtils.startsWith(ensembl, "ENSG")) {
+                                //This is humman
+                                String GeneName = chr.getGeneName();
+                                String Chromosome = chr.getChromosome();
+                                long StartPosition = chr.getStartPosition();
+                                long EndPosition = chr.getEndPosition();
+                                csvWriter.writeNext(new String[]{GeneName, Chromosome, String.valueOf(StartPosition), String.valueOf(EndPosition), ensembl});
+                            }
+                            finishedHGenes.add(ensembl);
+                        }
+                    }
+                }
+                if (StringUtils.contains(species, "Mus musculus")){
+                    csvWriter.writeNext(new String[]{"Mouse Chromosomal Location"});
+                    csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
+                    List<String> finishedMGenes = new ArrayList<String>();
+                    for (Gene chr : chromosomeGeneList) {
+                        String ensemblM = chr.getEnsgAccession();
+                        if (!finishedMGenes.contains(ensemblM)) {
+                            if (StringUtils.startsWith(ensemblM, "ENSMUSG")) {
+                                //This is mouse
+                                String GeneName = chr.getGeneName();
+                                String Chromosome = chr.getChromosome();
+                                long StartPosition = chr.getStartPosition();
+                                long EndPosition = chr.getEndPosition();
+                                csvWriter.writeNext(new String[]{GeneName, Chromosome, String.valueOf(StartPosition), String.valueOf(EndPosition), ensemblM});
+                            }
+                            finishedMGenes.add(ensemblM);
+                        }
+                    }
+                }
             }
-
+//       csvWrit}                                           er.writeNext(new String[]{""});
+//       csvWriter.writeNext(new String[]{"Chromosome", "Gene Count"});
+//       for (Object[] obja : chromosomeList) {
+//           String chrom = (String) obja[0];
+//           long genecounter = (Long) obja[1];
+//           csvWriter.writeNext(new String[]{chrom, String.valueOf(genecounter)});
+//       }
+//
             //flush out
             csvWriter.flush();
             this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
