@@ -20,41 +20,41 @@
                 <div class="parag_title_div">
                     Homo sapiens statistics
                 </div>
-                <table class="datatable" border="1" style="margin-left: auto; margin-right: auto;">
+                <table class="datatable" border="1" width="90%" style="margin-left: auto; margin-right: auto;">
                     <tbody><tr>
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>
                     <tr>
-                        <td>Experiments</td> <td><@s.property value="stats.human.experimentsI" /></td>     <td><@s.property value="stats.human.experimentsII" /></td> <td><@s.property value="stats.human.experimentsIII" /></td> <td><@s.property value="stats.human.experiments" /></td>
+                        <td>Experiments</td> <td align="center"><@s.property value="stats.human.experimentsI" /></td>     <td align="center"><@s.property value="stats.human.experimentsII" /></td> <td align="center"><@s.property value="stats.human.experimentsIII" /></td> <td align="center"><@s.property value="stats.human.experiments" /></td>
                     </tr>
                     <tr>
-                        <td>Datasets</td> <td><@s.property value="stats.human.datasetsI" /></td>     <td><@s.property value="stats.human.datasetsII" /></td> <td><@s.property value="stats.human.datasetsIII" /></td> <td><@s.property value="stats.human.datasets" /></td>
+                        <td>Datasets</td> <td align="center"><@s.property value="stats.human.datasetsI" /></td>     <td align="center"><@s.property value="stats.human.datasetsII" /></td> <td align="center"><@s.property value="stats.human.datasetsIII" /></td> <td align="center"><@s.property value="stats.human.datasets" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05 and fold change &gt;=x2</td> <td><@s.property value="stats.human.fcI" /></td>     <td><@s.property value="stats.human.fcII" /></td> <td><@s.property value="stats.human.fcIII" /></td> <td><@s.property value="stats.human.fc" /></td>
+                        <td>Genes with p-value &lt;0.05 and fold change &gt;=2</td> <td align="center"><@s.property value="stats.human.fcI" /></td>     <td align="center"><@s.property value="stats.human.fcII" /></td> <td align="center"><@s.property value="stats.human.fcIII" /></td> <td align="center"><@s.property value="stats.human.fc" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05</td> <td><@s.property value="stats.human.allDataI" /></td>     <td><@s.property value="stats.human.allDataII" /></td> <td><@s.property value="stats.human.allDataIII" /></td> <td><@s.property value="stats.human.allData" /></td>
+                        <td>Genes with p-value &lt;0.05</td> <td align="center"><@s.property value="stats.human.allDataI" /></td>     <td align="center"><@s.property value="stats.human.allDataII" /></td> <td align="center"><@s.property value="stats.human.allDataIII" /></td> <td align="center"><@s.property value="stats.human.allData" /></td>
                     </tr>
                     </tbody></table>
                 <div class="parag_title_div">
                     Mus musculus statistics
                 </div>
-                <table class="datatable" border="1" style="margin-left: auto; margin-right: auto;">
+                <table class="datatable" border="1"  width="90%" style="margin-left: auto; margin-right: auto;">
                     <tbody><tr>
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>
                     <tr>
-                        <td>Experiments</td> <td><@s.property value="stats.mouse.experimentsI" /></td>     <td><@s.property value="stats.mouse.experimentsII" /></td> <td><@s.property value="stats.mouse.experimentsIII" /></td> <td><@s.property value="stats.mouse.experiments" /></td>
+                        <td>Experiments</td>   <td align="center"><@s.property value="stats.mouse.experimentsI" /></td>     <td align="center"><@s.property value="stats.mouse.experimentsII" /></td> <td align="center"><@s.property value="stats.mouse.experimentsIII" /></td> <td align="center"><@s.property value="stats.mouse.experiments" /></td>
                     </tr>
                     <tr>
-                        <td>Datasets</td> <td><@s.property value="stats.mouse.datasetsI" /></td>     <td><@s.property value="stats.mouse.datasetsII" /></td> <td><@s.property value="stats.mouse.datasetsIII" /></td> <td><@s.property value="stats.mouse.datasets" /></td>
+                        <td>Datasets</td>      <td align="center"><@s.property value="stats.mouse.datasetsI" /></td>        <td align="center"><@s.property value="stats.mouse.datasetsII" /></td>      <td align="center"><@s.property value="stats.mouse.datasetsIII" /></td> <td align="center"><@s.property value="stats.mouse.datasets" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05 and fold change &gt;=x2</td> <td><@s.property value="stats.mouse.fcI" /></td>     <td><@s.property value="stats.mouse.fcI" /></td> <td><@s.property value="stats.mouse.fcI" /></td> <td><@s.property value="stats.mouse.fcI" /></td>
+                        <td>Genes with p-value &lt;0.05 and fold change &gt;=2</td> <td align="center"><@s.property value="stats.mouse.fcI" /></td>          <td align="center"><@s.property value="stats.mouse.fcI" /></td>         <td align="center"><@s.property value="stats.mouse.fcI" /></td> <td align="center"><@s.property value="stats.mouse.fcI" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05</td> <td><@s.property value="stats.mouse.allDataI" /></td>     <td><@s.property value="stats.mouse.allDataII" /></td> <td><@s.property value="stats.mouse.allDataIII" /></td> <td><@s.property value="stats.mouse.allData" /></td>
+                        <td>Genes with p-value &lt;0.05</td>  <td align="center"><@s.property value="stats.mouse.allDataI" /></td>        <td align="center"><@s.property value="stats.mouse.allDataII" /></td>  <td align="center"><@s.property value="stats.mouse.allDataIII" /></td> <td align="center"><@s.property value="stats.mouse.allData" /></td>
                     </tr>
                 </tbody></table>
             </div>
