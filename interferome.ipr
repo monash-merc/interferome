@@ -2,6 +2,14 @@
 <project version="4">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/build.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
   </component>
   <component name="ArtifactManager">
     <artifact name="interferome">
@@ -32,11 +40,7 @@
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
     </wildcardResourcePatterns>
-    <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-    </annotationProcessing>
+    <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="merc">
     <copyright>
@@ -127,7 +131,10 @@
         <inspection_tool class="JpaDataSourceORMInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JpaQlInspection" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LocalVariableOfConcreteClass" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreInHashCode" value="true" />
+          <option name="ignoreInTestCode" value="false" />
+        </inspection_tool>
         <inspection_tool class="MethodOnlyUsedFromInnerClass" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreMethodsAccessedFromAnonymousClass" value="false" />
           <option name="ignoreStaticMethodsFromNonStaticInnerClass" value="false" />
