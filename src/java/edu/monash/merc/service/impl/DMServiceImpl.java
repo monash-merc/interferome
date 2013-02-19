@@ -1053,6 +1053,72 @@ public class DMServiceImpl implements DMService {
         return this.probeService.getProbeByProbeId(probeId);
     }
 
+    //TODO: simon comments:
+    // to verify simon's code based on the validation of Probe, Gene and Species (csv file)
+    //TODO: if we think the probe error is very important, then we need create a PorbeError Object inside the ProbCounter.java
+    @Override
+    public ProbCounter importAllPGSBeans(List<PGSBean> pgsBeans) {
+        int countUpdated = 0;
+        int countNew = 0;
+        //probes counter
+        ProbCounter counter = new ProbCounter();
+        for (PGSBean pgsBean : pgsBeans) {
+            String probeId = pgsBean.getProbeId();
+            String ensemblAccession = pgsBean.getEnsemblAccession();
+            String speciesName = pgsBean.getSpecies();
+
+            //TODO: verify this validation is right or not
+            if (StringUtils.isNotBlank(probeId) && StringUtils.isNotBlank(ensemblAccession) && StringUtils.isNotBlank(speciesName)) {
+                Gene foundGene = this.getGeneByEnsgAccession(ensemblAccession);
+                //if gene is not found, we just save it
+                if (foundGene == null) {
+                    foundGene = new Gene();
+                    foundGene.setEnsgAccession(ensemblAccession);
+                    this.saveGene(foundGene);
+                }
+                Species foundSpecies = this.getSpeciesByName(speciesName);
+                if (foundSpecies == null) {
+                    foundSpecies = new Species();
+                    foundSpecies.setSpeciesName(speciesName);
+                    this.saveSpecies(foundSpecies);
+                }
+                Probe foundProbe = this.getProbeByProbeId(probeId);
+                if (foundProbe == null) {
+                    foundProbe = new Probe();
+                    foundProbe.setProbeId(probeId);
+                }
+                //found all genes which are associated with this probe id
+                List<Gene> foundGeneList = this.getGenesByProbeId(probeId);
+                //if not found a list of gene, we just create an empty one
+                if (foundGeneList == null) {
+                    foundGeneList = new ArrayList<Gene>();
+                }
+                //if the foundGene is not in this list, just add it
+                if (!foundGeneList.contains(foundGene)) {
+                    foundGeneList.add(foundGene);
+                }
+                //set the species for this probe
+                foundProbe.setSpecies(foundSpecies);
+                //set the gene list for this probe
+                foundProbe.setGenes(foundGeneList);
+
+                //if there is no database id for this probe, which means this probe is new. just save it
+                if (foundProbe.getId() == 0) {
+                    this.saveProbe(foundProbe);
+                    countNew++;
+                } else {//we do a merging as the probe is still in a hibernate session
+                    this.mergeProbe(foundProbe);
+                    countUpdated++;
+                }
+            }
+        }
+
+        counter.setTotalUpdated(countUpdated);
+        counter.setTotalNew(countNew);
+        return counter;
+    }
+
+    //TODO to be removed
     @Override
     public ProbCounter importAllProbes(List<Probe> probes) {
         int countUpdated = 0;
@@ -1067,12 +1133,12 @@ public class DMServiceImpl implements DMService {
 
                 // find out if the probe is already in the database
                 Probe existedProbe = this.getProbeByProbeId(probe.getProbeId());
-                logger.debug("PROBE ID: "+probe.getProbeId());
+                logger.debug("PROBE ID: " + probe.getProbeId());
 
                 // set the species ID from the name
-                Species speciesN =this.getSpeciesByName(probe.getSpeciesName());
+                Species speciesN = this.getSpeciesByName(probe.getSpeciesName());
                 probe.setSpecies(speciesN);
-                logger.debug("PROBE SPECIES: "+probe.getSpecies().getSpeciesName());
+                logger.debug("PROBE SPECIES: " + probe.getSpecies().getSpeciesName());
 
                 // get the gene ID (many-to-many) - set it after including existing gene list
 
@@ -1080,11 +1146,11 @@ public class DMServiceImpl implements DMService {
 
                 // if there is no matching gene, log the error and skip this probe
                 if (gene != null) {
-                    logger.debug("PROBE MATCHED GENE: "+gene.getGeneName());
-                    logger.debug("geneID: "+gene.getId());
+                    logger.debug("PROBE MATCHED GENE: " + gene.getGeneName());
+                    logger.debug("geneID: " + gene.getId());
                 } else {
                     logger.debug("GENE IS NULL");
-                    importError(probe, "No matching gene in database");
+                    // importError(probe, "No matching gene in database");
                     continue;
                 }
 
@@ -1101,7 +1167,7 @@ public class DMServiceImpl implements DMService {
                     probe.setGenes(geneList);
 
                     // update.
-
+                    //TODO: why put two db operations (merge definitely includes the updating)
                     this.mergeProbe(probe);
                     this.updateProbe(probe);
                     //count how many probes have been updated
@@ -1122,7 +1188,8 @@ public class DMServiceImpl implements DMService {
                     countNew++;
                 }
             } else {
-                importError(probe, "Blank ID column");
+                //Simon comment: just ignore it.
+                //importError(probe, "Blank ID column");
             }
         }
         counter.setTotalUpdated(countUpdated);
@@ -1131,28 +1198,31 @@ public class DMServiceImpl implements DMService {
     }
 
     /**
-        Message the user through email that this probe can not be created, as the gene it references isn't in our
-        database.
+     * Message the user through email that this probe can not be created, as the gene it references isn't in our
+     * database.
      */
-    private void importError(Probe probe, String msg) {
-        logger.warn("The following probe failed to import, with message '"+msg+"': " + probe.getProbeId());
-        importErrors.add(probe);
-        importErrorMessages.add(msg);
-    }
 
-    @Override
-    public List<Probe> getProbeImportErrors() {
-        return importErrors;
-    }
-
-    @Override
-    public List<String> getProbeImportErrorMessages(){
-        return importErrorMessages;
-    }
-
-    private List<Probe> importErrors = new ArrayList<Probe>();
-    private List<String> importErrorMessages = new ArrayList<String>() ;
-
+    //TODO: the error message should be returned inside the return Object when you save probes-genes-species
+    // TODO: if you think  the error message is very important for probe, you should put the error message inside the  ProbCounter
+//    private void importError(Probe probe, String msg) {
+//        logger.warn("The following probe failed to import, with message '" + msg + "': " + probe.getProbeId());
+//        importErrors.add(probe);
+//        importErrorMessages.add(msg);
+//    }
+//
+//    @Override
+//    public List<Probe> getProbeImportErrors() {
+//        return importErrors;
+//    }
+//
+//    @Override
+//    public List<String> getProbeImportErrorMessages() {
+//        return importErrorMessages;
+//    }
+//
+//    private List<Probe> importErrors = new ArrayList<Probe>();
+//    private List<String> importErrorMessages = new ArrayList<String>();
+//
     @Override
     public void importProbe(ProbeBean probeBean) {
         ImportProbeThread probeThread = new ImportProbeThread(this, probeBean);
@@ -1171,9 +1241,10 @@ public class DMServiceImpl implements DMService {
     }
 
     @Override
-    public List<Probe> getProbeBySpecies(String speciesName){
+    public List<Probe> getProbeBySpecies(String speciesName) {
         return this.probeService.getProbeBySpecies(speciesName);
     }
+
     @Override
     public List<Probe> getProbesByGeneId(long geneId) {
         return this.probeService.getProbesByGeneId(geneId);
@@ -1224,9 +1295,9 @@ public class DMServiceImpl implements DMService {
                     } else {
                         this.mergeProbe(probe);
                     }
-            //    } else {
-            //          // message user that the probe cannot be loaded
-            //          importError(probes, "No matching gene in database");
+                    //    } else {
+                    //          // message user that the probe cannot be loaded
+                    //          importError(probes, "No matching gene in database");
                 }
             }
 
@@ -1314,61 +1385,65 @@ public class DMServiceImpl implements DMService {
     }
 
     @Override
-    public Tissue getTissueByName(String tissueId){
+    public Tissue getTissueByName(String tissueId) {
         return this.tissueService.getTissueByName(tissueId);
     }
 
     @Override
-    public void saveTissueExpression(TissueExpression tissueExpression){
+    public void saveTissueExpression(TissueExpression tissueExpression) {
         this.tissueExpressionService.saveTissueExpression(tissueExpression);
     }
+
     @Override
-    public void updateTissueExpression(TissueExpression tissueExpression){
+    public void updateTissueExpression(TissueExpression tissueExpression) {
         this.tissueExpressionService.updateTissueExpression(tissueExpression);
     }
+
     @Override
-    public void mergeTissueExpression(TissueExpression tissueExpression){
+    public void mergeTissueExpression(TissueExpression tissueExpression) {
         this.tissueExpressionService.mergeTissueExpression(tissueExpression);
     }
+
     @Override
-    public void deleteTissueExpression(TissueExpression tissueExpression){
+    public void deleteTissueExpression(TissueExpression tissueExpression) {
         this.tissueExpressionService.deleteTissueExpression(tissueExpression);
     }
 
     @Override
-    public List<TissueExpression> getTissueByProbeId(String probeId){
+    public List<TissueExpression> getTissueByProbeId(String probeId) {
         return this.tissueExpressionService.getTissueByProbeId(probeId);
     }
+
     @Override
-    public List<TissueExpression> getTissueByTissueId(String tissueId){
+    public List<TissueExpression> getTissueByTissueId(String tissueId) {
         return this.tissueExpressionService.getTissueByTissueId(tissueId);
     }
 
     @Override
-    public TissueCounter importAllTissues(List<TissueExpression> tissues){
+    public TissueCounter importAllTissues(List<TissueExpression> tissues) {
         int countUpdated = 0;
         int countNew = 0;
         //tissue counter
         TissueCounter counter = new TissueCounter();
 
         for (TissueExpression tissueExpressions : tissues) {
-            Probe probeId  = this.getProbeByProbeId(tissueExpressions.getProbeId());
-            Tissue tissueN =this.getTissueByName(tissueExpressions.getTissueId());
+            Probe probeId = this.getProbeByProbeId(tissueExpressions.getProbeId());
+            Tissue tissueN = this.getTissueByName(tissueExpressions.getTissueId());
             tissueExpressions.setTissue(tissueN);
             tissueExpressions.setProbe(probeId);
             if (probeId != null) {
                 TissueExpression existedTissue = this.getTissueExpressionById(tissueExpressions.getId());
                 //System.out.println("1 MESSAGE: '"+existedTissue+"'");
-               // System.out.println("2 MESSAGE: '"+existedTissue+"'");
-                  if (existedTissue != null)  {
-                      tissueExpressions.setId(existedTissue.getId());
-                      this.updateTissueExpression(tissueExpressions);
-                      countUpdated++;
+                // System.out.println("2 MESSAGE: '"+existedTissue+"'");
+                if (existedTissue != null) {
+                    tissueExpressions.setId(existedTissue.getId());
+                    this.updateTissueExpression(tissueExpressions);
+                    countUpdated++;
 
-                   }  else {
-                      this.saveTissueExpression(tissueExpressions);
-                      countNew++;
-                   }
+                } else {
+                    this.saveTissueExpression(tissueExpressions);
+                    countNew++;
+                }
 
             }
         }
@@ -1407,11 +1482,10 @@ public class DMServiceImpl implements DMService {
 //  }
 
     @Override
-    public void importTissue(TissueBean tissueBean){
+    public void importTissue(TissueBean tissueBean) {
         ImportTissueThread tissueThread = new ImportTissueThread(this, tissueBean);
         tissueThread.importTissue();
     }
-
 
 
     //Species
@@ -1634,7 +1708,7 @@ public class DMServiceImpl implements DMService {
             String probeId = probes[i];
 
             Probe probe = this.getProbeByProbeId(probeId);
-            if (probe == null){
+            if (probe == null) {
                 failCount++;
                 missingProbes += probeId + ", ";
                 continue;
@@ -1666,15 +1740,15 @@ public class DMServiceImpl implements DMService {
         dataset.setData(dataList);
         //save dataset, and save the all data as we
         logger.info("About to save dataset. Datalist size: " + dataList.size());
-        logger.debug("dataset: "+dataList.get(0).getDataset());
-        logger.debug("probe: "+dataList.get(0).getProbe());
-        logger.debug("value: "+dataList.get(0).getValue());
+        logger.debug("dataset: " + dataList.get(0).getDataset());
+        logger.debug("probe: " + dataList.get(0).getProbe());
+        logger.debug("value: " + dataList.get(0).getValue());
         this.saveDataset(dataset);
 
         // If any probes were not found, throw error containing list of missing probes and success count.
-        String msg = "" ;
-        if (failCount > 0)  {
-            msg = " - well, " +successCount + " out of "+data_arr.length+" data units were imported successfully, but the following "+failCount+" probes were not found in the database: " + missingProbes;
+        String msg = "";
+        if (failCount > 0) {
+            msg = " - well, " + successCount + " out of " + data_arr.length + " data units were imported successfully, but the following " + failCount + " probes were not found in the database: " + missingProbes;
         }
 
         long endtime = System.currentTimeMillis();

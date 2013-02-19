@@ -52,7 +52,7 @@ import java.util.List;
 @Table(name = "probe")
 @org.hibernate.annotations.Table(appliesTo = "probe",
         indexes = {@Index(name = "probeId", columnNames = {"probe_id"})
-               // @Index(name = "idx_platform", columnNames = {"platform"}),
+                // @Index(name = "idx_platform", columnNames = {"platform"}),
                 //@Index(name = "idx_species", columnNames = {"species"})
         })
 public class Probe extends Domain {
@@ -67,9 +67,11 @@ public class Probe extends Domain {
     @Column(name = "probe_id")
     private String probeId;
 
+    //TODO: remove this field, as the ensemblId is a field in the Gene domain object. dont' use it as DTO
     @Transient
     private String ensemblId;
 
+    //TODO: remove this field, as the speciesName is a field in the Species domain object. dont' use it as DTO
     @Transient
     private String speciesName;
 
@@ -83,7 +85,7 @@ public class Probe extends Domain {
     @LazyCollection(LazyCollectionOption.TRUE)
     private List<Gene> genes;
 
-    @OneToMany(targetEntity = Data.class,mappedBy = "probe")
+    @OneToMany(targetEntity = Data.class, mappedBy = "probe")
     private List<Data> data;
 
     public long getId() {
@@ -103,11 +105,11 @@ public class Probe extends Domain {
     }
 
     public Species getSpecies() {
-      return species;
+        return species;
     }
 
     public void setSpecies(Species species) {
-      this.species = species;
+        this.species = species;
     }
 
     public String getSpeciesName() {

@@ -28,101 +28,47 @@
 
 package edu.monash.merc.dto;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.User;
-
 import java.io.Serializable;
-import java.util.List;
 
 /**
+ * The DTO (data transfer object) which holds the relation between probe, gene and species
+ *
  * @author Simon Yu
+ *         <p/>
+ *         Email: xiaoming.yu@monash.edu
  * @version 1.0
- * @email Xiaoming.Yu@monash.edu
  * @since 1.0
  *        <p/>
- *        Date: 28/06/12
- *        Time: 4:21 PM
+ *        Date: 19/02/13 2:57 PM
  */
-public class ProbeBean implements Serializable {
+public class PGSBean implements Serializable {
+    private String probeId;
 
-    private String probeName;
+    private String ensemblAccession;
 
-    private List<PGSBean> pgsBeans;
+    private String species;
 
-    private User user;
-
-    private String appName;
-
-    private String serverName;
-
-    private boolean sendMailRequired;
-
-    private String fromMail;
-
-    private String toMail;
-
-    public String getProbeName() {
-        return probeName;
+    public String getProbeId() {
+        return probeId;
     }
 
-    public void setProbeName(String probeName) {
-        this.probeName = probeName;
+    public void setProbeId(String probeId) {
+        this.probeId = probeId;
     }
 
-    public List<PGSBean> getPgsBeans() {
-        return pgsBeans;
+    public String getEnsemblAccession() {
+        return ensemblAccession;
     }
 
-    public void setPgsBeans(List<PGSBean> pgsBeans) {
-        this.pgsBeans = pgsBeans;
+    public void setEnsemblAccession(String ensemblAccession) {
+        this.ensemblAccession = ensemblAccession;
     }
 
-    public User getUser() {
-        return user;
+    public String getSpecies() {
+        return species;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setSpecies(String species) {
+        this.species = species;
     }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    public boolean isSendMailRequired() {
-        return sendMailRequired;
-    }
-
-    public void setSendMailRequired(boolean sendMailRequired) {
-        this.sendMailRequired = sendMailRequired;
-    }
-
-    public String getFromMail() {
-        return fromMail;
-    }
-
-    public void setFromMail(String fromMail) {
-        this.fromMail = fromMail;
-    }
-
-    public String getToMail() {
-        return toMail;
-    }
-
-    public void setToMail(String toMail) {
-        this.toMail = toMail;
-    }
-
 }

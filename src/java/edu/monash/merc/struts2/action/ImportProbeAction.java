@@ -33,6 +33,7 @@ import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.User;
 import edu.monash.merc.domain.UserType;
+import edu.monash.merc.dto.PGSBean;
 import edu.monash.merc.dto.ProbeBean;
 import edu.monash.merc.exception.DCException;
 import edu.monash.merc.util.MercUtil;
@@ -108,8 +109,8 @@ public class ImportProbeAction extends DMBaseAction {
             //start to upload the probe file
             FileInputStream fis = null;
             fis = new FileInputStream(upload);
-            //get all probes from the file
-            List<Probe> probes = generateProbes(fis);
+            //get all probe and gene and species from the file
+            List<PGSBean> probes = generatePGSBeans(fis);
             //create probes bean
             ProbeBean probeBean = createProbeBean(user, probes);
             //call the import probes service
@@ -128,9 +129,9 @@ public class ImportProbeAction extends DMBaseAction {
         return SUCCESS;
     }
 
-    private List<Probe> generateProbes(FileInputStream fileInputStream) {
+    private List<PGSBean> generatePGSBeans(FileInputStream fileInputStream) {
         CSVReader csvReader = null;
-        List<Probe> probeList = new ArrayList<Probe>();
+        List<PGSBean> probeList = new ArrayList<PGSBean>();
         try {
             csvReader = new CSVReader(new InputStreamReader(fileInputStream));
             String[] columnsLine = csvReader.readNext();
@@ -142,15 +143,14 @@ public class ImportProbeAction extends DMBaseAction {
 
             String[] columnValuesLine;
             while ((columnValuesLine = csvReader.readNext()) != null) {
-                Probe probes = new Probe();
-                if (columnValuesLine.length == columnsLine.length) {
-                    CSVProbGenerator probGenerator = new CSVProbGenerator();
 
+                if (columnValuesLine.length == columnsLine.length) {
+                    CSVProbGenerator csvProbGenerator = new CSVProbGenerator();
                     for (int i = 0; i < columnsLine.length; i++) {
-                        probGenerator.getColumns().add(new ProbeColumn(columnsLine[i], columnValuesLine[i]));
+                        csvProbGenerator.getColumns().add(new ProbeColumn(columnsLine[i], columnValuesLine[i]));
                     }
-                    probes = probGenerator.genProbe();
-                    probeList.add(probes);
+                    PGSBean pgsBean = csvProbGenerator.generatePGSBean();
+                    probeList.add(pgsBean);
                 }
             }
         } catch (Exception ex) {
@@ -170,7 +170,7 @@ public class ImportProbeAction extends DMBaseAction {
         return probeList;
     }
 
-    private ProbeBean createProbeBean(User user, List<Probe> probes) {
+    private ProbeBean createProbeBean(User user, List<PGSBean> pgsBeans) {
         ProbeBean probeBean = new ProbeBean();
         String serverQName = getServerQName();
         String appName = appSetting.getPropValue(AppPropSettings.APPLICATION_NAME);
@@ -182,7 +182,7 @@ public class ImportProbeAction extends DMBaseAction {
         probeBean.setUser(user);
         probeBean.setToMail(user.getEmail());
         probeBean.setProbeName(this.uploadFileName);
-        probeBean.setProbes(probes);
+        probeBean.setPgsBeans(pgsBeans);
         return probeBean;
     }
 
@@ -236,10 +236,10 @@ public class ImportProbeAction extends DMBaseAction {
     }
 
     public boolean isSendMailRequired() {
-         return sendMailRequired;
-     }
+        return sendMailRequired;
+    }
 
-     public void setSendMailRequired(boolean sendMailRequired) {
-         this.sendMailRequired = sendMailRequired;
-     }
+    public void setSendMailRequired(boolean sendMailRequired) {
+        this.sendMailRequired = sendMailRequired;
+    }
 }
