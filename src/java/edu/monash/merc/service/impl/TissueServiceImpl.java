@@ -26,58 +26,80 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.service.impl;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
+import edu.monash.merc.dao.impl.TissueDAO;
+import edu.monash.merc.domain.Tissue;
+import edu.monash.merc.service.TissueService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 4:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
 
-    private Probe probe;
+@Scope("prototype")
+@Service
+@Transactional
+public class TissueServiceImpl implements TissueService {
 
-    private List<TissueExpression> tissueexpression;
+    @Autowired
+    private TissueDAO tissueDao;
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
+
+
+    public void setTissueDao(TissueDAO tissueDao) {
+        this.tissueDao = tissueDao;
     }
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
+    @Override
+    public Tissue getTissueById(long id) {
+        return this.tissueDao.get(id);
     }
 
-    public Probe getProbe() {
-        return probe;
+    @Override
+    public void saveTissue(Tissue tissue) {
+        this.tissueDao.add(tissue);
     }
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
+    @Override
+    public int saveTissue(List<Tissue> tissue) {
+        return this.tissueDao.saveAll(tissue);
     }
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
+    @Override
+    public void updateTissue(Tissue tissue) {
+        this.tissueDao.update(tissue);
     }
 
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
+    @Override
+    public void mergeTissue(Tissue tissue) {
+        this.tissueDao.merge(tissue);
     }
 
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
+    @Override
+    public int updateTissue(List<Tissue> tissue) {
+        return this.tissueDao.updateAll(tissue);
     }
+
+    @Override
+    public void deleteTissue(Tissue tissue) {
+        this.tissueDao.remove(tissue);
+    }
+
+    @Override
+    public Tissue getTissueByName(String tissueId) {
+        return this.tissueDao.getTissueByName(tissueId);
+    }
+
 
 }

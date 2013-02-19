@@ -58,14 +58,14 @@ public class Tissue extends Domain {
 
     @Basic
     @Column(name = "display_name")
-    private String tissue;
+    private String tissueId;
 
-    public String getTissue() {
-        return tissue;
+    public String getTissueId() {
+        return tissueId;
     }
 
-    public void setTissue(String tissue) {
-        this.tissue = tissue;
+    public void setTissueId(String tissueId) {
+        this.tissueId = tissueId;
     }
 
     public long getId() {

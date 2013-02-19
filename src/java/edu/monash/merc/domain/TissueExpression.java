@@ -29,6 +29,7 @@
 package edu.monash.merc.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 
 import javax.persistence.*;
 
@@ -44,6 +45,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "tissue_expression")
+@org.hibernate.annotations.Table(appliesTo = "tissue_expression",
+        indexes = {@Index(name = "expression", columnNames = {"expression"})
+        })
 public class TissueExpression extends Domain {
 
     @Id
@@ -52,17 +56,31 @@ public class TissueExpression extends Domain {
     @Column(name = "id", nullable = false)
     private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "gene_id")
-    private Gene gene;
+//    @ManyToOne
+//    @JoinColumn(name = "gene_id")
+//    private Gene gene;
 
+    @Transient
+    private String probeId;
+
+    @Transient
+    private String tissueId;
+
+    @ManyToOne
+    @JoinColumn(name = "probe_id")
+    private Probe probe;
+
+//   @ManyToOne(targetEntity = Probe.class)
+//   @JoinColumn(name = "probe_id", referencedColumnName = "id", nullable = false)
+//   private Probe probe;
 
     @ManyToOne
     @JoinColumn(name = "tissue_id")
     private Tissue tissue;
 
     @Basic
-    private Double expression;
+    @Column(name = "expression")
+    private double expression;
 
     public long getId() {
         return id;
@@ -72,12 +90,28 @@ public class TissueExpression extends Domain {
         this.id = id;
     }
 
-    public Gene getGene() {
-        return gene;
+//  public Gene getGene() {
+//      return gene;
+//  }
+//
+//  public void setGene(Gene gene) {
+//      this.gene = gene;
+//  }
+
+    public String getProbeId() {
+       return probeId;
     }
 
-    public void setGene(Gene gene) {
-        this.gene = gene;
+    public void setProbeId(String probeId) {
+       this.probeId = probeId;
+    }
+
+    public Probe getProbe() {
+        return probe;
+    }
+
+    public void setProbe(Probe probe) {
+        this.probe = probe;
     }
 
     public Tissue getTissue() {
@@ -86,6 +120,14 @@ public class TissueExpression extends Domain {
 
     public void setTissue(Tissue tissue) {
         this.tissue = tissue;
+    }
+
+    public String getTissueId() {
+        return tissueId;
+    }
+
+    public void setTissueId(String tissueId) {
+        this.tissueId = tissueId;
     }
 
     public Double getExpression() {

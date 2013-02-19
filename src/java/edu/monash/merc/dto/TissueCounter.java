@@ -28,56 +28,34 @@
 
 package edu.monash.merc.dto;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 12:39 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public class TissueCounter implements Serializable {
 
-    private Probe probe;
+    private int totalUpdated;
 
-    private List<TissueExpression> tissueexpression;
+    private int totalNew;
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
+    public int getTotalUpdated() {
+        return totalUpdated;
     }
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
+    public void setTotalUpdated(int totalUpdated) {
+        this.totalUpdated = totalUpdated;
     }
 
-    public Probe getProbe() {
-        return probe;
+    public int getTotalNew() {
+        return totalNew;
     }
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
+    public void setTotalNew(int totalNew) {
+        this.totalNew = totalNew;
     }
-
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
-
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
-    }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
 }

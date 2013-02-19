@@ -24,6 +24,7 @@
         <@s.if test="%{user.userType == 1 || user.userType ==2}">
             <li><a href="${base}/data/showImportProbes.jspx">Import Probes</a></li>
             <li><a href="${base}/data/showImportTFSite.jspx">Import Transcription Site</a></li>
+            <li><a href="${base}/data/showImportTissue.jspx">Import Tissues</a></li>
         </@s.if>
 		<li><a href="${base}/manage/getUserEvents.jspx">Events</a></li>
 		<li><a href="${base}/admin/listAllUsers.jspx">Users</a></li>

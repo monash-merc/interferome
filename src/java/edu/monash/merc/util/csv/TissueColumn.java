@@ -26,58 +26,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
-
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
-
-import java.util.ArrayList;
-import java.util.List;
+package edu.monash.merc.util.csv;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 12:47 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public class TissueColumn {
 
-    private Probe probe;
+        private String columnName;
 
-    private List<TissueExpression> tissueexpression;
+        private String columnValue;
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
-    }
+        public TissueColumn(String columnName, String columnValue) {
+            this.columnName = columnName;
+            this.columnValue = columnValue;
+        }
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
-    }
+        public String getColumnName() {
+            return columnName;
+        }
 
-    public Probe getProbe() {
-        return probe;
-    }
+        public void setColumnName(String columnName) {
+            this.columnName = columnName;
+        }
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
-    }
+        public String getColumnValue() {
+            return columnValue;
+        }
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
-
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
-    }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
+        public void setColumnValue(String columnValue) {
+            this.columnValue = columnValue;
+        }
 }

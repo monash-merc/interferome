@@ -28,56 +28,99 @@
 
 package edu.monash.merc.dto;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.domain.User;
+import edu.monash.merc.domain.TissueExpression;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 12:38 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public class TissueBean implements Serializable {
 
-    private Probe probe;
+    private String tissueName;
 
-    private List<TissueExpression> tissueexpression;
+    private List<TissueExpression> tissues;
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
+    private User user;
+
+    private String appName;
+
+    private String serverName;
+
+    private boolean sendMailRequired;
+
+    private String fromMail;
+
+    private String toMail;
+
+    public String getTissueName() {
+        return tissueName;
     }
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
+    public void setTissueName(String tissueName) {
+        this.tissueName = tissueName;
     }
 
-    public Probe getProbe() {
-        return probe;
+    public List<TissueExpression> getTissues() {
+        return tissues;
     }
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
+    public void setTissues(List<TissueExpression> tissues) {
+        this.tissues = tissues;
     }
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
+    public User getUser() {
+        return user;
     }
 
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
+    public String getAppName() {
+        return appName;
     }
 
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public boolean isSendMailRequired() {
+        return sendMailRequired;
+    }
+
+    public void setSendMailRequired(boolean sendMailRequired) {
+        this.sendMailRequired = sendMailRequired;
+    }
+
+    public String getFromMail() {
+        return fromMail;
+    }
+
+    public void setFromMail(String fromMail) {
+        this.fromMail = fromMail;
+    }
+
+    public String getToMail() {
+        return toMail;
+    }
+
+    public void setToMail(String toMail) {
+        this.toMail = toMail;
+    }
 }
+

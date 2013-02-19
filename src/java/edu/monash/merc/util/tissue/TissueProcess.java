@@ -26,58 +26,47 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.util.tissue;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 12:17 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public class TissueProcess implements Serializable {
 
-    private Probe probe;
+    private long processId;
 
-    private List<TissueExpression> tissueexpression;
+    private boolean processFinished;
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
+    private boolean cancelled;
+
+    public long getProcessId() {
+        return processId;
     }
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
+    public void setProcessId(long processId) {
+        this.processId = processId;
     }
 
-    public Probe getProbe() {
-        return probe;
+    public boolean isProcessFinished() {
+        return processFinished;
     }
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
+    public void setProcessFinished(boolean processFinished) {
+        this.processFinished = processFinished;
     }
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
+    public boolean isCancelled() {
+        return cancelled;
     }
 
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
 }
+

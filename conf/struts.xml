@@ -480,6 +480,20 @@
             <result name="success">/web/data/import_tfSite_finished.ftl</result>
         </action>
 
+        <!-- show the tissue page -->
+        <action name="showImportTissue" class="data.importTissueAction" method="showImportTissue">
+            <result name="input">/web/data/import_tissue.ftl</result>
+            <result name="error">/web/data/import_tissue.ftl</result>
+            <result name="success">/web/data/import_tissue.ftl</result>
+        </action>
+
+        <!-- tissues importing -->
+        <action name="importTissue" class="data.importTissueAction" method="importTissue">
+            <result name="input">/web/data/import_tissue.ftl</result>
+            <result name="error">/web/data/import_tissue.ftl</result>
+            <result name="success">/web/data/import_tissue_finished.ftl</result>
+        </action>
+
         <!-- capture the dataset, ajax version for dataset import -->
         <action name="importDataset" class="data.importDatasetAction" method="importDataset">
             <result name="success" type="json">

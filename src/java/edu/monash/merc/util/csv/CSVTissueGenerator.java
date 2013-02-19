@@ -26,58 +26,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.util.csv;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Tissue;
 import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 12:46 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public class CSVTissueGenerator {
+    private List<TissueColumn> columns = new ArrayList<TissueColumn>();
 
-    private Probe probe;
-
-    private List<TissueExpression> tissueexpression;
-
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
+    public List<TissueColumn> getColumns() {
+        return columns;
     }
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
+    public void setColumns(List<TissueColumn> columns) {
+        this.columns = columns;
     }
 
-    public Probe getProbe() {
-        return probe;
-    }
+    public TissueExpression genTissues() {
+        TissueExpression tissue = new TissueExpression();
+        for (TissueColumn tscolumn : columns) {
+            String columnName = tscolumn.getColumnName();
+            String columnValue = tscolumn.getColumnValue();
+            if (columnName.equalsIgnoreCase(TField.PROBEID)) {
+                tissue.setProbeId(columnValue);
+            }
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
-    }
+            if (columnName.equalsIgnoreCase(TField.EXPRESSION)) {
+                tissue.setExpression(Double.parseDouble(columnValue));
+            }
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
+            if (columnName.equalsIgnoreCase(TField.TISSUE) ) {
+                tissue.setTissueId(columnValue);
+            }
 
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
+        }
+        return tissue;
     }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
 }
+

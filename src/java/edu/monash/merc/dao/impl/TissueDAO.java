@@ -26,58 +26,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.dao.impl;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
+import edu.monash.merc.domain.Tissue;
+import edu.monash.merc.dao.HibernateGenericDAO;
+import edu.monash.merc.repository.ITissueRepository;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 1:57 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
 
-    private Probe probe;
+@Scope("prototype")
+@Repository
+public class TissueDAO extends HibernateGenericDAO<Tissue> implements ITissueRepository {
 
-    private List<TissueExpression> tissueexpression;
-
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
-    }
-
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
-    }
-
-    public Probe getProbe() {
-        return probe;
-    }
-
-    public void setProbe(Probe probe) {
-        this.probe = probe;
-    }
-
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
-
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
-    }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
+    @Override
+    public Tissue getTissueByName(String tissueId) {
+        Criteria criteria = this.session().createCriteria(this.persistClass);
+        criteria.add(Restrictions.eq("tissueId", tissueId));
+        Tissue result = (Tissue) criteria.uniqueResult();
+        this.session().evict(result);
+        return result;
     }
 
 }

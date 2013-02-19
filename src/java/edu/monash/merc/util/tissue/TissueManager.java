@@ -26,58 +26,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.util.tissue;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 12:16 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public class TissueManager {
 
-    private Probe probe;
+    private static final Object LOCK = new Object();
 
-    private List<TissueExpression> tissueexpression;
+    public static final long PROCESS_ID = 10000;
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
+    private static Map<Long, TissueProcess> processMap = new HashMap<Long, TissueProcess>();
+
+    public static boolean registerProcess(long processId, TissueProcess process) {
+        synchronized (LOCK) {
+            long pid = process.getProcessId();
+            if (processId != pid) {
+            }
+            if (findImportProcess(processId)) {
+                return false;
+            } else {
+                processMap.put(processId, process);
+                return true;
+            }
+        }
     }
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
+    public static boolean unRegisterProcess(long pId) {
+        synchronized (LOCK) {
+            processMap.remove(pId);
+            return true;
+        }
     }
 
-    public Probe getProbe() {
-        return probe;
+    public static boolean findImportProcess(long pid) {
+        TissueProcess process = processMap.get(pid);
+        // can't find the process, just return false;
+        if (process == null) {
+            return false;
+        }
+        // if process is finished, just return false;
+        if (process.isProcessFinished()) {
+            return false;
+        } else {
+            return true;
+        }
     }
-
-    public void setProbe(Probe probe) {
-        this.probe = probe;
-    }
-
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
-
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
-    }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
 }

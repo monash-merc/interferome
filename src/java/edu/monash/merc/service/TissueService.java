@@ -26,58 +26,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.service;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
-import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
+import edu.monash.merc.domain.Tissue;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 4:23 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public interface TissueService {
 
-    private Probe probe;
+    public Tissue getTissueById(long id);
 
-    private List<TissueExpression> tissueexpression;
+    public void saveTissue(Tissue tissue);
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
-    }
+    public int saveTissue(List<Tissue> tissue);
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
-    }
+    public void updateTissue(Tissue tissue);
 
-    public Probe getProbe() {
-        return probe;
-    }
+    public void mergeTissue(Tissue tissue);
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
-    }
+    public int updateTissue(List<Tissue> tissue);
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
+    public void deleteTissue(Tissue tissue);
 
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
-    }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
+    public Tissue getTissueByName(String tissueId);
 }

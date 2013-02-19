@@ -26,58 +26,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.repository;
 
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 12/02/13
+ * Time: 5:10 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public interface ITissueExpressionRepository {
 
-    private Probe probe;
+    public List<TissueExpression> getTissueByProbeId(String probeId);
 
-    private List<TissueExpression> tissueexpression;
-
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
-    }
-
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
-    }
-
-    public Probe getProbe() {
-        return probe;
-    }
-
-    public void setProbe(Probe probe) {
-        this.probe = probe;
-    }
-
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
-
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
-    }
-
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
+    public List<TissueExpression> getTissueByTissueId(String tissueId);
 }

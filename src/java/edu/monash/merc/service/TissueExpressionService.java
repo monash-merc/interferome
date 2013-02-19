@@ -26,58 +26,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.monash.merc.dto;
+package edu.monash.merc.service;
 
-import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
+import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
+ * User: Irina
+ * Date: 13/02/13
+ * Time: 3:15 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeneExpressionRecord {
+public interface TissueExpressionService {
 
-    private Probe probe;
+    public TissueExpression getTissueExpressionById(long id);
 
-    private List<TissueExpression> tissueexpression;
+    public void saveTissueExpression(TissueExpression tissueExpression);
 
-    public GeneExpressionRecord(Probe p){
-        this.probe = p;
-        tissueexpression = new ArrayList<TissueExpression>();
-    }
+    public int saveTissueExpression(List<TissueExpression> tissueExpression);
 
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
-    }
+    public void updateTissueExpression(TissueExpression tissueExpression);
 
-    public Probe getProbe() {
-        return probe;
-    }
+    public void mergeTissueExpression(TissueExpression tissueExpression);
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
-    }
+    public int updateTissueExpression(List<TissueExpression> tissueExpression);
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
-    }
+    public void deleteTissueExpression(TissueExpression tissueExpression);
 
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
-    }
+    public List<TissueExpression> getTissueByProbeId(String probeId);
 
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
-    }
-
+    public List<TissueExpression> getTissueByTissueId(String tissueId);
 }

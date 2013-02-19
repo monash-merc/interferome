@@ -250,9 +250,7 @@ public class SearchAction extends DMBaseAction {
 
     private List<GeneExpressionRecord> tissueExpressionList;
 
-    /**
-     *
-     */
+//    private List<TissueExpression> tissueExprList;
 
     private Object[] subtypeList;
 
@@ -665,19 +663,21 @@ public class SearchAction extends DMBaseAction {
 
             //Get the Tissue Expression
             List<TissueExpression> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
-            this.tissueExpressionList = new ArrayList<GeneExpressionRecord>();
-            Iterator i = te.iterator();
-            HashMap<String, Integer> genes = new HashMap<String, Integer>();
-            while (i.hasNext()) {
-                TissueExpression t = (TissueExpression) i.next();
-                // System.out.println(t.getGene().getEnsgAccession());
-                if (genes.containsKey(t.getGene().getEnsgAccession())) {
-                    this.tissueExpressionList.get(genes.get(t.getGene().getEnsgAccession())).addTissueExpression(t);
-                } else {
-                    this.tissueExpressionList.add(new GeneExpressionRecord(t));
-                    genes.put(t.getGene().getEnsgAccession(), this.tissueExpressionList.size() - 1);
-                }
-            }
+             this.tissueExpressionList = new ArrayList<GeneExpressionRecord>();
+             Iterator i = te.iterator();
+             HashMap<String, Integer> probes = new HashMap<String, Integer>();
+             while (i.hasNext()) {
+                 TissueExpression t = (TissueExpression) i.next();
+                 System.out.println("MESSAGE - 1 - SearchAction: '"+t.getProbe().getProbeId()+"'");
+                 System.out.println("MESSAGE - 11 - SearchAction: '"+t.getTissue().getTissueId()+"'");
+                // System.out.println("MESSAGE - 12 - SearchAction: '"+t.getProbe().getEnsemblId()+"'");
+                 if (probes.containsKey(t.getProbe().getProbeId())) {
+                     this.tissueExpressionList.get(probes.get(t.getProbe().getEnsemblId())).addTissueExpression(t);
+                 } else {
+                     this.tissueExpressionList.add(new GeneExpressionRecord(t));
+                     probes.put(t.getProbe().getEnsemblId(), this.tissueExpressionList.size() - 1);
+                 }
+             }
 
             //set the searched flag as true
             searched = true;
@@ -1051,15 +1051,15 @@ public class SearchAction extends DMBaseAction {
             List<TissueExpression> te = this.searchDataService.searchTissueExpression(searchBean, 1, maxRecords, orderBy, orderByType);
             this.tissueExpressionList = new ArrayList<GeneExpressionRecord>();
             Iterator i = te.iterator();
-            HashMap<String, Integer> genes = new HashMap<String, Integer>();
+            HashMap<String, Integer> probes = new HashMap<String, Integer>();
             while (i.hasNext()) {
                 TissueExpression t = (TissueExpression) i.next();
-                // System.out.println(t.getGene().getEnsgAccession());
-                if (genes.containsKey(t.getGene().getEnsgAccession())) {
-                    this.tissueExpressionList.get(genes.get(t.getGene().getEnsgAccession())).addTissueExpression(t);
+                System.out.println("MESSAGE - 33 - SearchAction: '"+t.getTissue().getTissueId());
+                if (probes.containsKey(t.getProbeId())) {
+                 this.tissueExpressionList.get(probes.get(t.getProbe().getEnsemblId())).addTissueExpression(t);
                 } else {
                     this.tissueExpressionList.add(new GeneExpressionRecord(t));
-                    genes.put(t.getGene().getEnsgAccession(), this.tissueExpressionList.size() - 1);
+                 probes.put(t.getProbe().getEnsemblId(), this.tissueExpressionList.size() - 1);
                 }
             }
             this.csvInputStream = createCSVFileTissueExpression(searchBean, tissueExpressionList);
@@ -2723,14 +2723,14 @@ public class SearchAction extends DMBaseAction {
             csvWriter.writeNext(new String[]{""});
 
             List<String> heads = new ArrayList<String>();
-            heads.add("Gene Names");
+            heads.add("Probe Id");
             //will be a head of csv file
             for (GeneExpressionRecord gerecord : tissueExpressionList) {
                 List<TissueExpression> tissueExpressions = gerecord.getTissueexpression();
 
                 for (TissueExpression tissueExpression : tissueExpressions) {
                     Tissue tissue = tissueExpression.getTissue();
-                    String tissueVal = tissue.getTissue();
+                    String tissueVal = tissue.getTissueId();
                     heads.add(tissueVal);
                 }
             }
@@ -2739,10 +2739,10 @@ public class SearchAction extends DMBaseAction {
             for (GeneExpressionRecord gerecord : tissueExpressionList) {
                 List<TissueExpression> tissueExpressions = gerecord.getTissueexpression();
                 //for individual row in csv file
-                Gene gene = gerecord.getGene();
-                String gname = gene.getGeneName();
+                Probe probe = gerecord.getProbe();
+                String probeId = probe.getProbeId();
                 List<String> rowvalues = new ArrayList<String>();
-                rowvalues.add(gname);
+                rowvalues.add(probeId);
                 for (TissueExpression tissueExpression : tissueExpressions) {
                     double expression = tissueExpression.getExpression();
                     rowvalues.add(String.valueOf(expression));
@@ -2750,7 +2750,7 @@ public class SearchAction extends DMBaseAction {
                 csvWriter.writeNext(rowvalues.toArray(new String[rowvalues.size()]));
             }
 
-            //        csvWriter.writeNext(new String[]{TermAccession,goLink+TermAccession,newDelimTermName,newDelimTermDefinition, String.valueOf(gCount), " N/A"});
+            //csvWriter.writeNext(new String[]{TermAccession,goLink+TermAccession,newDelimTermName,newDelimTermDefinition, String.valueOf(gCount), " N/A"});
 
             //flush out
             csvWriter.flush();

@@ -189,6 +189,7 @@ public interface DMService {
 
     public void saveMetaRegInfo(MDRegistrationBean mdRegistrationBean);
 
+    //Reporters
     public void saveReporter(Reporter reporter);
 
     public void mergeReporter(Reporter reporter);
@@ -244,6 +245,35 @@ public interface DMService {
     public TfSiteCounter importAllTFSites(List<TFSite> tfSites);
 
     public TFSite getTFSite(TFSite tfSite);
+
+    // Tissues
+//  public void saveTissue(Tissue tissue);
+//
+//  public void updateTissue(Tissue tissue);
+//
+//  public void mergeTissue(Tissue tissue);
+
+    public TissueExpression getTissueExpressionById(long id);
+//
+    public Tissue getTissueByName(String tissueId);
+
+    public void saveTissueExpression(TissueExpression tissueExpression);
+
+    public void updateTissueExpression(TissueExpression tissueExpression);
+
+    public void mergeTissueExpression(TissueExpression tissueExpression);
+
+    public void deleteTissueExpression(TissueExpression tissueExpression);
+
+    public List<TissueExpression> getTissueByProbeId(String probeId);
+
+    public List<TissueExpression> getTissueByTissueId(String tissueId);
+
+    public TissueCounter importAllTissues(List<TissueExpression> tissues);
+
+  //  public TissueCounter importTissues(List<Tissue> tissue);
+
+    public void importTissue(TissueBean tissueBean);
 
     //Species
 
@@ -311,57 +341,21 @@ public interface DMService {
     public List<String> getAbnormalFactors();
 
 
-    /**
-     * Get a Gene by Gene id
-     *
-     * @param id a Gene id
-     * @return a Gene object
-     */
+     // Genes
     public Gene getGeneById(long id);
 
-    /**
-     * Save a Gene
-     *
-     * @param gene a Gene object
-     */
     public void saveGene(Gene gene);
 
-    /**
-     * Merge a Gene object
-     *
-     * @param gene a Gene object
-     */
     public void mergeGene(Gene gene);
 
-    /**
-     * Update a Gene object
-     *
-     * @param gene a Gene object
-     */
     public void updateGene(Gene gene);
 
-    /**
-     * Delete a Gene object
-     *
-     * @param gene a Gene object
-     */
     public void deleteGene(Gene gene);
 
-    /**
-     * Get the Gene by an ensembl accession id
-     *
-     * @param ensgAccession an ensembl accession id
-     * @return a Gene
-     */
     public Gene getGeneByEnsgAccession(String ensgAccession);
 
     public List<Gene> getGenesByProbeId(String probeId);
 
-    /**
-     * import all genes
-     *
-     * @param genes a list of Genes.
-     */
     void importGenes(List<Gene> genes, Date importedTime);
 
     //Evidence Code
