@@ -45,6 +45,7 @@ import edu.monash.merc.util.interferome.dataset.VarFactor;
 import edu.monash.merc.util.probe.ImportProbeThread;
 import edu.monash.merc.util.reporter.ImportReporterThread;
 import edu.monash.merc.util.tfsite.ImportTFSiteThread;
+import edu.monash.merc.util.tissue.ImportTissueThread;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +110,12 @@ public class DMServiceImpl implements DMService {
 
     @Autowired
     private TFSiteService tfSiteService;
+
+    @Autowired
+    private TissueExpressionService tissueExpressionService;
+
+    @Autowired
+    private TissueService tissueService;
 
     @Autowired
     private SpeciesService speciesService;
@@ -1288,6 +1295,125 @@ public class DMServiceImpl implements DMService {
         tfSiteThread.importTFSite();
     }
 
+    // Tissues
+//  @Override
+//  public void saveTissue(Tissue tissue){
+//      this.tissueService.saveTissue(tissue);
+//  }
+//  @Override
+//  public void updateTissue(Tissue tissue){
+//      this.tissueService.updateTissue(tissue);
+//  }
+//  @Override
+//  public void mergeTissue(Tissue tissue){
+//      this.tissueService.mergeTissue(tissue);
+//  }
+    @Override
+    public TissueExpression getTissueExpressionById(long id) {
+        return this.tissueExpressionService.getTissueExpressionById(id);
+    }
+
+    @Override
+    public Tissue getTissueByName(String tissueId){
+        return this.tissueService.getTissueByName(tissueId);
+    }
+
+    @Override
+    public void saveTissueExpression(TissueExpression tissueExpression){
+        this.tissueExpressionService.saveTissueExpression(tissueExpression);
+    }
+    @Override
+    public void updateTissueExpression(TissueExpression tissueExpression){
+        this.tissueExpressionService.updateTissueExpression(tissueExpression);
+    }
+    @Override
+    public void mergeTissueExpression(TissueExpression tissueExpression){
+        this.tissueExpressionService.mergeTissueExpression(tissueExpression);
+    }
+    @Override
+    public void deleteTissueExpression(TissueExpression tissueExpression){
+        this.tissueExpressionService.deleteTissueExpression(tissueExpression);
+    }
+
+    @Override
+    public List<TissueExpression> getTissueByProbeId(String probeId){
+        return this.tissueExpressionService.getTissueByProbeId(probeId);
+    }
+    @Override
+    public List<TissueExpression> getTissueByTissueId(String tissueId){
+        return this.tissueExpressionService.getTissueByTissueId(tissueId);
+    }
+
+    @Override
+    public TissueCounter importAllTissues(List<TissueExpression> tissues){
+        int countUpdated = 0;
+        int countNew = 0;
+        //tissue counter
+        TissueCounter counter = new TissueCounter();
+
+        for (TissueExpression tissueExpressions : tissues) {
+            Probe probeId  = this.getProbeByProbeId(tissueExpressions.getProbeId());
+            Tissue tissueN =this.getTissueByName(tissueExpressions.getTissueId());
+            tissueExpressions.setTissue(tissueN);
+            tissueExpressions.setProbe(probeId);
+            if (probeId != null) {
+                TissueExpression existedTissue = this.getTissueExpressionById(tissueExpressions.getId());
+                //System.out.println("1 MESSAGE: '"+existedTissue+"'");
+               // System.out.println("2 MESSAGE: '"+existedTissue+"'");
+                  if (existedTissue != null)  {
+                      tissueExpressions.setId(existedTissue.getId());
+                      this.updateTissueExpression(tissueExpressions);
+                      countUpdated++;
+
+                   }  else {
+                      this.saveTissueExpression(tissueExpressions);
+                      countNew++;
+                   }
+
+            }
+        }
+        counter.setTotalUpdated(countUpdated);
+        counter.setTotalNew(countNew);
+        return counter;
+    }
+
+//  @Override
+//  public TissueCounter importTissues(List<Tissue> tissue){
+//      int countUpdated = 0;
+//      int countNew = 0;
+//      //reporters counter
+//      TissueCounter counter = new TissueCounter();
+//
+//      for (Tissue tissue1 : tissue) {
+//          if (StringUtils.isNotBlank(tissue1.getTissueId())) {
+//              Tissue existedTissue = this.getTissueByName(tissue1.getTissueId());
+//              if (existedTissue != null) {
+//                  tissue1.setId(existedTissue.getId());
+//                  // this.mergeReporter(reporter);
+//                  this.updateTissue(tissue1);
+//                  //count how many reporters have been updated
+//                  countUpdated++;
+//              } else {
+//                  this.saveTissue(tissue1);
+//                  //count how many reporters are new
+//                  countNew++;
+//              }
+//          }
+//      }
+//      counter.setTotalUpdated(countUpdated);
+//      counter.setTotalNew(countNew);
+//      return counter;
+//
+//  }
+
+    @Override
+    public void importTissue(TissueBean tissueBean){
+        ImportTissueThread tissueThread = new ImportTissueThread(this, tissueBean);
+        tissueThread.importTissue();
+    }
+
+
+
     //Species
 
     @Override
@@ -1620,51 +1746,32 @@ public class DMServiceImpl implements DMService {
         return this.ifnVariationService.getAbnormalFactors();
     }
 
-    //Gene
-
-    /**
-     * {@inheritDoc}
-     */
+    //Genes
     @Override
     public Gene getGeneById(long id) {
         return this.geneService.getGeneById(id);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void saveGene(Gene gene) {
         this.geneService.saveGene(gene);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mergeGene(Gene gene) {
         this.geneService.mergeGene(gene);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateGene(Gene gene) {
         this.geneService.updateGene(gene);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deleteGene(Gene gene) {
         this.geneService.deleteGene(gene);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Gene getGeneByEnsgAccession(String ensgAccession) {
         return this.geneService.getGeneByEnsgAccession(ensgAccession);
@@ -1675,9 +1782,6 @@ public class DMServiceImpl implements DMService {
         return this.geneService.getGenesByProbeId(probeId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void importGenes(List<Gene> genes, Date importedTime) {
         if (genes != null) {
