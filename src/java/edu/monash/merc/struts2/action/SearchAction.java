@@ -1055,7 +1055,7 @@ public class SearchAction extends DMBaseAction {
             while (i.hasNext()) {
                 TissueExpression t = (TissueExpression) i.next();
                 System.out.println("MESSAGE - 33 - SearchAction: '"+t.getTissue().getTissueId());
-                if (probes.containsKey(t.getProbeId())) {
+                if (probes.containsKey(t.getProbe().getProbeId())) {
                  this.tissueExpressionList.get(probes.get(t.getProbe().getEnsemblId())).addTissueExpression(t);
                 } else {
                     this.tissueExpressionList.add(new GeneExpressionRecord(t));

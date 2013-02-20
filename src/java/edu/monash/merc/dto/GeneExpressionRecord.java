@@ -47,10 +47,13 @@ public class GeneExpressionRecord {
 
     private Probe probe;
 
+    private Gene gene;
+
     private List<TissueExpression> tissueexpression;
 
-    public GeneExpressionRecord(Probe p){
+    public GeneExpressionRecord(Probe p, Gene g){
         this.probe = p;
+        this.gene = g;
         tissueexpression = new ArrayList<TissueExpression>();
     }
 

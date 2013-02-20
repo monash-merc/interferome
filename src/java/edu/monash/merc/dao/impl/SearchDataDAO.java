@@ -362,7 +362,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
         List<Probe> probes = uniqueProbesPages.getPageResults();
-        System.out.println("================= uniqProbesPage: " + probes.size());
        // ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {
             String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.genes g WHERE pbs.probeId IN (:probes) ORDER BY pbs, te";
