@@ -67,11 +67,9 @@ public class Probe extends Domain {
     @Column(name = "probe_id")
     private String probeId;
 
-    //TODO: remove this field, as the ensemblId is a field in the Gene domain object. dont' use it as DTO
     @Transient
     private String ensemblId;
 
-    //TODO: remove this field, as the speciesName is a field in the Species domain object. dont' use it as DTO
     @Transient
     private String speciesName;
 

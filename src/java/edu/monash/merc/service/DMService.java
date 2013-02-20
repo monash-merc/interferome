@@ -223,18 +223,15 @@ public interface DMService {
 
     public Probe getProbeByProbeId(String probeId);
 
-    public ProbCounter importAllPGSBeans(List<PGSBean> pgsBeans);
-
     public ProbCounter importAllProbes(List<Probe> probes);
 
     public void importProbe(ProbeBean probeBeans);
 
     public void importProbes(List<ProbeGeneBean> probeGeneBeans);
 
-    //TODO: not right way to define these two methods (simon)
-    // public List<Probe> getProbeImportErrors();
+    public List<Probe> getProbeImportErrors();
 
-    // public List<String> getProbeImportErrorMessages();
+    public List<String> getProbeImportErrorMessages();
 
     // TFSite
     public void saveTFSite(TFSite tfSite);
@@ -257,8 +254,7 @@ public interface DMService {
 //  public void mergeTissue(Tissue tissue);
 
     public TissueExpression getTissueExpressionById(long id);
-
-    //
+//
     public Tissue getTissueByName(String tissueId);
 
     public void saveTissueExpression(TissueExpression tissueExpression);
@@ -275,7 +271,7 @@ public interface DMService {
 
     public TissueCounter importAllTissues(List<TissueExpression> tissues);
 
-    //  public TissueCounter importTissues(List<Tissue> tissue);
+  //  public TissueCounter importTissues(List<Tissue> tissue);
 
     public void importTissue(TissueBean tissueBean);
 
@@ -345,7 +341,7 @@ public interface DMService {
     public List<String> getAbnormalFactors();
 
 
-    // Genes
+     // Genes
     public Gene getGeneById(long id);
 
     public void saveGene(Gene gene);

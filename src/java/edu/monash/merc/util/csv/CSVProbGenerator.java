@@ -30,9 +30,7 @@ package edu.monash.merc.util.csv;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import edu.monash.merc.domain.Probe;
-import edu.monash.merc.dto.PGSBean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -52,32 +50,28 @@ public class CSVProbGenerator {
         this.columns = columns;
     }
 
-    //TODO: simon comment
-    //replace the return Probe object by a Probe_Gene_Species DTO object (PGSBean)
-    public PGSBean generatePGSBean() {
-        PGSBean pgsBean = new PGSBean();
-        for (ProbeColumn prcolumn : columns) {
-            String columnName = prcolumn.getColumnName();
-            String columnValue = prcolumn.getColumnValue();
-            //set the probe id
-            if (columnName.equalsIgnoreCase(PField.PROBEID)) {
-                pgsBean.setProbeId(columnValue);
-            }
-            //set the ensembl accession
-            if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
-                pgsBean.setEnsemblAccession(columnValue);
-            }
-            //set the species
-            if (columnName.equalsIgnoreCase(PField.SPECIES)) {
-                pgsBean.setSpecies(columnValue);
-            }
-            //TODO: Don't need it
-            //TODO: Fix setGenes(null). I just fixed the syntax.
+    public Probe genProbe() {
+        Probe probes = new Probe();
+         for (ProbeColumn prcolumn : columns) {
+             String columnName = prcolumn.getColumnName();
+             String columnValue = prcolumn.getColumnValue();
+             if (columnName.equalsIgnoreCase(PField.PROBEID)) {
+                 probes.setProbeId(columnValue);
+             }
+             if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
+                 probes.setEnsemblId(columnValue);
+             }
+              //TODO: Fix relations between Probe and Species domains
+             if (columnName.equalsIgnoreCase(PField.SPECIES)) {
+                 probes.setSpeciesName(columnValue);
+             }
+
+             //TODO: Fix setGenes(null). I just fixed the syntax.
             // if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
-            //  System.out.println("DBG MESSAGE - Species name from CSV: '"+columnValue+"'");
-            //    probes.setGenes(null);
+             //  System.out.println("DBG MESSAGE - Species name from CSV: '"+columnValue+"'");
+             //    probes.setGenes(null);
             // }
-        }
-        return pgsBean;
+         }
+         return probes;
     }
 }

@@ -31,7 +31,6 @@ package edu.monash.merc.util.probe;
 import edu.monash.merc.domain.AuditEvent;
 import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.User;
-import edu.monash.merc.dto.PGSBean;
 import edu.monash.merc.dto.ProbCounter;
 import edu.monash.merc.dto.ProbeBean;
 import edu.monash.merc.service.DMService;
@@ -87,10 +86,11 @@ public class ImportProbeThread implements Runnable {
             if (registerProcess(ProbeManager.PROCESS_ID)) {
                 String eventMsg = null;
                 try {
-                    List<PGSBean> pgsBeans = this.probeBean.getPgsBeans();
-                    if (pgsBeans != null && pgsBeans.size() > 0) {
-                        ProbCounter probeCounter = this.dmService.importAllPGSBeans(pgsBeans);
+                    List<Probe> probes = this.probeBean.getProbes();
+                    if (probes != null && probes.size() > 0) {
+                        ProbCounter probeCounter = this.dmService.importAllProbes(probes);
                         eventMsg = genEventMsg(probeCounter);
+                        eventMsg += probeImportErrors();
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -116,27 +116,25 @@ public class ImportProbeThread implements Runnable {
         }
     }
 
-    //if we think the error message is very important, we should define another field called ErrorProbe object inside  ProbCounter.java
     /**
-     * @return A error message string representing any probes that didn't import successfully, or the empty string
-     *         if no errors occurred.
+     * @return    A error message string representing any probes that didn't import successfully, or the empty string
+     * if no errors occurred.
      */
     private String probeImportErrors() {
-//        List<Probe> failedProbes = dmService.getProbeImportErrors();
-//        List<String> failureMessages = dmService.getProbeImportErrorMessages();
-//        String err = "";
-//        if (failedProbes.size() > 0) {
-//            err = "The following probes failed to import: \n\n";
-//            err += "ProbeID, EnsemblId, Species, Reason for failure";
-//            for (int i = 0; i < failedProbes.size(); i++) {
-//                Probe failure = failedProbes.get(i);
-//                String failureMessage = failureMessages.get(i);
-//                err += "\n" + failure.getProbeId() + ", " + failure.getEnsemblId() + ", " + failure.getSpeciesName() + ", " + failureMessage;
-//            }
-//            err += "\n";
-//        }
-//        return err;
-        return null;
+        List<Probe> failedProbes = dmService.getProbeImportErrors();
+        List<String> failureMessages = dmService.getProbeImportErrorMessages();
+        String err = "";
+        if (failedProbes.size() > 0) {
+            err = "The following probes failed to import: \n\n";
+            err += "ProbeID, EnsemblId, Species, Reason for failure";
+            for (int i=0; i<failedProbes.size(); i++){
+                Probe failure = failedProbes.get(i);
+                String failureMessage = failureMessages.get(i);
+                err += "\n"+failure.getProbeId() +", "+failure.getEnsemblId()+", "+failure.getSpeciesName()+", "+failureMessage;
+            }
+            err += "\n";
+        }
+        return err;
     }
 
     private boolean registerProcess(long processId) {

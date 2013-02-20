@@ -47,7 +47,7 @@ public class ProbeBean implements Serializable {
 
     private String probeName;
 
-    private List<PGSBean> pgsBeans;
+    private List<Probe> probes;
 
     private User user;
 
@@ -69,12 +69,12 @@ public class ProbeBean implements Serializable {
         this.probeName = probeName;
     }
 
-    public List<PGSBean> getPgsBeans() {
-        return pgsBeans;
+    public List<Probe> getProbes() {
+        return probes;
     }
 
-    public void setPgsBeans(List<PGSBean> pgsBeans) {
-        this.pgsBeans = pgsBeans;
+    public void setProbes(List<Probe> probes) {
+        this.probes = probes;
     }
 
     public User getUser() {
