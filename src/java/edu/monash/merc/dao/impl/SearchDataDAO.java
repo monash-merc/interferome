@@ -373,15 +373,15 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
 
             //  if (gnenNameList.size() > 0) {
-            String teHQL ="SELECT te, g.geneName FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList)";
+            String teHQL ="SELECT te, g.geneName, s.speciesName FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.species s INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList)";
             Query teQuery = this.session().createQuery(teHQL);
             teQuery.setParameterList(("gnenNameList"), gnenNameList);
 
             ArrayList<GeneExpressionRecord> geneExpressionRecords = new ArrayList<GeneExpressionRecord>();
             for (Object rowObject : teQuery.list()) {
                 Object[] row = (Object[]) rowObject;
-                assert row.length == 2;
-                geneExpressionRecords.add(new GeneExpressionRecord((TissueExpression) row[0], (String) row[1]));
+                assert row.length == 3;
+                geneExpressionRecords.add(new GeneExpressionRecord((TissueExpression) row[0], (String) row[1], (String) row[2]));
             }
 
             return geneExpressionRecords;

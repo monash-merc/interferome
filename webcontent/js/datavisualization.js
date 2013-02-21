@@ -7,10 +7,13 @@ window.onload = function() {
         var ci = new ChromosomeImage();
     }
 
-    if(document.getElementById('tissueexp_container')){
-        new HeatMap();
+    if(document.getElementById('human_picture_container')){
+        new HeatMap(document.getElementById('human_picture_container'));
     }
 
+    if(document.getElementById('mouse_picture_container')){
+        new HeatMap(document.getElementById('mouse_picture_container'));
+    }
 
     if(document.getElementById('venn')){
         drawVenn();

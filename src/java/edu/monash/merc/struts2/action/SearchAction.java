@@ -247,7 +247,9 @@ public class SearchAction extends DMBaseAction {
      *
      */
 
-    private List<GeneExpressionRecord> geneExpressionRecordList;
+    private List<GeneExpressionRecord> humanGeneExpressionList;
+    private List<GeneExpressionRecord> mouseGeneExpressionList;
+
 
 //    private List<TissueExpression> tissueExprList;
 
@@ -662,7 +664,13 @@ public class SearchAction extends DMBaseAction {
 
 
             List<GeneExpressionRecord> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
-            this.geneExpressionRecordList = combineByGeneAndProbe(te);
+            this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
+            this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
+
+
+            System.out.println("MESSAGE - size of tissue expression list from first element: "+this.humanGeneExpressionList.get(0).getTissueExpressionList().size());
+            System.out.println("MESSAGE - size of tissue expression list from second element: "+this.humanGeneExpressionList.get(1).getTissueExpressionList().size());
+
 
             //set the searched flag as true
             searched = true;
@@ -687,15 +695,23 @@ public class SearchAction extends DMBaseAction {
      *
      * Therefore, we use a HashMap to combine the tissue expression values and names from all our retrieved rows
      *
+     * @param species Only use this species name
      * @return A list of gene expression records with their lists of matching tissues filled out
      */
-    private ArrayList<GeneExpressionRecord> combineByGeneAndProbe(List<GeneExpressionRecord> te){
+    private ArrayList<GeneExpressionRecord> combineByGeneAndProbe(List<GeneExpressionRecord> te, String species){
         ArrayList<GeneExpressionRecord> geneExpressionRecords = new ArrayList<GeneExpressionRecord>();
         Iterator<GeneExpressionRecord> i = te.iterator();
         HashMap<GeneExpressionRecord, GeneExpressionRecord> geneAndProbe = new HashMap<GeneExpressionRecord, GeneExpressionRecord>();
 
         while (i.hasNext()) {
             GeneExpressionRecord current = i.next();
+            if (!current.getSpeciesName().equalsIgnoreCase(species)) {
+                System.out.println("MESSAGE - Current species name: "+current.getSpeciesName());
+                System.out.println("MESSAGE - Ignore as they are different");
+                continue;
+            } else {
+                System.out.println("MESSAGE - Current species matches");
+            }
             //System.out.println("MESSAGE - 1 - SearchAction: '"+t.getProbe().getProbeId()+"'");
             // List<String>  genes =  new ArrayList<String>();
             if (geneAndProbe.containsKey(current)) {
@@ -710,10 +726,9 @@ public class SearchAction extends DMBaseAction {
             geneExpressionRecords.add(geneExpressionRecord);
         }
 
-        //System.out.println("MESSAGE - size of gene expression record list: "+this.geneExpressionRecordList.size());
-        //System.out.println("MESSAGE - size of tissue expression list from first element: "+this.geneExpressionRecordList.get(0).getTissueExpressionList().size());
-        //System.out.println("MESSAGE - size of tissue expression list from second element: "+this.geneExpressionRecordList.get(1).getTissueExpressionList().size());
-        //GeneExpressionRecord temp = this.geneExpressionRecordList.get(0);
+        System.out.println("MESSAGE - species: "+species);
+        System.out.println("MESSAGE - size of gene expression record list: "+geneExpressionRecords.size());
+        //GeneExpressionRecord temp = this.humanGeneExpressionList.get(0);
         //for (TissueExpression t : temp.getTissueExpressionList()) {
         //    System.out.println("MESSAGE - tissue id: "+t.getTissue().getTissueId());
         //}
@@ -1077,8 +1092,9 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             List<GeneExpressionRecord> te = this.searchDataService.searchTissueExpression(searchBean, 1, maxRecords, orderBy, orderByType);
-            this.geneExpressionRecordList = combineByGeneAndProbe(te);
-            this.csvInputStream = createCSVFileTissueExpression(searchBean, geneExpressionRecordList);
+            this.humanGeneExpressionList = combineByGeneAndProbe(te, "human");
+            this.mouseGeneExpressionList = combineByGeneAndProbe(te, "mouse");    // TODO use this
+            this.csvInputStream = createCSVFileTissueExpression(searchBean, humanGeneExpressionList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
             this.contentDisposition = "attachment;filename=\"" + csvFileName + "_TissueExpressionSearchResults.txt" + "\"";
@@ -3195,11 +3211,15 @@ public class SearchAction extends DMBaseAction {
         this.subtypeList = subtypeList;
     }
 
-    public List<GeneExpressionRecord> getGeneExpressionRecordList() {
-        return geneExpressionRecordList;
+    public List<GeneExpressionRecord> getHumanGeneExpressionList() {
+        return humanGeneExpressionList;
     }
 
-    public void setGeneExpressionRecordList(List<GeneExpressionRecord> tissueExpressioList) {
-        this.geneExpressionRecordList = tissueExpressioList;
+    public List<GeneExpressionRecord> getMouseGeneExpressionList() {
+        return mouseGeneExpressionList;
+    }
+
+    public void setHumanGeneExpressionList(List<GeneExpressionRecord> tissueExpressioList) {
+        this.humanGeneExpressionList = tissueExpressioList;
     }
 }

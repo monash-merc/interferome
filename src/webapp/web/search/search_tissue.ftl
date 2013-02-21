@@ -4,7 +4,7 @@
 <div id="saveimage"></div>
 <div class="export_div">
     Save as a TXT file<a
-    href="${base}/search/exportCsvFileTissueExpression.jspx">
+        href="${base}/search/exportCsvFileTissueExpression.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
 <br>
@@ -22,28 +22,61 @@
           <p>The IRG list resulting from the search is plotted against expression in these tissues and cells; deep red indicates very high expression, pale red indicates moderately high expression, pale blue indicates moderately low expresison, and deep blue indicates very low expression.</p>
           <p>Some gene names are associated with more than one probe within the BioGPS  data set, in which case data from both probes are presented on different rows.</p>
     </span>
-    <div id="tissueexp_container"></div>
-    <div id="te_table">
-        <table id="tesites">
-            <@s.iterator status="tissStat" value="geneExpressionRecordList" id="tissueResult">
-                <tr>
-                    <@s.if test="#tissStat.first == true">
-                        <th>Probe Id</th>
-                        <@s.iterator status="headerStat" value="#tissueResult.tissueExpressionList" id="headerVal">
-                            <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
-                        </@s.iterator>
-                        </tr><tr>
-                    </@s.if>
-                    <td class="probeId"><@s.property value='#tissueResult.probe.probeId' />  <@s.property value='#tissueResult.geneName' /></td>
-                    <!--<td class="geneId"><@s.property value='#tissueResult.geneName' /></td>   -->
-                    <@s.iterator status="expStat" value="#tissueResult.tissueExpressionList" id="expVal">
-                        <td class="expressionVal"><@s.property value='#expVal.expression' /></td>
+
+    <div id="human_picture_container" style="margin-right: auto; margin-left: auto; padding: 15px; border: thin solid teal;">
+        <div class="tissueexp_headers" style="float:left;"></div>
+        <div class="tissueexp_container"></div>
+        <div class="teid_table">
+            <table class="tesites">
+            <@s.iterator status="tissStat" value="humanGeneExpressionList" id="tissueResult">
+            <tr>
+                <@s.if test="#tissStat.first == true">
+                    <th>Probe Id</th>
+                    <@s.iterator status="headerStat" value="#tissueResult.tissueExpressionList" id="headerVal">
+                        <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
                     </@s.iterator>
-                </tr>
+                </tr><tr>
+                </@s.if>
+                <td class="probeId"><@s.property value='#tissueResult.geneName' /> <@s.property value='#tissueResult.probe.probeId' /> </td>
+                <!--<td class="geneId"><@s.property value='#tissueResult.geneName' /></td>   -->
+                <@s.iterator status="expStat" value="#tissueResult.tissueExpressionList" id="expVal">
+                    <td class="expressionVal"><@s.property value='#expVal.expression' /></td>
+                </@s.iterator>
+            </tr>
 
             </@s.iterator>
-        </table>
+            </table>
+        </div>
     </div>
+    <div id="mouse_picture_container" style="margin-right: auto; margin-left: auto; padding: 15px; border: thin solid teal;">
+        <div class="tissueexp_headers" style="float:left;"></div>
+        <div class="tissueexp_container"></div>
+
+        <div class="teid_table">
+            <table class="tesites">
+            <@s.iterator status="tissStat" value="mouseGeneExpressionList" id="tissueResult">
+            <tr>
+                <@s.if test="#tissStat.first == true">
+                    <th>Probe Id</th>
+                    <@s.iterator status="headerStat" value="#tissueResult.tissueExpressionList" id="headerVal">
+                        <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
+                    </@s.iterator>
+                </tr><tr>
+                </@s.if>
+                <td class="probeId"><@s.property value='#tissueResult.geneName' /> <@s.property value='#tissueResult.probe.probeId' /> </td>
+                <!--<td class="geneId"><@s.property value='#tissueResult.geneName' /></td>   -->
+                <@s.iterator status="expStat" value="#tissueResult.tissueExpressionList" id="expVal">
+                    <td class="expressionVal"><@s.property value='#expVal.expression' /></td>
+                </@s.iterator>
+            </tr>
+
+            </@s.iterator>
+            </table>
+
+        </div>
+
+    </div>
+
     <p><sup>*</sup>Chunlei Wu, Ian MacLeod, and Andrew I. Su. (2012) <i>BioGPS and MyGene.info: organizing online, gene-centric information.</i> Nucleic Acids Research<b>41(D1):</b> D561-D565.</p>
 </div>
 <br/>

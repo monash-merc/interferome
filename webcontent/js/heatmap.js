@@ -6,24 +6,38 @@
  * To change this template use File | Settings | File Templates.
  */
 
-function HeatMap(){
+function HeatMap(container_obj){
     //This is the background
 
+    container = $(container_obj);
     //
-    var oTable = document.getElementById('tesites');
+    var oTable = container.find("table.tesites")[0];
+    var row_header_container = container.find('div.tissueexp_headers')[0];
+    var row_data_container = container.find('div.tissueexp_container')[0];
+
+    if (oTable.rows.length == 0){
+        container.css("visibility", "hidden");
+        return;
+    }
     //Skip first (header) row
     var rowLength = oTable.rows.length;
     var columns = oTable.rows.item(0).cells.length - 1;
     var boxWidth = 10;
     var boxHeight = 10;
+    var rowHeaderWidth = 50;
 
-    paper = new Raphael(document.getElementById('tissueexp_container'), 150+(boxWidth*columns) , 250+(boxHeight*rowLength));
+    $(row_header_container).width(rowHeaderWidth);
+    var rowHeader
+        = new Raphael(row_header_container, "100%", 250 + (boxHeight * rowLength));
+
+    var paper = new Raphael(row_data_container, (boxWidth*columns) , 250+(boxHeight*rowLength));
 
     var colorStats = calculateColorStatistics(oTable);
     var yPos = 170;
 
     //Draw Header
     var headX = 10;
+    var xPos = headX;
     for(var k = 1; k < columns+1;k++){
         var tissue = oTable.rows.item(0).cells.item(k).innerHTML;
         var text = paper.text(headX, 170, tissue);
@@ -37,11 +51,21 @@ function HeatMap(){
     //Skip the tissues row;
     for (i = 1; i < oTable.rows.length; i++){
         var oCells = oTable.rows.item(i).cells;
-        var xPos = 100;
         //Add Gene Name
         var geneName = oCells.item(0).innerHTML;
-        var text = paper.text(60, yPos+(boxHeight/2), geneName);
-        text.attr({'text-anchor': 'start'})
+        var text = rowHeader.text(15, yPos+(boxHeight/2), geneName);  // align text right
+        text.attr({'text-anchor': 'start'});
+
+        // check that the text does not exceed the width of the box. If it does, widen the container!
+
+        var textWidth = text.getBBox().width;
+        if (textWidth > rowHeaderWidth){
+            alert("pause")    ;
+            $(row_header_container).width(textWidth+30);
+        }
+
+
+
 
         //Skip the header column (gene name)
         for(var j = 1; j < columns+1; j++){
@@ -64,9 +88,11 @@ function HeatMap(){
 
     saveChromosome(paper, "saveimage", "human")
     //document.getElementById("tf_table").style.visibility="hidden";
-    document.getElementById("tesites").style.visibility = "hidden";
-    document.getElementById("tissueexp_container").style.overflow = "scroll";
+    oTable.style.visibility = "hidden";
+    row_data_container.style.overflow = "scroll";
+
 }
+
 
 function calculateColorStatistics(oTable){
     var averageArray = new Array();

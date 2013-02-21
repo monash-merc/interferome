@@ -44,10 +44,12 @@ public class GeneExpressionRecord {
      * This list contains all of the tissues where this unique combination of probe and gene are combined
      */
     private List<TissueExpression> tissueExpressionList = new ArrayList<TissueExpression>();
+    private String speciesName;
 
-    public GeneExpressionRecord(TissueExpression t, String geneName){
+    public GeneExpressionRecord(TissueExpression t, String geneName, String speciesName){
         this.geneName = geneName;
         this.tissueExpression = t;
+        this.speciesName = speciesName;
         this.addTissueExpression(t);
     }
 
@@ -100,5 +102,9 @@ public class GeneExpressionRecord {
         int result = geneName != null ? geneName.hashCode() : 0;
         result = 31 * result + (getProbe() != null ? getProbe().hashCode() : 0);
         return result;
+    }
+
+    public String getSpeciesName() {
+        return speciesName;
     }
 }
