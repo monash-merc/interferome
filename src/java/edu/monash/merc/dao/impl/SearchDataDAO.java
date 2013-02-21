@@ -360,14 +360,32 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @Override
     public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-
         List<Probe> probes = uniqueProbesPages.getPageResults();
+        System.out.println("========found probes : "+probes.size());
+
        // ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {
-            String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.genes g WHERE pbs.probeId IN (:probes) ORDER BY pbs, te";
-            Query teQuery = this.session().createQuery(teHQL);
-            teQuery.setParameterList(("probes"), probes);
-            return teQuery.list();
+
+//          String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.probe pbs WHERE pbs.probeId IN (:probes) ORDER BY pbs, te";
+//          Query teQuery = this.session().createQuery(teHQL);
+//          teQuery.setParameterList(("probes"), probes);
+
+            List<Gene> gnenNameList = new ArrayList<Gene>();
+            String gnHQL = "SELECT g.geneName  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) GROUP BY g.geneName ORDER BY g";
+            Query gnQuery = this.session().createQuery(gnHQL);
+            gnQuery.setParameterList(("probes"), probes);
+            gnenNameList = gnQuery.list();
+            System.out.println("========found genes : "+gnenNameList.size());
+
+             //  if (gnenNameList.size() > 0) {
+               String teHQL ="SELECT te, g FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList)";
+               Query teQuery = this.session().createQuery(teHQL);
+               teQuery.setParameterList(("gnenNameList"), gnenNameList);
+               System.out.println("========teQuery.list().size : "+teQuery.list().size());
+
+               return teQuery.list();
+
+
         } else {
             return new ArrayList<TissueExpression>();
         }

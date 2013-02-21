@@ -665,17 +665,19 @@ public class SearchAction extends DMBaseAction {
             List<TissueExpression> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
              this.tissueExpressionList = new ArrayList<GeneExpressionRecord>();
              Iterator i = te.iterator();
-             HashMap<String, Integer> probes = new HashMap<String, Integer>();
+             HashMap<String, Integer> probes = new HashMap<String , Integer>();
              while (i.hasNext()) {
                  TissueExpression t = (TissueExpression) i.next();
-                 System.out.println("MESSAGE - 1 - SearchAction: '"+t.getProbe().getProbeId()+"'");
-                 System.out.println("MESSAGE - 11 - SearchAction: '"+t.getTissue().getTissueId()+"'");
-                // System.out.println("MESSAGE - 12 - SearchAction: '"+t.getProbe().getEnsemblId()+"'");
+                 //System.out.println("MESSAGE - 1 - SearchAction: '"+t.getProbe().getProbeId()+"'");
+                // List<String>  genes =  new ArrayList<String>();
                  if (probes.containsKey(t.getProbe().getProbeId())) {
-                     this.tissueExpressionList.get(probes.get(t.getProbe().getEnsemblId())).addTissueExpression(t);
+                     this.tissueExpressionList.get(probes.get(t.getProbe().getProbeId())).addTissueExpression(t);
+                     System.out.println("MESSAGE - 1 - SearchAction: '"+t.getProbe().getProbeId()+"'");
                  } else {
                      this.tissueExpressionList.add(new GeneExpressionRecord(t));
-                     probes.put(t.getProbe().getEnsemblId(), this.tissueExpressionList.size() - 1);
+                    // genes.add(t.getProbe().getGenes().get(0).getGeneName());
+                    // genes.add(t.getProbe().getProbeId());
+                     probes.put(t.getProbe().getProbeId(), this.tissueExpressionList.size() - 1);
                  }
              }
 
@@ -1054,12 +1056,15 @@ public class SearchAction extends DMBaseAction {
             HashMap<String, Integer> probes = new HashMap<String, Integer>();
             while (i.hasNext()) {
                 TissueExpression t = (TissueExpression) i.next();
-                System.out.println("MESSAGE - 33 - SearchAction: '"+t.getTissue().getTissueId());
+               // List<String>  genes =  new ArrayList<String>();
+                //System.out.println("MESSAGE - 33 - SearchAction: '"+t.getTissue().getTissueId());
                 if (probes.containsKey(t.getProbe().getProbeId())) {
-                 this.tissueExpressionList.get(probes.get(t.getProbe().getEnsemblId())).addTissueExpression(t);
+                 this.tissueExpressionList.get(probes.get(t.getProbe().getProbeId())).addTissueExpression(t);
                 } else {
                     this.tissueExpressionList.add(new GeneExpressionRecord(t));
-                 probes.put(t.getProbe().getEnsemblId(), this.tissueExpressionList.size() - 1);
+                  //  genes.add(t.getProbe().getGenes().get(0).getGeneName());
+                 //   genes.add(t.getProbe().getProbeId());
+                    probes.put(t.getProbe().getProbeId(), this.tissueExpressionList.size() - 1);
                 }
             }
             this.csvInputStream = createCSVFileTissueExpression(searchBean, tissueExpressionList);

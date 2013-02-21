@@ -33,6 +33,7 @@ import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.domain.User;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +48,10 @@ public class GeneExpressionRecord {
 
     private Probe probe;
 
-    private Gene gene;
+    private   Gene gene;
+
+   // private List<Gene> geneList;
+
 
     private List<TissueExpression> tissueexpression;
 
@@ -59,6 +63,7 @@ public class GeneExpressionRecord {
 
     public GeneExpressionRecord(TissueExpression t){
         this.probe = t.getProbe();
+        this.gene = t.getProbe().getGenes().get(0);
         tissueexpression = new ArrayList<TissueExpression>();
         addTissueExpression(t);
     }
@@ -69,6 +74,14 @@ public class GeneExpressionRecord {
 
     public void setProbe(Probe probe) {
         this.probe = probe;
+    }
+
+    public Gene getGene() {
+        return gene;
+    }
+
+    public void setGene(Gene gene) {
+        this.gene = gene;
     }
 
     public List<TissueExpression> getTissueexpression() {
