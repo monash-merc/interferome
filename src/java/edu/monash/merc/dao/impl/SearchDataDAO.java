@@ -32,6 +32,7 @@ import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.*;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -358,36 +359,35 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public List<GeneExpressionRecord> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
         List<Probe> probes = uniqueProbesPages.getPageResults();
-        System.out.println("========found probes : "+probes.size());
 
-       // ArrayList<ArrayList<Object>> geneTissueList = new ArrayList<ArrayList<Object>>();
         if (probes.size() > 0) {
-
-//          String teHQL = "SELECT te FROM TissueExpression te INNER JOIN te.probe pbs WHERE pbs.probeId IN (:probes) ORDER BY pbs, te";
-//          Query teQuery = this.session().createQuery(teHQL);
-//          teQuery.setParameterList(("probes"), probes);
 
             List<Gene> gnenNameList = new ArrayList<Gene>();
             String gnHQL = "SELECT g.geneName  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) GROUP BY g.geneName ORDER BY g";
             Query gnQuery = this.session().createQuery(gnHQL);
             gnQuery.setParameterList(("probes"), probes);
             gnenNameList = gnQuery.list();
-            System.out.println("========found genes : "+gnenNameList.size());
 
-             //  if (gnenNameList.size() > 0) {
-               String teHQL ="SELECT te, g FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList)";
-               Query teQuery = this.session().createQuery(teHQL);
-               teQuery.setParameterList(("gnenNameList"), gnenNameList);
-               System.out.println("========teQuery.list().size : "+teQuery.list().size());
 
-               return teQuery.list();
+            //  if (gnenNameList.size() > 0) {
+            String teHQL ="SELECT te, g.geneName FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList)";
+            Query teQuery = this.session().createQuery(teHQL);
+            teQuery.setParameterList(("gnenNameList"), gnenNameList);
 
+            ArrayList<GeneExpressionRecord> geneExpressionRecords = new ArrayList<GeneExpressionRecord>();
+            for (Object rowObject : teQuery.list()) {
+                Object[] row = (Object[]) rowObject;
+                assert row.length == 2;
+                geneExpressionRecords.add(new GeneExpressionRecord((TissueExpression) row[0], (String) row[1]));
+            }
+
+            return geneExpressionRecords;
 
         } else {
-            return new ArrayList<TissueExpression>();
+            return new ArrayList<GeneExpressionRecord>();
         }
     }
 

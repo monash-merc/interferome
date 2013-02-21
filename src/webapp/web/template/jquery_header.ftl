@@ -25,6 +25,7 @@
 <script type="text/javascript" src="${base}/js/easyTooltip.js"></script>
 <script type="text/javascript" src="${base}/js/tagcanvas.js"></script>
 <script type="text/javascript" src="${base}/js/raphael.js"></script>
+<script type="text/javascript" src="${base}/js/raphael.export.js"></script>
 <script type="text/javascript" src="${base}/js/datavisualization.js"></script>
 <script type="text/javascript" src="${base}/js/promoterimage.js"></script>
 <script type="text/javascript" src="${base}/js/chromosomeimage.js"></script>

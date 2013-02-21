@@ -1,6 +1,7 @@
 <div class="result_title_div">
     Search Results
 </div>
+<div id="saveimage"></div>
 <div class="export_div">
     Save as a TXT file<a
     href="${base}/search/exportCsvFileTFanalysis.jspx">
@@ -17,7 +18,8 @@
     </div>
     <span style="color: gray; font-size: 10pt"><p>The location of transcription factors on each of the genes from the region spaning -1500bp to + 500 bp from the start site.</p>
     <p>Each coloured box represents a specific transcription factor, the key for which is provided below the graphic.</p>
-    <p>Mouse over the transciption factor to reveal the TRANSFAC<sup>*</sup> predicted match between the transcription factor and its predicted binding site.</p></span>
+        <p>Move the cursor over the transciption factor's coloured box to reveal the TRANSFAC<sup>*</sup> predicted match between the transcription factor and its predicted binding site.</p>
+    </span>
 
     <div id="promoter_container"></div>
     <div id="tf_table">

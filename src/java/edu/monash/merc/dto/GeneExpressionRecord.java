@@ -29,71 +29,76 @@
 package edu.monash.merc.dto;
 
 import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.TissueExpression;
-import edu.monash.merc.domain.User;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: samf
- * Date: 27/06/12
- * Time: 2:51 PM
- * To change this template use File | Settings | File Templates.
- */
 public class GeneExpressionRecord {
 
-    private Probe probe;
+    private String geneName;
 
-    private   Gene gene;
+    private TissueExpression tissueExpression;
 
-   // private List<Gene> geneList;
+    /**
+     * This list contains all of the tissues where this unique combination of probe and gene are combined
+     */
+    private List<TissueExpression> tissueExpressionList = new ArrayList<TissueExpression>();
 
-
-    private List<TissueExpression> tissueexpression;
-
-    public GeneExpressionRecord(Probe p, Gene g){
-        this.probe = p;
-        this.gene = g;
-        tissueexpression = new ArrayList<TissueExpression>();
-    }
-
-    public GeneExpressionRecord(TissueExpression t){
-        this.probe = t.getProbe();
-        this.gene = t.getProbe().getGenes().get(0);
-        tissueexpression = new ArrayList<TissueExpression>();
-        addTissueExpression(t);
+    public GeneExpressionRecord(TissueExpression t, String geneName){
+        this.geneName = geneName;
+        this.tissueExpression = t;
+        this.addTissueExpression(t);
     }
 
     public Probe getProbe() {
-        return probe;
+        return tissueExpression.getProbe();
     }
 
-    public void setProbe(Probe probe) {
-        this.probe = probe;
+    public String getGeneName() {
+        return geneName;
     }
 
-    public Gene getGene() {
-        return gene;
+    public TissueExpression getTissueExpression() {
+        return tissueExpression;
     }
 
-    public void setGene(Gene gene) {
-        this.gene = gene;
+
+    public List<TissueExpression> getTissueExpressionList() {
+        return tissueExpressionList;
     }
 
-    public List<TissueExpression> getTissueexpression() {
-        return tissueexpression;
+    public void addTissueExpression(TissueExpression tissueExpression) {
+        this.tissueExpressionList.add(tissueExpression);
     }
 
-    public void setTissueexpression(List<TissueExpression> tissueexpression) {
-        this.tissueexpression = tissueexpression;
+    /**
+     * Implemented to match on geneName and probe
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GeneExpressionRecord)) return false;
+
+        GeneExpressionRecord that = (GeneExpressionRecord) o;
+
+        if (geneName != null ? !geneName.equals(that.geneName) : that.geneName != null) return false;
+        if (getProbe() != null ? !getProbe().equals(that.getProbe()) : that.getProbe() != null)
+            return false;
+
+        return true;
     }
 
-    public void addTissueExpression(TissueExpression te){
-        tissueexpression.add(te);
+    /**
+     * Implemented to match on geneName and probe
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        int result = geneName != null ? geneName.hashCode() : 0;
+        result = 31 * result + (getProbe() != null ? getProbe().hashCode() : 0);
+        return result;
     }
-
 }

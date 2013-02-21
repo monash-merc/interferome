@@ -33,7 +33,7 @@ import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.dao.impl.SearchDataDAO;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.TissueExpression;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.service.SearchDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,7 @@ public class SearchDataServiceImpl implements SearchDataService {
     }
 
     @Override
-    public List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public List<GeneExpressionRecord> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         return this.searchDataDao.searchTissueExpression(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
     }
 

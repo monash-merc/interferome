@@ -62,6 +62,7 @@ function HeatMap(){
         yPos=yPos+boxHeight;
     }
 
+    saveChromosome(paper, "saveimage", "human")
     //document.getElementById("tf_table").style.visibility="hidden";
     document.getElementById("tesites").style.visibility = "hidden";
     document.getElementById("tissueexp_container").style.overflow = "scroll";

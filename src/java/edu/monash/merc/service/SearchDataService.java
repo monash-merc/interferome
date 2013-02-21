@@ -34,6 +34,7 @@ import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.Probe;
 import edu.monash.merc.domain.TissueExpression;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.SearchBean;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public interface SearchDataService {
 
     Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
-    List<TissueExpression> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
+    List<GeneExpressionRecord> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
     List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 

@@ -1,6 +1,7 @@
 <div class="result_title_div">
     Search Results
 </div>
+<div id="saveimage"></div>
 <div class="export_div">
     Save as a TXT file<a
     href="${base}/search/exportCsvFileSubtypes.jspx">

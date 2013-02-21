@@ -78,28 +78,40 @@ function ChromosomeImage(){
         rowm=r;
     }
     //draw both genomes is there are genes for both human and mouse ...
+
+    var mmPaper;
+    var hsPaper;
+
     if (rowh != 0 && rowm !=0){
-        drawChromosome((new Raphael(document.getElementById('hs_chromosome_container'), 500, 350)), hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
-        drawChromosome((new Raphael(document.getElementById('mm_chromosome_container'), 500, 350)), mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+        mmPaper = new Raphael(document.getElementById('mm_chromosome_container'), 500, 350);
+        hsPaper = new Raphael(document.getElementById('hs_chromosome_container'), 500, 350);
+        drawChromosome(mmPaper, hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
+        drawChromosome(hsPaper, mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+        saveChromosome(hsPaper, "hs_saveimage", "human");
+        saveChromosome(mmPaper, "mm_saveimage", "mouse");
+
     }
     //else draw only human if mouse is missing
     else if (rowh != 0 && rowm ==0){
-        drawChromosome((new Raphael(document.getElementById('hs_chromosome_container'), 500, 350)), hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
+        hsPaper = new Raphael(document.getElementById('hs_chromosome_container'), 500, 350);
+        drawChromosome(hsPaper, hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
+        saveChromosome(hsPaper, "hs_saveimage", "human");
     }
     //else draw only mouse if human is missing ...
     else if (rowh == 0 && rowm !=0){
-        drawChromosome((new Raphael(document.getElementById('mm_chromosome_container'), 500, 350)), mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+        mmPaper = new Raphael(document.getElementById('mm_chromosome_container'), 500, 350);
+        drawChromosome(mmPaper, mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+        saveChromosome(mmPaper, "mm_saveimage", "mouse");
     }
 
-
-
-    //Successful Drawing of Chromosomes hide data table
+     //Successful Drawing of Chromosomes hide data table
     document.getElementById("chromosome_result_tab").style.display="none";
     document.getElementById("gene_table").style.display="none";
 }
 
 function drawChromosome(paper, visHashChrom, gene_pos_table, header){
     // show the values stored
+
     var spacer = 0;
     for (var chromName in visHashChrom) {
         // use hasOwnProperty to filter out keys from the Object.prototype
