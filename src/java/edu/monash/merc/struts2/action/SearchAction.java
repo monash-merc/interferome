@@ -2758,16 +2758,18 @@ public class SearchAction extends DMBaseAction {
             heads.add("Gene Name");
             heads.add("Probe Id");
             //will be a head of csv file
-            for (GeneExpressionRecord gerecord : tissueExpressionList) {
-                List<TissueExpression> tissueExpressions = gerecord.getTissueExpressionList();
+          //  for (GeneExpressionRecord gerecord : tissueExpressionList) {
+                List<TissueExpression> teHeades = tissueExpressionList.get(0).getTissueExpressionList();
 
-                for (TissueExpression tissueExpression : tissueExpressions) {
-                    Tissue tissue = tissueExpression.getTissue();
+                for (TissueExpression headesList : teHeades) {
+                    Tissue tissue = headesList.getTissue();
                     String tissueVal = tissue.getTissueId();
                     heads.add(tissueVal);
                 }
-            }
-            csvWriter.writeNext(heads.toArray(new String[heads.size()]));
+
+                csvWriter.writeNext(heads.toArray(new String[heads.size()]));
+          //  }
+            //csvWriter.writeNext(heads.toArray(new String[heads.size()]));
 
             //for individual row in csv file
             for (GeneExpressionRecord gerecord : tissueExpressionList) {
