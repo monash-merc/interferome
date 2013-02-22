@@ -115,7 +115,11 @@ function drawVenn(){
 
     var svg = paper.toSVG();
     var b64 = Base64.encode(svg);
-    document.getElementById("saveimage").innerHTML = "<a href-lang='image/svg+xml'  target='_blank'  href='data:image/svg+xml;base64,\n"+b64+"' title='heatmap.svg'>Download Image</a>";
+
+    document.getElementById("saveimage").innerHTML = "Save as an Image " +
+        "<a href-lang='image/svg+xml'  target='_blank'  href='data:image/svg+xml;base64,\n"+b64+"' title='heatmap.svg'>"
+        + '<img src="/interferome/images/save_picture_icon.png" />' +
+        '<div id="saveimage" class="export_pic"></div>';
     document.getElementById("hiddenlist").style.display = "none";
 
 }
@@ -256,6 +260,8 @@ var Base64 = {
 function saveChromosome(paper, div, species){
     var svg = paper.toSVG();
     var b64 = Base64.encode(svg);
-    document.getElementById(div).innerHTML  = "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+b64+"' title='"+species+"_chromosomes.svg'>Download "+species+" Image</a>";
+    document.getElementById(div).innerHTML  = "Save "+species+" as an Image<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+b64+"' title='"+species+"_chromosomes.svg'>" +
+        '<img src="/interferome/images/save_picture_icon.png" />'
+        "</a>";
 }
 

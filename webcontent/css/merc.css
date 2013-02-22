@@ -1871,6 +1871,12 @@ body {
     display: block;
 }
 
+.export_pic {
+    color: #7d7d7d;
+    float: right;
+    display: block;
+}
+
 .export_div img {
     vertical-align: bottom;
 }

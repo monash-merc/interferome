@@ -6,8 +6,8 @@
     href="${base}/search/exportCsvFileChromosome.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
-<div id="hs_saveimage"></div>
-<div id="mm_saveimage"></div>
+<div id="hs_saveimage" class="export_pic" ></div>
+<div id="mm_saveimage" class="export_pic" ></div>
 <div class="search_table_div">
     <div class="nojava">
         <p>(Javascript Must Be Enabled to View These Results)</p>

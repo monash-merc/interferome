@@ -71,7 +71,10 @@ function PromoterImage(){
     }
     var svg = paper.toSVG();
     var b64 = Base64.encode(svg);
-    document.getElementById("saveimage").innerHTML = "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+b64+"' title='promoter.svg'>Download Image</a>";
+    document.getElementById("saveimage").innerHTML = "Save as an Image" +
+        "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+b64+"' title='promoter.svg'>"
+        + '<img src="/interferome/images/save_picture_icon.png" />' +
+        "</a>";
     document.getElementById("tf_table").style.display="none";
 
 
