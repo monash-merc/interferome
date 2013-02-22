@@ -1190,10 +1190,6 @@ public class DMServiceImpl implements DMService {
                 String speciesName = probeGeneBean.getSpeciesName();
                 Gene gene = this.getGeneByEnsgAccession(ensgAc);
                 Species speciesN = this.getSpeciesByName(speciesName);
-
-                //TODO: If speciesN   is null, then we have to save this species (create a species object, put the values for this species object, then call species service to save it into db.)
-                //TODO: else if species is not null, just use it.
-
                 //if not save the species, the following code will get db exception when probe is referencing the species id.
                 //probe.setSpecies(this.getSpeciesByName(probe.getSpeciesName()));
                 Probe probe = this.getProbeByProbeId(probeId);
