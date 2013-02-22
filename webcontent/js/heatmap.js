@@ -21,7 +21,8 @@ function HeatMap(container_obj){
     }
     //Skip first (header) row
     var rowLength = oTable.rows.length;
-    var columns = oTable.rows.item(0).cells.length - 1;
+    var dataColumns = oTable.rows.item(0).cells.length - 2;
+    var dataStart = 2;
     var boxWidth = 10;
     var boxHeight = 10;
     var rowHeaderWidth = 50;
@@ -30,20 +31,31 @@ function HeatMap(container_obj){
     var rowHeader
         = new Raphael(row_header_container, "100%", 250 + (boxHeight * rowLength));
 
-    var paper = new Raphael(row_data_container, (boxWidth*columns) , 250+(boxHeight*rowLength));
+    paper = new Raphael(row_data_container, (boxWidth*dataColumns) +15 , 250+(boxHeight*rowLength));
 
-    var colorStats = calculateColorStatistics(oTable);
+    var colorStats = calculateColorStatistics(oTable, dataColumns, dataStart);
     var yPos = 170;
 
+
+    // Add Header for row titles
+    var geneEndPos = 40;
+    var probeStartPos = 50;
+    var separatorPos = 45;
+    var geneColTitle = rowHeader.text(geneEndPos, yPos - 20, "Gene");
+    geneColTitle.attr({'text-anchor': 'end'});
+    rowHeader.text(separatorPos, yPos - 20, " - ");
+    var probeColTitle = rowHeader.text(probeStartPos, yPos - 20, "Probe");
+    probeColTitle.attr({'text-anchor': 'start'});
+
     //Draw Header
-    var headX = 10;
-    var xPos = headX;
-    for(var k = 1; k < columns+1;k++){
-        var tissue = oTable.rows.item(0).cells.item(k).innerHTML;
-        var text = paper.text(headX, 170, tissue);
-        text.transform("t100,100r90t-100,0");
-        text.attr({'text-anchor': 'end'})
-        headX = 10 + ((k)*boxWidth);
+    var initial_x = 10;
+    var header_x = initial_x;
+    for(var k = 0; k < dataColumns;k++){
+        var tissue = oTable.rows.item(0).cells.item(k+dataStart).innerHTML;
+        var text = paper.text(header_x, 170, tissue);
+        text.transform("t5,100r90t-100,0");
+        text.attr({'text-anchor': 'end'});
+        header_x += boxWidth;
     }
 
     //Add Data
@@ -53,31 +65,37 @@ function HeatMap(container_obj){
         var oCells = oTable.rows.item(i).cells;
         //Add Gene Name
         var geneName = oCells.item(0).innerHTML;
-        var text = rowHeader.text(15, yPos+(boxHeight/2), geneName);  // align text right
-        text.attr({'text-anchor': 'start'});
+        var probeName = oCells.item(1).innerHTML;
+        var geneText = rowHeader.text(geneEndPos, yPos+(boxHeight/2), geneName);
+        geneText.attr({'text-anchor': 'end'});
+        var probeText = rowHeader.text(probeStartPos, yPos+(boxHeight/2),probeName);
+        probeText.attr({'text-anchor': 'start'});
+        rowHeader.text(separatorPos, yPos+(boxHeight/2), " - ");
 
         // check that the text does not exceed the width of the box. If it does, widen the container!
 
-        var textWidth = text.getBBox().width;
-        if (textWidth > rowHeaderWidth){
-            alert("pause")    ;
-            $(row_header_container).width(textWidth+30);
+        var textRight = probeText.getBBox().x2;
+        if (textRight > rowHeaderWidth){
+            //alert("pause")    ;
+            $(row_header_container).width(textRight+20);
         }
 
 
 
 
-        //Skip the header column (gene name)
-        for(var j = 1; j < columns+1; j++){
-            var cell = oCells.item(j);
+        var data_x = initial_x;
+        //Skip the header columns (gene name, probe id)
+        for(var j = 0; j < dataColumns; j++){
+            var cell = oCells.item(j+dataStart);
             if(cell != null){
                 var cellVal = cell.innerHTML;
                 if(cellVal != null){
                     if(cellVal != null && cellVal != ""){
-                        var rect = paper.rect(xPos, yPos, boxWidth, boxHeight);
+                        var rect = paper.rect(data_x, yPos, boxWidth, boxHeight);
                         var color = getColor(colorStats[0], colorStats[1], colorStats[2], cellVal);
-                        rect.attr({fill: color, stroke:"white"});
-                        xPos=xPos+boxWidth;
+                        //alert("color returned: " + color);
+                        rect.attr({fill: color, stroke:"black"});// set to black for debugging
+                        data_x += boxWidth;
                     }
                 }
             }
@@ -94,18 +112,18 @@ function HeatMap(container_obj){
 }
 
 
-function calculateColorStatistics(oTable){
+function calculateColorStatistics(oTable, dataColumns, dataStart){
     var averageArray = new Array();
-    var max = oTable.rows.item(1).cells.item(1).innerHTML;
-    var min = oTable.rows.item(1).cells.item(1).innerHTML;
+    var max = oTable.rows.item(1).cells.item(2).innerHTML;
+    var min = oTable.rows.item(1).cells.item(2).innerHTML;
     for (i = 1; i < oTable.rows.length; i++){
-        //Skip the header column (gene name)
+        //Skip the header columns (gene name, probe id)
         var rowItem = oTable.rows.item(0);
         if(rowItem != null){
-            for(var j = 1; j < rowItem.cells.length; j++){
+            for(var j = 0; j < dataColumns; j++){
                 var row = oTable.rows.item(i);
                 if(row != null){
-                   cell = row.cells.item(j);
+                   cell = row.cells.item(j+dataStart);
                    if(cell != null){
                        var cellVal = cell.innerHTML;
                        if(cellVal != null){
@@ -134,6 +152,8 @@ function calculateColorStatistics(oTable){
 function getColor(median, min, max, value){
     //Choose Color on blue/green scale
 
+    //alert("value: " + value + ", median: "+median);
+
     if(parseFloat(value) < median){
         var blueVal = Math.round(255 - (255/(min-median))*(parseFloat(value)-median));
         var color = "rgb(" + blueVal + ", " + blueVal + ", 255)";
@@ -148,6 +168,7 @@ function getColor(median, min, max, value){
         }
         //Choose white
         else{
+            //alert("returning white");
             return "White";
         }
     }
