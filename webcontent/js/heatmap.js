@@ -103,13 +103,13 @@ function HeatMap(container_obj){
         }
         yPos=yPos+boxHeight;
     }
-    //div = container.find("div.saveimage");
-    //var svg = paper.toSVG();
-    //var b64 = Base64.encode(svg);
-    //document.getElementById(div).innerHTML  = "<a href-lang='image/svg+xml' target='_blank' href='data:image/svg+xml;base64,\n"+b64+"' title='"+species+"_chromosomes.svg'>Download "+species+" Image</a>";
+    var link = $("span.saveimage a", container);
+    var paperSVG = paper.toSVG();
+    var rowHeaderSVG = rowHeader.toSVG();
+    var b64 = Base64.encode(paperSVG);
+    link.attr("href", "data:image/svg+xml;base64,\n"+b64);
+    link.attr("title", "heatmap.svg");
 
-    //document.getElementById("tf_table").style.visibility="hidden";
-    saveChromosome(paper, "saveimage", "human");
     oTable.style.visibility = "hidden";
     row_data_container.style.overflow = "scroll";
 
