@@ -34,7 +34,7 @@ function HeatMap(container_obj){
     var paper = new Raphael(row_data_container, (boxWidth*dataColumns) +15 , 250+(boxHeight*rowLength));
 
     var colorStats = calculateColorStatistics(oTable, dataColumns, dataStart);
-    var yPos = 172;
+    var yPos = 180;
 
 
     // Add Header for row titles
