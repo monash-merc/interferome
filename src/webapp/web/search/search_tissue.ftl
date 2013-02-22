@@ -31,14 +31,15 @@
             <@s.iterator status="tissStat" value="humanGeneExpressionList" id="tissueResult">
             <tr>
                 <@s.if test="#tissStat.first == true">
+                    <th>Gene Name</th>
                     <th>Probe Id</th>
                     <@s.iterator status="headerStat" value="#tissueResult.tissueExpressionList" id="headerVal">
-                        <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
+                    <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
                     </@s.iterator>
                 </tr><tr>
                 </@s.if>
-                <td class="probeId"><@s.property value='#tissueResult.geneName' /> <@s.property value='#tissueResult.probe.probeId' /> </td>
-                <!--<td class="geneId"><@s.property value='#tissueResult.geneName' /></td>   -->
+                    <td class="geneName"><@s.property value='#tissueResult.geneName' /></td>
+                    <td class="probeId"><@s.property value='#tissueResult.probe.probeId' /> </td>
                 <@s.iterator status="expStat" value="#tissueResult.tissueExpressionList" id="expVal">
                     <td class="expressionVal"><@s.property value='#expVal.expression' /></td>
                 </@s.iterator>
@@ -57,14 +58,15 @@
             <@s.iterator status="tissStat" value="mouseGeneExpressionList" id="tissueResult">
             <tr>
                 <@s.if test="#tissStat.first == true">
+                    <th>Gene Name</th>
                     <th>Probe Id</th>
                     <@s.iterator status="headerStat" value="#tissueResult.tissueExpressionList" id="headerVal">
-                        <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
+                    <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
                     </@s.iterator>
                 </tr><tr>
                 </@s.if>
-                <td class="probeId"><@s.property value='#tissueResult.geneName' /> <@s.property value='#tissueResult.probe.probeId' /> </td>
-                <!--<td class="geneId"><@s.property value='#tissueResult.geneName' /></td>   -->
+                    <td class="geneName"><@s.property value='#tissueResult.geneName' /></td>
+                    <td class="probeId"><@s.property value='#tissueResult.probe.probeId' /> </td>
                 <@s.iterator status="expStat" value="#tissueResult.tissueExpressionList" id="expVal">
                     <td class="expressionVal"><@s.property value='#expVal.expression' /></td>
                 </@s.iterator>
