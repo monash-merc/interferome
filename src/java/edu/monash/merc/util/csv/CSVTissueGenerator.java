@@ -61,15 +61,12 @@ public class CSVTissueGenerator {
             if (columnName.equalsIgnoreCase(TField.PROBEID)) {
                 tissue.setProbeId(columnValue);
             }
-
             if (columnName.equalsIgnoreCase(TField.EXPRESSION)) {
                 tissue.setExpression(Double.parseDouble(columnValue));
             }
-
             if (columnName.equalsIgnoreCase(TField.TISSUE) ) {
                 tissue.setTissueId(columnValue);
             }
-
         }
         return tissue;
     }

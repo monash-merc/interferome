@@ -61,16 +61,9 @@ public class CSVProbGenerator {
              if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
                  probes.setEnsemblId(columnValue);
              }
-              //TODO: Fix relations between Probe and Species domains
              if (columnName.equalsIgnoreCase(PField.SPECIES)) {
                  probes.setSpeciesName(columnValue);
              }
-
-             //TODO: Fix setGenes(null). I just fixed the syntax.
-            // if (columnName.equalsIgnoreCase(PField.ENSEMBLID)) {
-             //  System.out.println("DBG MESSAGE - Species name from CSV: '"+columnValue+"'");
-             //    probes.setGenes(null);
-            // }
          }
          return probes;
     }

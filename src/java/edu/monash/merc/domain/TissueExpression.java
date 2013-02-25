@@ -56,10 +56,6 @@ public class TissueExpression extends Domain {
     @Column(name = "id", nullable = false)
     private long id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "gene_id")
-//    private Gene gene;
-
     @Transient
     private String probeId;
 
@@ -69,10 +65,6 @@ public class TissueExpression extends Domain {
     @ManyToOne
     @JoinColumn(name = "probe_id")
     private Probe probe;
-
-//   @ManyToOne(targetEntity = Probe.class)
-//   @JoinColumn(name = "probe_id", referencedColumnName = "id", nullable = false)
-//   private Probe probe;
 
     @ManyToOne
     @JoinColumn(name = "tissue_id")
@@ -89,14 +81,6 @@ public class TissueExpression extends Domain {
     public void setId(long id) {
         this.id = id;
     }
-
-//  public Gene getGene() {
-//      return gene;
-//  }
-//
-//  public void setGene(Gene gene) {
-//      this.gene = gene;
-//  }
 
     public String getProbeId() {
        return probeId;

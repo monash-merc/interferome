@@ -47,13 +47,13 @@ public interface TissueExpressionService {
 
     public void saveTissueExpression(TissueExpression tissueExpression);
 
-    public int saveTissueExpression(List<TissueExpression> tissueExpression);
+    public int saveTissueExpression(List<TissueExpression> tissueExpressions);
 
     public void updateTissueExpression(TissueExpression tissueExpression);
 
     public void mergeTissueExpression(TissueExpression tissueExpression);
 
-    public int updateTissueExpression(List<TissueExpression> tissueExpression);
+    public int updateTissueExpression(List<TissueExpression> tissueExpressions);
 
     public void deleteTissueExpression(TissueExpression tissueExpression);
 

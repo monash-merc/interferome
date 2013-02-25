@@ -698,8 +698,6 @@ public class SearchAction extends DMBaseAction {
             GeneExpressionRecord current = i.next();
             if (!current.getSpeciesName().equalsIgnoreCase(species)) {
                 continue;
-            } else {
-                System.out.println("MESSAGE - Current species matches");
             }
              if (geneAndProbe.containsKey(current)) {
                 GeneExpressionRecord stored = geneAndProbe.get(current);
@@ -1363,10 +1361,6 @@ public class SearchAction extends DMBaseAction {
             //write a search results data column headers
             csvWriter.writeNext(new String[]{"Dataset ID", "Fold Change", "Inteferome Type", "Treatment Time", "Gene Name", "Description", "GenBank Accession", "Ensembl ID", "Probe ID"});
 
-            System.out.println("Headers done, ready to print some rows!");
-
-
-
             List<SearchResultRow> dataList = dPagination.getPageResults();
             for (SearchResultRow searchResultRow : dataList) {
                 //get dataset
@@ -1381,34 +1375,6 @@ public class SearchAction extends DMBaseAction {
                 String probeId = probe.getProbeId();
 
                 Gene gene = searchResultRow.gene;
-
-
-                //The following code causes a "session closed" error. However, it seems
-                //to be unnecessary, as all of the genes should at some stage be returned
-                //in a row of the results table.
-
-                /*
-
-                //get Gene Aliases
-                List<Gene> geneList = probe.getGenes();
-
-
-                // why a loop?
-                for (Gene gene : geneList) {
-                    System.out.println("Line 0");
-                    String geneName = gene.getGeneName();
-                    System.out.println("Line 1");
-                    String geneDesc = gene.getDescription();
-                    System.out.println("Line 2");
-                    String genBankId = gene.getGenbankId();
-                    System.out.println("Line 3");
-                    String ensemblId = gene.getEnsgAccession();
-                    System.out.println("Line 4");
-
-                    csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneName, geneDesc, genBankId, ensemblId, probeId});
-                }//write the csv into OutputStream
-                */
-
                 String geneName = gene.getGeneName();
                 String geneDesc = gene.getDescription();
                 String genBankId = gene.getGenbankId();
@@ -1611,7 +1577,6 @@ public class SearchAction extends DMBaseAction {
             csvWriter.writeNext(new String[]{"Found a total of " + gPagination.getTotalRecords() + " Gene(s)"});
             //write empty line
             csvWriter.writeNext(new String[]{""});
-
             //write a search results data column headers
             csvWriter.writeNext(new String[]{"Ensembl Id", "Gene Name", "Description", "Entrez", "Genbank", "UniGene"});
             List<Gene> geneList = gPagination.getPageResults();
@@ -2765,7 +2730,6 @@ public class SearchAction extends DMBaseAction {
                 mmheads.add("Gene Name");
                 mmheads.add("Probe Id");
                 //will be a head of csv file
-                //  for (GeneExpressionRecord gerecord : tissueExpressionList) {
                 List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
 
                 for (TissueExpression mheadesList : mmHeades) {
@@ -2798,7 +2762,6 @@ public class SearchAction extends DMBaseAction {
                     hmheads.add("Gene Name");
                     hmheads.add("Probe Id");
                     //will be a head of csv file
-                    //  for (GeneExpressionRecord gerecord : tissueExpressionList) {
                     List<TissueExpression> hmHeades = humanGeneExpressionList.get(0).getTissueExpressionList();
 
                     for (TissueExpression hmheadesList : hmHeades) {
@@ -2829,7 +2792,6 @@ public class SearchAction extends DMBaseAction {
                 mmheads.add("Gene Name");
                 mmheads.add("Probe Id");
                 //will be a head of csv file
-                //  for (GeneExpressionRecord gerecord : tissueExpressionList) {
                 List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
 
                 for (TissueExpression headesList : mmHeades) {

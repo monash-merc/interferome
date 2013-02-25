@@ -72,8 +72,8 @@ public class TissueExpressionServiceImpl implements TissueExpressionService {
     }
 
     @Override
-    public int saveTissueExpression(List<TissueExpression> tissueExpression) {
-        return this.tissueExpressionDAO.saveAll(tissueExpression);
+    public int saveTissueExpression(List<TissueExpression> tissueExpressions) {
+        return this.tissueExpressionDAO.saveAll(tissueExpressions);
     }
 
     @Override
@@ -87,8 +87,8 @@ public class TissueExpressionServiceImpl implements TissueExpressionService {
     }
 
     @Override
-    public int updateTissueExpression(List<TissueExpression> tissueExpression) {
-        return this.tissueExpressionDAO.updateAll(tissueExpression);
+    public int updateTissueExpression(List<TissueExpression> tissueExpressions) {
+        return this.tissueExpressionDAO.updateAll(tissueExpressions);
     }
 
     @Override

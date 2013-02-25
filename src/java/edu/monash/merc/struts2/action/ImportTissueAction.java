@@ -106,17 +106,15 @@ public class ImportTissueAction extends DMBaseAction{
                 addFieldError("importnotfinished", getText("tissue.import.working.in.progress"));
                 return INPUT;
             }
-            //start to upload the reporter file
+            //start to upload the tissue file
             FileInputStream fis = null;
             fis = new FileInputStream(upload);
-            //get all reporters from the file
+            //get all tissues from the file
             List<TissueExpression> tissueExpressions = generateTissueExpression(fis);
-            //List<Tissue> tissue = generateTissue(fis);
 
-            //create reporter bean
-           // TissueBean tissueBean = createTissueBean(user, tissueExpressions,tissue);
+            //create tissue bean
             TissueBean tissueBean = createTissueBean(user, tissueExpressions);
-            //call the import reporters service
+            //call the import tissues service
             this.dmService.importTissue(tissueBean);
 
             //set the success message

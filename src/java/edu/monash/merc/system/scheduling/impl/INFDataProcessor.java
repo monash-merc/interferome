@@ -92,10 +92,10 @@ public class INFDataProcessor implements DataProcessor {
 
         //TODO: step 1. the genes (human and mouse) must be imported first. unless you copy the gene data from existed gene table in the previous version
         //Gene for HUMAN
-     //   importEnsemblGenes(HUMAN, importedTime);
+        importEnsemblGenes(HUMAN, importedTime);
 
         //Gene for MOUSE
-     //  importEnsemblGenes(MOUSE, importedTime);
+       importEnsemblGenes(MOUSE, importedTime);
         long endTime = System.currentTimeMillis();
 
         //import human and mouse probes
@@ -104,19 +104,19 @@ public class INFDataProcessor implements DataProcessor {
 
         //TODO: step3, importing human gene ontology
         //GeneOntology for HUMAN
-     //   long goStartTime = System.currentTimeMillis();
-     //   importGeneOntology(HUMAN);
+        long goStartTime = System.currentTimeMillis();
+        importGeneOntology(HUMAN);
 
         //TODO: step4, importing mouse  gene ontology
         //import the geneontology for mouse
-     //   importGeneOntology(MOUSE);
-     //   long goEndTime = System.currentTimeMillis();
+        importGeneOntology(MOUSE);
+        long goEndTime = System.currentTimeMillis();
 
         logger.info("=====> The total process time for Gene: " + (endTime - startTime) / 1000 + "seconds");
 
-    //    logger.info("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
+        logger.info("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
 
-    //    logger.info("=====> The total process time for gene and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
+        logger.info("=====> The total process time for gene and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
     }
 
     private void importEnsemblGenes(String species, Date importedTime) {
@@ -203,7 +203,7 @@ public class INFDataProcessor implements DataProcessor {
         if (StringUtils.equals(type, PROBE_HUMAN_TYPE)) {
             probeSearch.clear();
         probeSearch.add("efg_agilent_sureprint_g3_ge_8x60k");
-     //   probeSearch.add("efg_agilent_wholegenome_4x44k_v1");
+        probeSearch.add("efg_agilent_wholegenome_4x44k_v1");
         probeSearch.add("efg_agilent_wholegenome_4x44k_v2");
         probeSearch.add("affy_hc_g110");
         probeSearch.add("affy_hg_u133_plus_2");

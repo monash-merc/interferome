@@ -6,6 +6,10 @@
     href="${base}/search/exportCsvFileSubtypes.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
+<br>
+<br/>
+<br>
+<br/>
 <div id="saveimage" class="export_pic"></div>
 <div class="search_table_div">
 <div class="nojava">

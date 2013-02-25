@@ -1,7 +1,6 @@
 <div class="result_title_div">
     Search Results
 </div>
-<div id="saveimage" class="export_pic"></div>
 <div class="export_div">
     Save as a TXT file<a
     href="${base}/search/exportCsvFileTFanalysis.jspx">
@@ -11,16 +10,16 @@
 <br/>
 <br>
 <br/>
+<div id="saveimage" class="export_pic"></div>
+<br>
+<br/>
+<br>
+<br/>
 <div class="search_table_div">
     <div class="nojava">
         Sites shown are only the most prevalent for the dataset searched.
         <p>(Javascript Must Be Enabled to View These Results)</p>
     </div>
-    <span style="color: gray; font-size: 10pt"><p>The location of transcription factors on each of the genes from the region spaning -1500bp to + 500 bp from the start site.</p>
-    <p>Each coloured box represents a specific transcription factor, the key for which is provided below the graphic.</p>
-        <p>Move the cursor over the transciption factor's coloured box to reveal the TRANSFAC<sup>*</sup> predicted match between the transcription factor and its predicted binding site.</p>
-    </span>
-
     <div id="promoter_container"></div>
     <div id="tf_table">
         <table id="tfsites">
@@ -45,7 +44,13 @@
                     </@s.iterator>
         </table>
     </div>
-<p><sup>*</sup>V. Matys, E. Fricke,R. Geffers, E. Gößling, M. Haubrock, R. Hehl, K. Hornischer, D. Karas, A. E. Kel, O. V. Kel-Margoulis, D.-U. Kloos, S. Land, B. Lewicki-Potapov, H. Michael, R. Münch, I. Reuter, S. Rotert, H. Saxel, M. Scheer, S. Thiele, and E. Wingender. (2003) <i>TRANSFAC®: transcriptional regulation, from patterns to profiles</i> Nucleic Acids Research <b>31:</b> 374-378.</p>
+        <span style="color: gray; font-size: 10pt"><p>The location of transcription factors on each of the genes from the region spaning -1500bp to + 500 bp from the start site.</p>
+    <p>Each coloured box represents a specific transcription factor, the key for which is provided below the graphic.</p>
+        <p>Move the cursor over the transciption factor's coloured box to reveal the TRANSFAC<sup>*</sup> predicted match between the transcription factor and its predicted binding site.</p>
+    </span>
+    <br>
+    <br/>
+    <p><sup>*</sup>V. Matys, E. Fricke,R. Geffers, E. Gößling, M. Haubrock, R. Hehl, K. Hornischer, D. Karas, A. E. Kel, O. V. Kel-Margoulis, D.-U. Kloos, S. Land, B. Lewicki-Potapov, H. Michael, R. Münch, I. Reuter, S. Rotert, H. Saxel, M. Scheer, S. Thiele, and E. Wingender. (2003) <i>TRANSFAC®: transcriptional regulation, from patterns to profiles</i> Nucleic Acids Research <b>31:</b> 374-378.</p>
 </div>
 <br/>
 

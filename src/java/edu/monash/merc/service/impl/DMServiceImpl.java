@@ -1062,9 +1062,7 @@ public class DMServiceImpl implements DMService {
 
         for (Probe probe : probes) {
             if (StringUtils.isNotBlank(probe.getProbeId())) {
-
                 // fill species ID, ensembl ID then save
-
                 // find out if the probe is already in the database
                 Probe existedProbe = this.getProbeByProbeId(probe.getProbeId());
                 logger.debug("PROBE ID: "+probe.getProbeId());
@@ -1075,7 +1073,6 @@ public class DMServiceImpl implements DMService {
                 logger.debug("PROBE SPECIES: "+probe.getSpecies().getSpeciesName());
 
                 // get the gene ID (many-to-many) - set it after including existing gene list
-
                 Gene gene = this.getGeneByEnsgAccession(probe.getEnsemblId());
 
                 // if there is no matching gene, log the error and skip this probe
@@ -1096,28 +1093,21 @@ public class DMServiceImpl implements DMService {
                     if (gene != null && !geneList.contains(gene)) {
                         geneList.add(gene);
                     }
-
                     // set the gene ID,
                     probe.setGenes(geneList);
-
                     // update.
-
                     this.mergeProbe(probe);
                     this.updateProbe(probe);
                     //count how many probes have been updated
                     countUpdated++;
                 } else {
-                    //probe = new Probe();
-
                     ArrayList<Gene> geneList = new ArrayList<Gene>();
                     if (gene != null) {
                         logger.debug("Adding gene to geneList");
                         geneList.add(gene);
                         probe.setGenes(geneList);
                     }
-
                     this.saveProbe(probe);
-
                     //coimportErrorunt how many probes are new
                     countNew++;
                 }
@@ -1186,23 +1176,17 @@ public class DMServiceImpl implements DMService {
             for (ProbeGeneBean probeGeneBean : probeGeneBeans) {
                 String ensgAc = probeGeneBean.getEnsgAccession();
                 String probeId = probeGeneBean.getProbeId();
-                //String platform = probeGeneBean.getPlatform();
                 String speciesName = probeGeneBean.getSpeciesName();
                 Gene gene = this.getGeneByEnsgAccession(ensgAc);
                 Species speciesN = this.getSpeciesByName(speciesName);
                 //if not save the species, the following code will get db exception when probe is referencing the species id.
-                //probe.setSpecies(this.getSpeciesByName(probe.getSpeciesName()));
                 Probe probe = this.getProbeByProbeId(probeId);
                 if (gene != null) {
                     if (probe == null) {
                         probe = new Probe();
                         probe.setProbeId(probeId);
                         probe.setSpecies(speciesN);
-                        // probe.setPlatform(platform);
-                        // probe.setSpecies(probeType);
                     }
-                    probe.getGenes();//why call this method without any object to hold this value?
-
                     List<Gene> geneList = this.getGenesByProbeId(probe.getProbeId());
                     if (geneList != null) {
                         if (!geneList.contains(gene)) {
@@ -1213,16 +1197,12 @@ public class DMServiceImpl implements DMService {
                         geneList.add(gene);
                     }
                     probe.setGenes(geneList);
-                    //System.out.println("DBG MESSAGE from DMServiceImpl:" + probe.getGenes());
                     //check if primary key id is zero which means new entity,
                     if (probe.getId() == 0) {
                         this.saveProbe(probe);
                     } else {
                         this.mergeProbe(probe);
                     }
-            //    } else {
-            //          // message user that the probe cannot be loaded
-            //          importError(probes, "No matching gene in database");
                 }
             }
         }
@@ -1283,7 +1263,6 @@ public class DMServiceImpl implements DMService {
 
     }
 
-
     @Override
     public void importTFSite(TFSiteBean tfSiteBean) {
         ImportTFSiteThread tfSiteThread = new ImportTFSiteThread(this, tfSiteBean);
@@ -1291,18 +1270,6 @@ public class DMServiceImpl implements DMService {
     }
 
     // Tissues
-//  @Override
-//  public void saveTissue(Tissue tissue){
-//      this.tissueService.saveTissue(tissue);
-//  }
-//  @Override
-//  public void updateTissue(Tissue tissue){
-//      this.tissueService.updateTissue(tissue);
-//  }
-//  @Override
-//  public void mergeTissue(Tissue tissue){
-//      this.tissueService.mergeTissue(tissue);
-//  }
     @Override
     public TissueExpression getTissueExpressionById(long id) {
         return this.tissueExpressionService.getTissueExpressionById(id);
@@ -1353,8 +1320,6 @@ public class DMServiceImpl implements DMService {
             tissueExpressions.setProbe(probeId);
             if (probeId != null) {
                 TissueExpression existedTissue = this.getTissueExpressionById(tissueExpressions.getId());
-                //System.out.println("1 MESSAGE: '"+existedTissue+"'");
-               // System.out.println("2 MESSAGE: '"+existedTissue+"'");
                   if (existedTissue != null)  {
                       tissueExpressions.setId(existedTissue.getId());
                       this.updateTissueExpression(tissueExpressions);
@@ -1371,35 +1336,6 @@ public class DMServiceImpl implements DMService {
         counter.setTotalNew(countNew);
         return counter;
     }
-
-//  @Override
-//  public TissueCounter importTissues(List<Tissue> tissue){
-//      int countUpdated = 0;
-//      int countNew = 0;
-//      //reporters counter
-//      TissueCounter counter = new TissueCounter();
-//
-//      for (Tissue tissue1 : tissue) {
-//          if (StringUtils.isNotBlank(tissue1.getTissueId())) {
-//              Tissue existedTissue = this.getTissueByName(tissue1.getTissueId());
-//              if (existedTissue != null) {
-//                  tissue1.setId(existedTissue.getId());
-//                  // this.mergeReporter(reporter);
-//                  this.updateTissue(tissue1);
-//                  //count how many reporters have been updated
-//                  countUpdated++;
-//              } else {
-//                  this.saveTissue(tissue1);
-//                  //count how many reporters are new
-//                  countNew++;
-//              }
-//          }
-//      }
-//      counter.setTotalUpdated(countUpdated);
-//      counter.setTotalNew(countNew);
-//      return counter;
-//
-//  }
 
     @Override
     public void importTissue(TissueBean tissueBean){
@@ -1441,45 +1377,6 @@ public class DMServiceImpl implements DMService {
     public Species getSpeciesByName(String speciesName) {
         return this.speciesService.getSpeciesByName(speciesName);
     }
-
-//    @Override
-//    public Species getSpeciesBySpeciesId(String speciesId){
-//        return this.speciesService.getSpeciesBySpeciesId(speciesId);
-//    }
-
-//    @Override
-//    public SpeciesCounter importAllSpecies(List<Species> specieses) {
-//        int countUpdated = 0;
-//        int countNew = 0;
-//        //reporters counter
-//        SpeciesCounter counter = new SpeciesCounter();
-//
-//        for (Species species : specieses) {
-//            if (StringUtils.isNotBlank(species.getSpecies())) {
-//                Species existedSpecies = this.getSpeciesByName(species.getSpeciesName());
-//                if (existedSpecies != null) {
-//                    species.setId(existedSpecies.getId());
-//                    // this.mergeReporter(reporter);
-//                    this.updateSpecies(species);
-//                    //count how many reporters have been updated
-//                    countUpdated++;
-//                } else {
-//                    this.saveSpecies(species);
-    //count how many reporters are new
-//                    countNew++;
-//                }
-//            }
-//        }
-//        counter.setTotalUpdated(countUpdated);
-//        counter.setTotalNew(countNew);
-//        return counter;
-//    }
-
-//    @Override
-//    public void importSpecies(SpeciesBean speciesBean) {
-//        ImportSpeciesThread speciesThread = new ImportSpeciesThread(this, speciesBean);
-//        speciesThread.importSpecies();
-//    }
 
     //Dataset
 
@@ -1636,21 +1533,6 @@ public class DMServiceImpl implements DMService {
             } else {
                 successCount++;
             }
-//
-//        //probe.getGenes();
-//
-//
-//        List<Gene> geneTab = this.getGenesByProbeId(probeId);
-//
-//        for (Gene genes : geneTab) {
-//        String geneName = genes.getGeneName();
-//        String geneDesc = genes.getDescription();
-//        String genBankId = genes.getGenbankId();
-//        String ensemblId = genes.getEnsgAccession();
-//        }
-//        probe.setGenes(geneTab);
-//
-
             Data data = new Data();
             data.setDataset(dataset);
             data.setProbe(probe);

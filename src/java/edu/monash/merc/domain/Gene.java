@@ -114,9 +114,6 @@ public class Gene extends Domain {
     @Column(name = "imported_time")
     private Date importedTime;
 
-   // @OneToMany(targetEntity = Probe.class)
-   // @JoinColumn(name = "probe_id", referencedColumnName = "id", nullable = false)
-   // private List<Probe> probe;
     @ManyToMany(mappedBy = "genes")
     private List<Probe> probe;
 
