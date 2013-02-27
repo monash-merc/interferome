@@ -14,11 +14,115 @@ function HeatMap(container_obj){
     var oTable = container.find("table.tesites")[0];
     var row_header_container = container.find('div.tissueexp_headers')[0];
     var row_data_container = container.find('div.tissueexp_container')[0];
+    var link = $("span.saveimage a", container);
 
     if (oTable.rows.length == 0){
         container.css("visibility", "hidden");
         return;
     }
+
+    // for display
+    drawHeatmap(oTable, row_data_container, row_header_container);
+
+    // for saving
+    var hiddenPaper = $('<div></div>').appendTo(container)[0];
+    hiddenPaper.style.visibility = "hidden";
+    var paper = drawHiddenHeatmap(oTable, hiddenPaper);
+
+    var paperSVG = paper.toSVG("end");
+    var b64 = Base64.encode(paperSVG);
+    link.attr("href", "data:image/svg+xml;base64,\n"+b64);
+    link.attr("title", "heatmap.svg");
+
+    oTable.style.visibility = "hidden";
+    row_data_container.style.overflow = "scroll";
+}
+
+function drawHiddenHeatmap(oTable, row_data_container){
+
+    //Skip first (header) row
+    var rowLength = oTable.rows.length;
+    var dataColumns = oTable.rows.item(0).cells.length - 2;
+    var dataStart = 2;
+    var boxWidth = 10;
+    var boxHeight = 10;
+    var rowHeaderWidth = 160;
+
+    var paper = new Raphael(row_data_container, rowHeaderWidth + (boxWidth*dataColumns) +20 , 250+(boxHeight*rowLength));
+
+    var colorStats = calculateColorStatistics(oTable, dataColumns, dataStart);
+    var yPos = 200;
+
+    // Add Header for row titles
+    var geneEndPos = 40;
+    var probeEndPos = rowHeaderWidth - 20;
+    var geneColTitle = paper.text(geneEndPos, yPos - 18, "Gene");
+    geneColTitle.attr({'text-anchor': 'end'});
+    var probeColTitle = paper.text(probeEndPos, yPos - 20, "Probe Id");
+    probeColTitle.attr({'text-anchor': 'end'});
+
+    //Draw Header
+    var initial_x = rowHeaderWidth + 10;
+    var header_x = initial_x;
+    for(var k = 0; k < dataColumns;k++){
+        var tissue = oTable.rows.item(0).cells.item(k+dataStart).innerHTML;
+        var text = paper.text(header_x, 190, tissue);
+        text.transform("t5,100r90t-100,0");
+        text.attr({'text-anchor': 'end'});
+        header_x += boxWidth;
+    }
+
+    //Add Data
+
+    //Skip the tissues row;
+    for (i = 1; i < oTable.rows.length; i++){
+        var oCells = oTable.rows.item(i).cells;
+        //Add Gene Name
+        var geneName = oCells.item(0).innerHTML;
+        var probeName = oCells.item(1).innerHTML;
+        var geneText = paper.text(geneEndPos, yPos+(boxHeight/2), geneName);
+        geneText.attr({'text-anchor': 'end'});
+        var probeText = paper.text(probeEndPos, yPos+(boxHeight/2),probeName);
+        probeText.attr({'text-anchor': 'end'});
+
+        // check that the text does not exceed the width of the box. If it does, widen the container!
+        /*
+        var textRight = probeText.getBBox().x2;
+        if (textRight > rowHeaderWidth){
+            //alert("pause")    ;
+            $(row_header_container).width(textRight+20);
+        }
+        */
+
+
+
+        var data_x = initial_x;
+        //Skip the header columns (gene name, probe id)
+        for(var j = 0; j < dataColumns; j++){
+            var cell = oCells.item(j+dataStart);
+            if(cell != null){
+                var cellVal = cell.innerHTML;
+                if(cellVal != null){
+                    if(cellVal != null && cellVal != ""){
+                        var rect = paper.rect(data_x, yPos, boxWidth, boxHeight);
+                        var color = getColor(colorStats[0], colorStats[1], colorStats[2], cellVal);
+                        //alert("color returned: " + color);
+                        rect.attr({fill: color, stroke:"black"});// set to black for debugging
+                        data_x += boxWidth;
+                    }
+                }
+            }
+
+        }
+        yPos=yPos+boxHeight;
+    }
+    return paper;
+}
+
+function drawHeatmap(oTable, row_data_container, row_header_container){
+
+
+
     //Skip first (header) row
     var rowLength = oTable.rows.length;
     var dataColumns = oTable.rows.item(0).cells.length - 2;
@@ -102,17 +206,7 @@ function HeatMap(container_obj){
         }
         yPos=yPos+boxHeight;
     }
-    var link = $("span.saveimage a", container);
-    var paperSVG = paper.toSVG("end");
-    var rowHeaderSVG = rowHeader.toSVG();
-    var b64 = Base64.encode(paperSVG);
-    //var b65 = Base64.encode(rowHeaderSVG);
-    link.attr("href", "data:image/svg+xml;base64,\n"+b64);
-    link.attr("title", "heatmap.svg");
-
-    oTable.style.visibility = "hidden";
-    row_data_container.style.overflow = "scroll";
-
+    return paper;
 }
 
 
