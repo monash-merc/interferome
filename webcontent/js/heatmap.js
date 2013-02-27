@@ -47,8 +47,11 @@ function drawHiddenHeatmap(oTable, row_data_container){
     var boxWidth = 10;
     var boxHeight = 10;
     var rowHeaderWidth = 160;
+    var totalHeight = 250+(boxHeight*rowLength);
 
-    var paper = new Raphael(row_data_container, rowHeaderWidth + (boxWidth*dataColumns) +20 , 250+(boxHeight*rowLength));
+    $(row_data_container).height(totalHeight);
+
+    var paper = new Raphael(row_data_container, rowHeaderWidth + (boxWidth*dataColumns) +20 , totalHeight);
 
     var colorStats = calculateColorStatistics(oTable, dataColumns, dataStart);
     var yPos = 200;
@@ -131,11 +134,15 @@ function drawHeatmap(oTable, row_data_container, row_header_container){
     var boxHeight = 10;
     var rowHeaderWidth = 50;
 
+    var totalHeight = 250+(boxHeight*rowLength);
+
+    $(row_data_container).height(totalHeight);
+    $(row_header_container).height(totalHeight);
     $(row_header_container).width(rowHeaderWidth);
     var rowHeader
-        = new Raphael(row_header_container, "100%", 250 + (boxHeight * rowLength));
+        = new Raphael(row_header_container, "100%", totalHeight);
 
-    var paper = new Raphael(row_data_container, (boxWidth*dataColumns) +20 , 250+(boxHeight*rowLength));
+    var paper = new Raphael(row_data_container, (boxWidth*dataColumns) +20 , totalHeight);
 
     var colorStats = calculateColorStatistics(oTable, dataColumns, dataStart);
     var yPos = 200;
