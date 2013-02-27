@@ -31,11 +31,10 @@ function HeatMap(container_obj){
     var rowHeader
         = new Raphael(row_header_container, "100%", 250 + (boxHeight * rowLength));
 
-    var paper = new Raphael(row_data_container, (boxWidth*dataColumns) +15 , 250+(boxHeight*rowLength));
+    var paper = new Raphael(row_data_container, (boxWidth*dataColumns) +20 , 250+(boxHeight*rowLength));
 
     var colorStats = calculateColorStatistics(oTable, dataColumns, dataStart);
-    var yPos = 180;
-
+    var yPos = 200;
 
     // Add Header for row titles
     var geneEndPos = 40;
@@ -44,7 +43,7 @@ function HeatMap(container_obj){
     var geneColTitle = rowHeader.text(geneEndPos, yPos - 20, "Gene");
     geneColTitle.attr({'text-anchor': 'end'});
     rowHeader.text(separatorPos, yPos - 20, " - ");
-    var probeColTitle = rowHeader.text(probeStartPos, yPos - 20, "Probe");
+    var probeColTitle = rowHeader.text(probeStartPos, yPos - 20, "Probe Id");
     probeColTitle.attr({'text-anchor': 'start'});
 
     //Draw Header
@@ -52,7 +51,7 @@ function HeatMap(container_obj){
     var header_x = initial_x;
     for(var k = 0; k < dataColumns;k++){
         var tissue = oTable.rows.item(0).cells.item(k+dataStart).innerHTML;
-        var text = paper.text(header_x, 170, tissue);
+        var text = paper.text(header_x, 190, tissue);
         text.transform("t5,100r90t-100,0");
         text.attr({'text-anchor': 'end'});
         header_x += boxWidth;
@@ -104,9 +103,10 @@ function HeatMap(container_obj){
         yPos=yPos+boxHeight;
     }
     var link = $("span.saveimage a", container);
-    var paperSVG = paper.toSVG();
+    var paperSVG = paper.toSVG("end");
     var rowHeaderSVG = rowHeader.toSVG();
     var b64 = Base64.encode(paperSVG);
+    //var b65 = Base64.encode(rowHeaderSVG);
     link.attr("href", "data:image/svg+xml;base64,\n"+b64);
     link.attr("title", "heatmap.svg");
 

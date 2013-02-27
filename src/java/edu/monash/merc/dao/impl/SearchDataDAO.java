@@ -362,17 +362,13 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     public List<GeneExpressionRecord> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
         List<Probe> probes = uniqueProbesPages.getPageResults();
-
         if (probes.size() > 0) {
-
             List<Gene> gnenNameList = new ArrayList<Gene>();
             String gnHQL = "SELECT g.geneName  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) GROUP BY g.geneName ORDER BY g";
             Query gnQuery = this.session().createQuery(gnHQL);
             gnQuery.setParameterList(("probes"), probes);
             gnenNameList = gnQuery.list();
 
-
-            //  if (gnenNameList.size() > 0) {
             String teHQL ="SELECT te, g.geneName, s.speciesName FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.species s INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList) ORDER BY te.tissue.tissueId";
             Query teQuery = this.session().createQuery(teHQL);
             teQuery.setParameterList(("gnenNameList"), gnenNameList);
@@ -383,7 +379,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 assert row.length == 3;
                 geneExpressionRecords.add(new GeneExpressionRecord((TissueExpression) row[0], (String) row[1], (String) row[2]));
             }
-
             return geneExpressionRecords;
 
         } else {

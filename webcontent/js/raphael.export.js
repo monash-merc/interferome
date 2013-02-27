@@ -140,7 +140,7 @@
 
                             return initial;
                         },
-                        { style: 'text-anchor: middle; ' + styleToString(style) + ';' }
+                        { style: 'text-anchor: '+glob_align+";" + styleToString(style) + ';' }
                     ),
                     node.matrix,
                     tag('tspan', { dy: computeTSpanDy(style.font.size, line + 1, node.attrs['text'].split('\n').length) }, null, text)
@@ -171,7 +171,7 @@
         // Other serializers should go here
     };
 
-    R.fn.toSVG = function() {
+    R.fn.toSVG = function(align) {
         var
             paper   = this,
             restore = { svg: R.svg, vml: R.vml },
@@ -180,6 +180,11 @@
 
         R.svg = true;
         R.vml = false;
+        if (align){
+            glob_align = align;
+        } else {
+            glob_align = "middle";
+        }
 
         for ( var node = paper.bottom; node != null; node = node.next ) {
             if ( node.node.style.display === 'none' ) continue;
