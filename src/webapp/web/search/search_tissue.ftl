@@ -1,14 +1,14 @@
-
 <div class="result_title_div">
     Search Results
+</div>
+
+<div class="nojava">
+    <p>(Javascript Must Be Enabled to View These Results)</p>
 </div>
 <div class="export_div">
     Save as a TXT file<a
     href="${base}/search/exportCsvFileTissueExpression.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
-</div>
-<div class="nojava">
-    <p>(Javascript Must Be Enabled to View These Results)</p>
 </div>
 <br>
 <br/>
@@ -29,8 +29,8 @@
             <br />
         <br />
         <br />
-        <div class="tissueexp_headers" style="float:left;"></div>
-        <div class="tissueexp_container"></div>
+        <div  id="h" class="tissueexp_headers" style="float:left; overflow: scroll;" onscroll="scroll_h()"></div>
+        <div id="d" class="tissueexp_container"  style="overflow: auto;" onscroll="scroll_d()"></div>
         <div class="teid_table">
             <table class="tesites">
             <@s.iterator status="tissStat" value="humanGeneExpressionList" id="tissueResult">
