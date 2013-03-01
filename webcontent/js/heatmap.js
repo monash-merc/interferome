@@ -36,8 +36,8 @@ function HeatMap(container_obj){
 
     oTable.style.visibility = "hidden";
 }
-function scroll_d() {document.getElementById("h").scrollTop = document.getElementById("d").scrollTop; }
-function scroll_h() {document.getElementById("d").scrollTop = document.getElementById("h").scrollTop; }
+function scroll_d(a,b) {document.getElementById(a).scrollTop = document.getElementById(b).scrollTop; }
+function scroll_h(a,b) {document.getElementById(b).scrollTop = document.getElementById(a).scrollTop; }
 
 function drawHiddenHeatmap(oTable, row_data_container){
 
@@ -141,9 +141,9 @@ function drawHeatmap(oTable, row_data_container, row_header_container){
     $(row_header_container).height(totalHeight);
     $(row_header_container).width(rowHeaderWidth);
     var rowHeader
-        = new Raphael(row_header_container, "100%", 250 + (boxHeight * rowLength));
+        = new Raphael(row_header_container, "100%", totalHeight);
 
-    var paper = new Raphael(row_data_container, (boxWidth*dataColumns) +15 , 250+(boxHeight*rowLength));
+    var paper = new Raphael(row_data_container, (boxWidth*dataColumns) +20 , totalHeight);
 
     var colorStats = calculateColorStatistics(oTable, dataColumns, dataStart);
     var yPos = 200;
