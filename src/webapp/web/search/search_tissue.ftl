@@ -1,3 +1,4 @@
+
 <div class="result_title_div">
     Search Results
 </div>
@@ -7,7 +8,7 @@
 </div>
 <div class="export_div">
     Save as a TXT file<a
-    href="${base}/search/exportCsvFileTissueExpression.jspx">
+        href="${base}/search/exportCsvFileTissueExpression.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
 <br>
@@ -21,8 +22,9 @@
             <div class="export_options" style="float: right;">
                 <span class="saveimage">
                     <a href-lang='image/svg+xml' target='_blank' href="">
-                    <img src="${base}/images/save_picture_icon.png" class="save_picture"/>
+                        <img src="${base}/images/save_picture_icon.png" class="save_picture"/>
                     </a>
+
                 </span>
             </div>
             <br />
@@ -59,6 +61,7 @@
     <div id="mouse_picture_container"
          style="margin-right: auto; margin-left: auto; padding: 15px; border: thin solid teal;">
         <h3>Mouse Tissue Expression</h3>
+
         <div class="export_options" style="float: right;">
                 <span class="saveimage">
                     <a href-lang='image/svg+xml' target='_blank' href="">
@@ -72,6 +75,9 @@
         <br />
         <div id="mh" class="tissueexp_headers" style="float:left; overflow: scroll;" onscroll="scroll_h('mh','md')"></div>
         <div id="md" class="tissueexp_container"  style="overflow: auto;" onscroll="scroll_d('mh','md')"></div>
+
+        <div class="tissueexp_headers" style="float:left;"></div>
+        <div class="tissueexp_container"></div>
         <div class="teid_table">
             <table class="tesites">
             <@s.iterator status="tissStat" value="mouseGeneExpressionList" id="tissueResult">
@@ -115,6 +121,7 @@
 
     <br>
     <br/>
+
     <p><sup>*</sup>Chunlei Wu, Ian MacLeod, and Andrew I. Su. (2012) <i>BioGPS and MyGene.info: organizing online,
         gene-centric information.</i> Nucleic Acids Research<b>41(D1):</b> D561-D565.</p>
 </div>

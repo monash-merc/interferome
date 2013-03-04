@@ -48,10 +48,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.*;
 
 
@@ -662,8 +659,15 @@ public class SearchAction extends DMBaseAction {
                 return ERROR;
             }
             List<GeneExpressionRecord> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
-            this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
-            this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
+            System.out.println("MESSAGE - Searched species: "+searchBean.getSpecies());
+            if (searchBean.getSpecies().equalsIgnoreCase("Homo sapiens")) {
+                this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
+            } else if (searchBean.getSpecies().equalsIgnoreCase("Mus musculus")) {
+                this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
+            } else {
+                this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
+                this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
+            }
             //set the searched flag as true
             searched = true;
             searchType = TISSUE_EXP_TYPE;
@@ -681,15 +685,15 @@ public class SearchAction extends DMBaseAction {
 
     /**
      * GeneExpressionRecords are uniquely identified by their probe and gene.
-     *
+     * <p/>
      * What we need is for each unique gene and probe, a list of the related tissue expressions and tissue names.
-     *
+     * <p/>
      * Therefore, we use a HashMap to combine the tissue expression values and names from all our retrieved rows
      *
      * @param species Only use this species name
      * @return A list of gene expression records with their lists of matching tissues filled out
      */
-    private ArrayList<GeneExpressionRecord> combineByGeneAndProbe(List<GeneExpressionRecord> te, String species){
+    private ArrayList<GeneExpressionRecord> combineByGeneAndProbe(List<GeneExpressionRecord> te, String species) {
         ArrayList<GeneExpressionRecord> geneExpressionRecords = new ArrayList<GeneExpressionRecord>();
         Iterator<GeneExpressionRecord> i = te.iterator();
         HashMap<GeneExpressionRecord, GeneExpressionRecord> geneAndProbe = new HashMap<GeneExpressionRecord, GeneExpressionRecord>();
@@ -699,7 +703,7 @@ public class SearchAction extends DMBaseAction {
             if (!current.getSpeciesName().equalsIgnoreCase(species)) {
                 continue;
             }
-             if (geneAndProbe.containsKey(current)) {
+            if (geneAndProbe.containsKey(current)) {
                 GeneExpressionRecord stored = geneAndProbe.get(current);
                 stored.addTissueExpression(current.getTissueExpression());
             } else {
@@ -776,7 +780,7 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             dataPagination = this.searchDataService.search(searchBean, 1, maxRecords, orderBy, orderByType);
-            System.out.println("dataPagination: "+dataPagination);
+            System.out.println("dataPagination: " + dataPagination);
             this.csvInputStream = createCSVFile(searchBean, dataPagination);
             System.out.println("file created");
             String csvFileName = MercUtil.genCurrentTimestamp();
@@ -2249,7 +2253,7 @@ public class SearchAction extends DMBaseAction {
                     }
                 }
             } else {
-                if (StringUtils.contains(species, "Homo sapiens")){
+                if (StringUtils.contains(species, "Homo sapiens")) {
                     csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
                     csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
                     //write data result
@@ -2269,7 +2273,7 @@ public class SearchAction extends DMBaseAction {
                         }
                     }
                 }
-                if (StringUtils.contains(species, "Mus musculus")){
+                if (StringUtils.contains(species, "Mus musculus")) {
                     csvWriter.writeNext(new String[]{"Mouse Chromosomal Location"});
                     csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
                     List<String> finishedMGenes = new ArrayList<String>();
@@ -2517,7 +2521,7 @@ public class SearchAction extends DMBaseAction {
 
     }
 
-    private InputStream createCSVFileTissueExpression(SearchBean searchBean, List<GeneExpressionRecord> humanGeneExpressionList,List<GeneExpressionRecord> mouseGeneExpressionList) {
+    private InputStream createCSVFileTissueExpression(SearchBean searchBean, List<GeneExpressionRecord> humanGeneExpressionList, List<GeneExpressionRecord> mouseGeneExpressionList) {
         CSVWriter csvWriter = null;
         try {
             ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
@@ -2692,69 +2696,69 @@ public class SearchAction extends DMBaseAction {
             //write new empty line
             csvWriter.writeNext(new String[]{""});
             if (StringUtils.equals(species, "-1")) {
-             csvWriter.writeNext(new String[]{"Human Tissue Expression"});
+                csvWriter.writeNext(new String[]{"Human Tissue Expression"});
                 if (!humanGeneExpressionList.isEmpty()) {
-                //write data result
-                List<String> hmheads = new ArrayList<String>();
-                hmheads.add("Gene Name");
-                hmheads.add("Probe Id");
-                //will be a head of csv file
-                List<TissueExpression> hmHeades = humanGeneExpressionList.get(0).getTissueExpressionList();
+                    //write data result
+                    List<String> hmheads = new ArrayList<String>();
+                    hmheads.add("Gene Name");
+                    hmheads.add("Probe Id");
+                    //will be a head of csv file
+                    List<TissueExpression> hmHeades = humanGeneExpressionList.get(0).getTissueExpressionList();
 
-                for (TissueExpression hmheadesList : hmHeades) {
-                    Tissue hmtissue = hmheadesList.getTissue();
-                    String hmtissueVal = hmtissue.getTissueId();
-                    hmheads.add(hmtissueVal);
-                }
-                csvWriter.writeNext(hmheads.toArray(new String[hmheads.size()]));
-                //for individual row in csv file
-                for (GeneExpressionRecord hgerecord : humanGeneExpressionList) {
-                    List<String> hrowvalues = new ArrayList<String>();
-                    // add the first two columns - probe and gene id
-                    hrowvalues.add(hgerecord.getGeneName());
-                    hrowvalues.add(hgerecord.getProbe().getProbeId());
-                    // add the list of expressions
-                    List<TissueExpression> htissueExpressions = hgerecord.getTissueExpressionList();
-                    for (TissueExpression htissueExpression : htissueExpressions) {
-                        double hmexpression = htissueExpression.getExpression();
-                        hrowvalues.add(String.valueOf(hmexpression));
+                    for (TissueExpression hmheadesList : hmHeades) {
+                        Tissue hmtissue = hmheadesList.getTissue();
+                        String hmtissueVal = hmtissue.getTissueId();
+                        hmheads.add(hmtissueVal);
                     }
-                    csvWriter.writeNext(hrowvalues.toArray(new String[hrowvalues.size()]));
-                }
+                    csvWriter.writeNext(hmheads.toArray(new String[hmheads.size()]));
+                    //for individual row in csv file
+                    for (GeneExpressionRecord hgerecord : humanGeneExpressionList) {
+                        List<String> hrowvalues = new ArrayList<String>();
+                        // add the first two columns - probe and gene id
+                        hrowvalues.add(hgerecord.getGeneName());
+                        hrowvalues.add(hgerecord.getProbe().getProbeId());
+                        // add the list of expressions
+                        List<TissueExpression> htissueExpressions = hgerecord.getTissueExpressionList();
+                        for (TissueExpression htissueExpression : htissueExpressions) {
+                            double hmexpression = htissueExpression.getExpression();
+                            hrowvalues.add(String.valueOf(hmexpression));
+                        }
+                        csvWriter.writeNext(hrowvalues.toArray(new String[hrowvalues.size()]));
+                    }
                 }
                 if (!mouseGeneExpressionList.isEmpty()) {
-                csvWriter.writeNext(new String[]{""});
-                csvWriter.writeNext(new String[]{"Mouse Tissue Expression"});
-                //write data result
-                List<String> mmheads = new ArrayList<String>();
-                mmheads.add("Gene Name");
-                mmheads.add("Probe Id");
-                //will be a head of csv file
-                List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
+                    csvWriter.writeNext(new String[]{""});
+                    csvWriter.writeNext(new String[]{"Mouse Tissue Expression"});
+                    //write data result
+                    List<String> mmheads = new ArrayList<String>();
+                    mmheads.add("Gene Name");
+                    mmheads.add("Probe Id");
+                    //will be a head of csv file
+                    List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
 
-                for (TissueExpression mheadesList : mmHeades) {
-                    Tissue mtissue = mheadesList.getTissue();
-                    String mtissueVal = mtissue.getTissueId();
-                    mmheads.add(mtissueVal);
-                }
-                csvWriter.writeNext(mmheads.toArray(new String[mmheads.size()]));
-                //for individual row in csv file
-                for (GeneExpressionRecord mgerecord : mouseGeneExpressionList) {
-                    List<String> mrowvalues = new ArrayList<String>();
-                    // add the first two columns - probe and gene id
-                    mrowvalues.add(mgerecord.getGeneName());
-                    mrowvalues.add(mgerecord.getProbe().getProbeId());
-                    // add the list of expressions
-                    List<TissueExpression> mtissueExpressions = mgerecord.getTissueExpressionList();
-                    for (TissueExpression mtissueExpression : mtissueExpressions) {
-                        double mexpression = mtissueExpression.getExpression();
-                        mrowvalues.add(String.valueOf(mexpression));
+                    for (TissueExpression mheadesList : mmHeades) {
+                        Tissue mtissue = mheadesList.getTissue();
+                        String mtissueVal = mtissue.getTissueId();
+                        mmheads.add(mtissueVal);
                     }
-                    csvWriter.writeNext(mrowvalues.toArray(new String[mrowvalues.size()]));
+                    csvWriter.writeNext(mmheads.toArray(new String[mmheads.size()]));
+                    //for individual row in csv file
+                    for (GeneExpressionRecord mgerecord : mouseGeneExpressionList) {
+                        List<String> mrowvalues = new ArrayList<String>();
+                        // add the first two columns - probe and gene id
+                        mrowvalues.add(mgerecord.getGeneName());
+                        mrowvalues.add(mgerecord.getProbe().getProbeId());
+                        // add the list of expressions
+                        List<TissueExpression> mtissueExpressions = mgerecord.getTissueExpressionList();
+                        for (TissueExpression mtissueExpression : mtissueExpressions) {
+                            double mexpression = mtissueExpression.getExpression();
+                            mrowvalues.add(String.valueOf(mexpression));
+                        }
+                        csvWriter.writeNext(mrowvalues.toArray(new String[mrowvalues.size()]));
+                    }
                 }
-                }
-            }  else {
-                if (StringUtils.contains(species, "Homo sapiens")){
+            } else {
+                if (StringUtils.contains(species, "Homo sapiens")) {
                     csvWriter.writeNext(new String[]{"Human Tissue Expression"});
 
                     //write data result
@@ -2785,36 +2789,36 @@ public class SearchAction extends DMBaseAction {
                         csvWriter.writeNext(hrowvalues.toArray(new String[hrowvalues.size()]));
                     }
                 }
-                if (StringUtils.contains(species, "Mus musculus")){
-                csvWriter.writeNext(new String[]{"Mouse Tissue Expression"});
-                //write data result
-                List<String> mmheads = new ArrayList<String>();
-                mmheads.add("Gene Name");
-                mmheads.add("Probe Id");
-                //will be a head of csv file
-                List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
+                if (StringUtils.contains(species, "Mus musculus")) {
+                    csvWriter.writeNext(new String[]{"Mouse Tissue Expression"});
+                    //write data result
+                    List<String> mmheads = new ArrayList<String>();
+                    mmheads.add("Gene Name");
+                    mmheads.add("Probe Id");
+                    //will be a head of csv file
+                    List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
 
-                for (TissueExpression headesList : mmHeades) {
-                    Tissue tissue = headesList.getTissue();
-                    String tissueVal = tissue.getTissueId();
-                    mmheads.add(tissueVal);
-                }
-                csvWriter.writeNext(mmheads.toArray(new String[mmheads.size()]));
-                //for individual row in csv file
-                for (GeneExpressionRecord mgerecord : mouseGeneExpressionList) {
-                    List<String> mrowvalues = new ArrayList<String>();
-                    // add the first two columns - probe and gene id
-                    mrowvalues.add(mgerecord.getGeneName());
-                    mrowvalues.add(mgerecord.getProbe().getProbeId());
-                    // add the list of expressions
-                    List<TissueExpression> mtissueExpressions = mgerecord.getTissueExpressionList();
-                    for (TissueExpression mtissueExpression : mtissueExpressions) {
-                        double expression = mtissueExpression.getExpression();
-                        mrowvalues.add(String.valueOf(expression));
+                    for (TissueExpression headesList : mmHeades) {
+                        Tissue tissue = headesList.getTissue();
+                        String tissueVal = tissue.getTissueId();
+                        mmheads.add(tissueVal);
                     }
-                    csvWriter.writeNext(mrowvalues.toArray(new String[mrowvalues.size()]));
+                    csvWriter.writeNext(mmheads.toArray(new String[mmheads.size()]));
+                    //for individual row in csv file
+                    for (GeneExpressionRecord mgerecord : mouseGeneExpressionList) {
+                        List<String> mrowvalues = new ArrayList<String>();
+                        // add the first two columns - probe and gene id
+                        mrowvalues.add(mgerecord.getGeneName());
+                        mrowvalues.add(mgerecord.getProbe().getProbeId());
+                        // add the list of expressions
+                        List<TissueExpression> mtissueExpressions = mgerecord.getTissueExpressionList();
+                        for (TissueExpression mtissueExpression : mtissueExpressions) {
+                            double expression = mtissueExpression.getExpression();
+                            mrowvalues.add(String.valueOf(expression));
+                        }
+                        csvWriter.writeNext(mrowvalues.toArray(new String[mrowvalues.size()]));
+                    }
                 }
-            }
             }
             //flush out
             csvWriter.flush();
@@ -2834,7 +2838,6 @@ public class SearchAction extends DMBaseAction {
         }
 
     }
-
 
 
     private void subTypePostProcess() {

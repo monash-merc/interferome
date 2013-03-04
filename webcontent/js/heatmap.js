@@ -15,9 +15,10 @@ function HeatMap(container_obj){
     var row_header_container = container.find('div.tissueexp_headers')[0];
     var row_data_container = container.find('div.tissueexp_container')[0];
     var link = $("span.saveimage a", container);
+    var form_input = $("form input", container);
 
     if (oTable.rows.length == 0){
-        container.css("visibility", "hidden");
+        container.css("display", "none");
         return;
     }
 
@@ -26,15 +27,16 @@ function HeatMap(container_obj){
 
     // for saving
     var hiddenPaper = $('<div></div>').appendTo(container)[0];
-    hiddenPaper.style.visibility = "hidden";
     var paper = drawHiddenHeatmap(oTable, hiddenPaper);
+    $(hiddenPaper).css("display", "none");
 
     var paperSVG = paper.toSVG("end");
     var b64 = Base64.encode(paperSVG);
+
     link.attr("href", "data:image/svg+xml;base64,\n"+b64);
     link.attr("title", "heatmap.svg");
 
-    oTable.style.visibility = "hidden";
+    $(oTable).css("display", "none");
 }
 function scroll_d(a,b) {document.getElementById(a).scrollTop = document.getElementById(b).scrollTop; }
 function scroll_h(a,b) {document.getElementById(b).scrollTop = document.getElementById(a).scrollTop; }
@@ -188,11 +190,8 @@ function drawHeatmap(oTable, row_data_container, row_header_container){
         var textRight = probeText.getBBox().x2;
         if (textRight > rowHeaderWidth){
             //alert("pause")    ;
-            $(row_header_container).width(textRight+20);
+            $(row_header_container).width(textRight+27);
         }
-
-
-
 
         var data_x = initial_x;
         //Skip the header columns (gene name, probe id)
