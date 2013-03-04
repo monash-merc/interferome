@@ -4,6 +4,13 @@
 <div class="nojava">
     <p>(Javascript Must Be Enabled to View These Results)</p>
 </div>
+<div class="IE8">
+    <p>
+        Visualisations are not compatible with IE8 and below. Please upgrade to
+        the latest version of Internet Explorer, or use another browser such as Mozilla Firefox
+        or Google Chrome.
+    </p>
+</div>
 <div class="export_div">
     Save as a TXT file<a
     href="${base}/search/exportCsvFileChromosome.jspx">

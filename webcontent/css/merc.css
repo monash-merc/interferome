@@ -374,6 +374,12 @@ body {
     font-size: 11px;
     color: #858585
 }
+
+.IE8{
+    font-size: 11px;
+    color: #858585
+}
+
 .empty_div {
     margin: 0 auto;
     height: 50px;

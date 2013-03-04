@@ -67,7 +67,10 @@ window.onload = function() {
 
     //Everything worked remove the java required tag
     var noJavaDivs = document.getElementsByClassName('nojava')
-
+    var ie8 = document.getElementsByClassName("IE8");
+    if ( !$.browser.msie || parseInt($.browser.version, 10) > 8) {
+        $(ie8).css("display", "none");
+    }
 
     for (var i = 0; i < noJavaDivs.length; i++) {
         noJavaDivs[i].style.display = 'none';

@@ -13,6 +13,13 @@
             <div class="nojava">
                 <p>(Javascript Must Be Enabled to View These Results)</p>
             </div>
+            <div class="IE8">
+                <p>
+                    Visualisations are not compatible with IE8 and below. Please upgrade to
+                    the latest version of Internet Explorer, or use another browser such as Mozilla Firefox
+                    or Google Chrome.
+                </p>
+            </div>
             <div id="myCanvasContainer<@s.property value='%{#ontologyList.count}' />">
                 <canvas width="500" height="300" id="myCanvas<@s.property value='%{#ontologyList.count}' />">
                     <p>In Internet Explorer versions up to 8, things inside the canvas are inaccessible!</p>
