@@ -98,7 +98,8 @@
         </div>
 
     </div>
- <span style="color: gray; font-size: 10pt"><p>The images on top use a heat map to display the expression of
+ <span style="color: gray; font-size: 10pt">
+     <p>The images on top use a heat map to display the expression of
      interferon regulated genes (IRGs) in their resting, unstimulated state, across various tissues and cells.</p>
           <p>A separate plot is produced for human and mouse data.</p>
           <p>The human and mouse expression data were obtained from the tissues and cell lines data in the BioGPS portal<sup>*</sup>.

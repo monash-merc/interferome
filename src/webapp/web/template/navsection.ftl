@@ -23,7 +23,7 @@
 			<li><a href="${base}/data/listExperiments.jspx">Experiments</a></li>
 		</@s.if>
 		<li><a href="${base}/search/showSearch.jspx">Search</a></li>
-        <li><a href="${base}/site/dbStat.jspx"">Database Statistics</a></li>
+        <li><a href="${base}/site/dbStat.jspx">Database Statistics</a></li>
         <li><a href="${base}/site/showSubmitData.jspx">Submit Data</a></li>
         <li><a href="${base}/site/showHelp.jspx">Help</a></li>
         <li><a href="${base}/site/showCitation.jspx">How To Cite</a></li>

@@ -1319,17 +1319,7 @@ public class DMServiceImpl implements DMService {
             tissueExpressions.setTissue(tissueN);
             tissueExpressions.setProbe(probeId);
             if (probeId != null) {
-               // this.getTissueExpressionByProbeAndTissue(probeId, tissueN);
-                System.out.println("TISSUE ID: "+tissueN.getTissueId());
-                List<TissueExpression> existingTissues = this.getTissueByTissueId(tissueN.getTissueId());
-
-                TissueExpression existingTissue = null;
-                for (TissueExpression te : existingTissues){
-                    if (te.getProbeId().equals(probeId.getProbeId())){
-                        existingTissue = te;
-                    }
-                }
-                //TissueExpression existedTissue = this.getTissueExpressionById(tissueExpressions.getId());
+                 TissueExpression existingTissue = this.getTissueExpressionById(tissueExpressions.getId());
                   if (existingTissue  != null)  {
                       tissueExpressions.setId(existingTissue.getId());
                       this.updateTissueExpression(tissueExpressions);

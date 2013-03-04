@@ -247,14 +247,8 @@ public interface DMService {
     public TFSite getTFSite(TFSite tfSite);
 
     // Tissues
-//  public void saveTissue(Tissue tissue);
-//
-//  public void updateTissue(Tissue tissue);
-//
-//  public void mergeTissue(Tissue tissue);
-
     public TissueExpression getTissueExpressionById(long id);
-//
+
     public Tissue getTissueByName(String tissueId);
 
     public void saveTissueExpression(TissueExpression tissueExpression);
@@ -271,8 +265,6 @@ public interface DMService {
 
     public TissueCounter importAllTissues(List<TissueExpression> tissues);
 
-  //  public TissueCounter importTissues(List<Tissue> tissue);
-
     public void importTissue(TissueBean tissueBean);
 
     //Species
@@ -285,13 +277,7 @@ public interface DMService {
 
     public void updateSpecies(Species species);
 
-//  public void importSpecies(SpeciesBean speciesBean);
-
-//    public SpeciesCounter importAllSpecies(List<Species> species);
-
     public Species getSpeciesByName(String speciesName);
-
-//    public Species getSpeciesBySpeciesId(String speciesId);
 
     public Pagination<Species> getSpecies(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
 

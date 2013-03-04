@@ -1,6 +1,9 @@
 <div class="result_title_div">
     Search Results
 </div>
+<div class="nojava">
+    <p>(Javascript Must Be Enabled to View These Results)</p>
+</div>
 <div class="export_div">
     Save as a TXT file<a
     href="${base}/search/exportCsvFileSubtypes.jspx">
@@ -12,9 +15,6 @@
 <br/>
 <div id="saveimage" class="export_pic"></div>
 <div class="search_table_div">
-<div class="nojava">
-    <p>(Javascript Must Be Enabled to View These Results)</p>
-</div>
 <div id="venn">
   <span style="color: gray; font-size: 10pt" xmlns="http://www.w3.org/1999/html">The Venn diagram shows the number of genes regulated by one or more IFN type (Type I, II or III).  It should be noted that there are far more  datasets for genes regulated by type I than for types II or III, this imbalance introduces the risk of false nagatives and bias for the under-represented types II and III; caution is therefore encouraged in interpreting low or negative results from these subtypes.</span>
 <div id="hiddenlist">
