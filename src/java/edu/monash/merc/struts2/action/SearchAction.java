@@ -659,7 +659,6 @@ public class SearchAction extends DMBaseAction {
                 return ERROR;
             }
             List<GeneExpressionRecord> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
-            System.out.println("MESSAGE - Searched species: "+searchBean.getSpecies());
             if (searchBean.getSpecies().equalsIgnoreCase("Homo sapiens")) {
                 this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
             } else if (searchBean.getSpecies().equalsIgnoreCase("Mus musculus")) {

@@ -574,11 +574,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query geneTotalCountQuery = this.session().createQuery(geneTotalCountHQL);
             Long totalGeneN = ((Long) geneTotalCountQuery.uniqueResult());
             //Get Count of all Human genes in db (Nh)
-            String geneTotalHumanCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 'Human'";
+            String geneTotalHumanCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 1";
             Query geneTotalHumanCountQuery = this.session().createQuery(geneTotalHumanCountHQL);
             Long totalGeneNh = ((Long) geneTotalHumanCountQuery.uniqueResult());
             //Get Count of all Mouse genes in db (Nm)
-            String geneTotalMouseCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 'Mouse'";
+            String geneTotalMouseCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.species = 2";
             Query geneTotalMouseCountQuery = this.session().createQuery(geneTotalMouseCountHQL);
             Long totalGeneNm = ((Long) geneTotalMouseCountQuery.uniqueResult());
 

@@ -90,7 +90,6 @@ public class INFDataProcessor implements DataProcessor {
 
         Date importedTime = GregorianCalendar.getInstance().getTime();
 
-        //TODO: step 1. the genes (human and mouse) must be imported first. unless you copy the gene data from existed gene table in the previous version
         //Gene for HUMAN
         importEnsemblGenes(HUMAN, importedTime);
 
@@ -99,15 +98,12 @@ public class INFDataProcessor implements DataProcessor {
         long endTime = System.currentTimeMillis();
 
         //import human and mouse probes
-        //TODO: step 2. importing the probes after gene data has been imported, or you just copy data from exited probe table in the previous version if probe table hasn't been changed
         importProbes();
 
-        //TODO: step3, importing human gene ontology
         //GeneOntology for HUMAN
         long goStartTime = System.currentTimeMillis();
         importGeneOntology(HUMAN);
 
-        //TODO: step4, importing mouse  gene ontology
         //import the geneontology for mouse
         importGeneOntology(MOUSE);
         long goEndTime = System.currentTimeMillis();
