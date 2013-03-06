@@ -38,8 +38,8 @@
             <br />
         <br />
         <br />
-        <div  id="hh" class="tissueexp_headers" style="float:left; overflow: scroll;" onscroll="scroll_h('hh','hd')"></div>
-        <div id="hd" class="tissueexp_container"  style="overflow: auto;" onscroll="scroll_d('hh','hd')"></div>
+        <div class="tissueexp_headers" style="float:left;"></div>
+        <div class="tissueexp_container" style="overflow-x: scroll;overflow-y: hidden;"></div>
         <div class="teid_table">
             <table class="tesites">
             <@s.iterator status="tissStat" value="humanGeneExpressionList" id="tissueResult">
@@ -80,8 +80,8 @@
         <br />
         <br />
         <br />
-        <div id="mh" class="tissueexp_headers" style="float:left; overflow: scroll;" onscroll="scroll_h('mh','md')"></div>
-        <div id="md" class="tissueexp_container"  style="overflow: auto;" onscroll="scroll_d('mh','md')"></div>
+        <div class="tissueexp_headers" style="float:left;"></div>
+        <div class="tissueexp_container"  style="overflow-x: scroll;overflow-y: hidden;"></div>
 
         <div class="tissueexp_headers" style="float:left;"></div>
         <div class="tissueexp_container"></div>

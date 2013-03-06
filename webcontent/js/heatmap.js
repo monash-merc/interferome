@@ -32,7 +32,6 @@ function HeatMap(container_obj){
 
     var paperSVG = paper.toSVG("end");
     var b64 = Base64.encode(paperSVG);
-
     link.attr("href", "data:image/svg+xml;base64,\n"+b64);
     link.attr("title", "heatmap.svg");
 
@@ -60,8 +59,8 @@ function drawHiddenHeatmap(oTable, row_data_container){
     var yPos = 200;
 
     // Add Header for row titles
-    var geneEndPos = 40;
-    var probeEndPos = rowHeaderWidth - 20;
+    var geneEndPos = 80;
+    var probeEndPos = rowHeaderWidth - 10;
     var geneColTitle = paper.text(geneEndPos, yPos - 18, "Gene");
     geneColTitle.attr({'text-anchor': 'end'});
     var probeColTitle = paper.text(probeEndPos, yPos - 20, "Probe Id");
@@ -137,7 +136,7 @@ function drawHeatmap(oTable, row_data_container, row_header_container){
     var boxHeight = 10;
     var rowHeaderWidth = 50;
 
-    var totalHeight = 250+(boxHeight*rowLength);
+    var totalHeight = 230+(boxHeight*rowLength);
 
     $(row_data_container).height(totalHeight);
     $(row_header_container).height(totalHeight);
@@ -151,9 +150,9 @@ function drawHeatmap(oTable, row_data_container, row_header_container){
     var yPos = 200;
 
     // Add Header for row titles
-    var geneEndPos = 40;
-    var probeStartPos = 50;
-    var separatorPos = 45;
+    var geneEndPos = 70;
+    var probeStartPos = 80;
+    var separatorPos = 75;
     var geneColTitle = rowHeader.text(geneEndPos, yPos - 20, "Gene");
     geneColTitle.attr({'text-anchor': 'end'});
     rowHeader.text(separatorPos, yPos - 20, " - ");
@@ -190,7 +189,7 @@ function drawHeatmap(oTable, row_data_container, row_header_container){
         var textRight = probeText.getBBox().x2;
         if (textRight > rowHeaderWidth){
             //alert("pause")    ;
-            $(row_header_container).width(textRight+27);
+            $(row_header_container).width(textRight+15);
         }
 
         var data_x = initial_x;
