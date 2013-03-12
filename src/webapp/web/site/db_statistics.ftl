@@ -51,7 +51,7 @@
                         <td>Datasets</td>      <td align="center"><@s.property value="stats.mouse.datasetsI" /></td>        <td align="center"><@s.property value="stats.mouse.datasetsII" /></td>      <td align="center"><@s.property value="stats.mouse.datasetsIII" /></td> <td align="center"><@s.property value="stats.mouse.datasets" /></td>
                     </tr>
                     <tr>
-                        <td>Genes with p-value &lt;0.05 and fold change &gt;=2</td> <td align="center"><@s.property value="stats.mouse.fcI" /></td>          <td align="center"><@s.property value="stats.mouse.fcI" /></td>         <td align="center"><@s.property value="stats.mouse.fcI" /></td> <td align="center"><@s.property value="stats.mouse.fcI" /></td>
+                        <td>Genes with p-value &lt;0.05 and fold change &gt;=2</td> <td align="center"><@s.property value="stats.mouse.fcI" /></td>          <td align="center"><@s.property value="stats.mouse.fcII" /></td>         <td align="center"><@s.property value="stats.mouse.fcIII" /></td> <td align="center"><@s.property value="stats.mouse.fc" /></td>
                     </tr>
                     <tr>
                         <td>Genes with p-value &lt;0.05</td>  <td align="center"><@s.property value="stats.mouse.allDataI" /></td>        <td align="center"><@s.property value="stats.mouse.allDataII" /></td>  <td align="center"><@s.property value="stats.mouse.allDataIII" /></td> <td align="center"><@s.property value="stats.mouse.allData" /></td>

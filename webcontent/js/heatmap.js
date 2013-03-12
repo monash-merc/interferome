@@ -189,7 +189,7 @@ function drawHeatmap(oTable, row_data_container, row_header_container){
         var textRight = probeText.getBBox().x2;
         if (textRight > rowHeaderWidth){
             //alert("pause")    ;
-            $(row_header_container).width(textRight+15);
+            $(row_header_container).width(textRight+20);
         }
 
         var data_x = initial_x;
