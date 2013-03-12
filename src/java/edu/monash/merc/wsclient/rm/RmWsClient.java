@@ -65,19 +65,17 @@ import java.util.List;
  */
 public class RmWsClient extends Stub {
 
-    // Production: "http://mobs.its.monash.edu.au:7778/orabpel/ResearchMaster/AIRMANDSService/1.0"
-    // private static String DEFAULT_SERVICE_NAME = "AIRMANDSService";
-
-    // QA "http://edithvale.its.monash.edu.au:7778/orabpel/ResearchMaster/AIRMANDSService/1.0";
-    // private static String DEFAULT_SERVICE_NAME = "AIRMANDSService";
-
-    private static String DEFAULT_TARGET_ENDPOINT = "http://mobs.its.monash.edu.au:7778/orabpel/ResearchMaster/AIRMANDSService/1.0";
+    private static String DEFAULT_TARGET_ENDPOINT = "https://gateway.integration.monash.edu.au:443/AIRMANDSService";
 
     private static String DEFAULT_SERVICE_NAME = "AIRMANDSService";
 
-    private static String DEFAULT_ELEMENT_NAMESPACE = "http://monash.edu/AI/AIRMService";
+    private static String GET_NLA_ID_NAMESPACE = "http://monash.edu/AI/AIRMNLAActivityIDPLSQLWS";
 
-    private static String DEFAULT_OPERATION_NAMESPACE = "http://monash.edu/AI/AIRMANDS";
+    private static String GET_PARTY_REGISTRY_OBJECT_NAMESPACE = "http://monash.edu/AI/AIRMPartyPLSQLWS";
+
+    private static String GET_PROJECTS_NAMESPACE = "http://monash.edu/AI/AIRMNLAActivityIDPLSQLWS";
+
+    private static String GET_ACTIVITY_NAMESPACE = "http://monash.edu/AI/AIRMActivityPLSQLWS";
 
     private static String DEFAULT_ELEMENT_NAMESPACE_PREFIX = "ns1";
 
@@ -96,7 +94,7 @@ public class RmWsClient extends Stub {
 
     private static String OME_PARTY_ID_NAME = "pPartyId";
 
-    // Activity Summary
+    // Activity Summary - projects
     private static String ACTION_GET_PROJECTS = "getProjects";
 
     private static String OMELEMENT_GET_PROJECT_NAME = "getProjectsElement";
@@ -185,20 +183,23 @@ public class RmWsClient extends Stub {
     protected void populateAxisService() throws AxisFault {
         _service = new AxisService(serviceName + getUniqueSuffix());
         operations = new AxisOperation[4];
-
-        AxisOperation operation = new OutInAxisOperation(new QName(DEFAULT_OPERATION_NAMESPACE, ACTION_GET_NLAID));
+        //get nla id
+        AxisOperation operation = new OutInAxisOperation(new QName(GET_NLA_ID_NAMESPACE, ACTION_GET_NLAID));
         _service.addOperation(operation);
         operations[0] = operation;
 
-        operation = new OutInAxisOperation(new QName(DEFAULT_OPERATION_NAMESPACE, ACTION_GET_PARTY_OBJECT));
+        //get party
+        operation = new OutInAxisOperation(new QName(GET_PARTY_REGISTRY_OBJECT_NAMESPACE, ACTION_GET_PARTY_OBJECT));
         _service.addOperation(operation);
         operations[1] = operation;
 
-        operation = new OutInAxisOperation(new QName(DEFAULT_OPERATION_NAMESPACE, ACTION_GET_PROJECTS));
+        //get projects (activity summary)
+        operation = new OutInAxisOperation(new QName(GET_PROJECTS_NAMESPACE, ACTION_GET_PROJECTS));
         _service.addOperation(operation);
         operations[2] = operation;
 
-        operation = new OutInAxisOperation(new QName(DEFAULT_OPERATION_NAMESPACE, ACTION_GET_ACTIVITY_OBJECT));
+        //get activity
+        operation = new OutInAxisOperation(new QName(GET_ACTIVITY_NAMESPACE, ACTION_GET_ACTIVITY_OBJECT));
         _service.addOperation(operation);
         operations[3] = operation;
     }
@@ -229,7 +230,7 @@ public class RmWsClient extends Stub {
             org.apache.axiom.soap.SOAPEnvelope env = null;
             SOAPFactory factory = getFactory(operationClient.getOptions().getSoapVersionURI());
             env = createEnvelope(factory, ACTION_GET_NLAID, authcateId);
-
+            // System.out.println("send envelop: " + env);
             // adding SOAP soap_headers
             _serviceClient.addHeadersToEnvelope(env);
 
@@ -246,10 +247,13 @@ public class RmWsClient extends Stub {
 
             SOAPEnvelope _returnEnv = returnMessageContext.getEnvelope();
 
+            // System.out.println("_return envelop: " + _returnEnv);
+
             return parseNlaId(_returnEnv);
         } catch (AxisFault axe) {
 
             OMElement fault = axe.getDetail();
+
             if (fault != null) {
                 throw new WSException(fault.getFirstElement().getText());
             } else {
@@ -316,7 +320,7 @@ public class RmWsClient extends Stub {
             MessageContext returnMessageContext = operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
             SOAPEnvelope _returnEnv = returnMessageContext.getEnvelope();
-
+            //System.out.println("=== Response envelope: " + env);
             return parseParty(_returnEnv);
         } catch (AxisFault axe) {
             OMElement fault = axe.getDetail();
@@ -462,7 +466,7 @@ public class RmWsClient extends Stub {
             org.apache.axiom.soap.SOAPEnvelope env = null;
             SOAPFactory factory = getFactory(operationClient.getOptions().getSoapVersionURI());
             env = createEnvelope(factory, ACTION_GET_PROJECTS, nlaId);
-
+            //System.out.println("=== send envelope: " + env);
             // adding SOAP soap_headers
             _serviceClient.addHeadersToEnvelope(env);
 
@@ -477,7 +481,7 @@ public class RmWsClient extends Stub {
 
             MessageContext returnMessageContext = operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             SOAPEnvelope _returnEnv = returnMessageContext.getEnvelope();
-            // System.out.println("===> env: " + _returnEnv);
+            // System.out.println("===> return env: " + _returnEnv);
             return parseActivitySummary(_returnEnv);
         } catch (AxisFault axe) {
             OMElement fault = axe.getDetail();
@@ -607,7 +611,7 @@ public class RmWsClient extends Stub {
         ActivityBean ab = new ActivityBean();
 
         OMElement activityRegistryObjectsElement = respEnvelope.getBody().getFirstElement();
-        // System.out.println("activity: rif-cs: " + activityRegistryObjectsElement);
+        //System.out.println("activity: rif-cs: " + activityRegistryObjectsElement);
         OMElement registryObject = activityRegistryObjectsElement.getFirstElement();
 
         // get the party group
@@ -685,35 +689,40 @@ public class RmWsClient extends Stub {
 
     private SOAPEnvelope createEnvelope(SOAPFactory factory, String operationName, String param) {
         SOAPEnvelope reqEnvelope = factory.getDefaultEnvelope();
-        OMNamespace defaultOMNamespace = factory.createOMNamespace(DEFAULT_ELEMENT_NAMESPACE, DEFAULT_ELEMENT_NAMESPACE_PREFIX);
+
 
         if (operationName.equals(ACTION_GET_NLAID)) {
-            OMElement nlaOMElement = factory.createOMElement(OMELEMENT_GET_NLAID_NAME, defaultOMNamespace);
-            OMElement authencateOMElement = factory.createOMElement(OME_PAUTHCATE_USER_NAME, defaultOMNamespace);
+            OMNamespace nlaIdOMNamespace = factory.createOMNamespace(GET_NLA_ID_NAMESPACE, DEFAULT_ELEMENT_NAMESPACE_PREFIX);
+            OMElement nlaOMElement = factory.createOMElement(OMELEMENT_GET_NLAID_NAME, nlaIdOMNamespace);
+            OMElement authencateOMElement = factory.createOMElement(OME_PAUTHCATE_USER_NAME, nlaIdOMNamespace);
             authencateOMElement.setText(param);
             nlaOMElement.addChild(authencateOMElement);
             reqEnvelope.getBody().addChild(nlaOMElement);
         }
 
+
         if (operationName.equals(ACTION_GET_PARTY_OBJECT)) {
-            OMElement partyOMElement = factory.createOMElement(OMELEMENT_GET_PARTY_NAME, defaultOMNamespace);
-            OMElement partyIdOMElement = factory.createOMElement(OME_PARTY_ID_NAME, defaultOMNamespace);
+            OMNamespace partyOMNamespace = factory.createOMNamespace(GET_PARTY_REGISTRY_OBJECT_NAMESPACE, DEFAULT_ELEMENT_NAMESPACE_PREFIX);
+            OMElement partyOMElement = factory.createOMElement(OMELEMENT_GET_PARTY_NAME, partyOMNamespace);
+            OMElement partyIdOMElement = factory.createOMElement(OME_PARTY_ID_NAME, partyOMNamespace);
             partyIdOMElement.setText(param);
             partyOMElement.addChild(partyIdOMElement);
             reqEnvelope.getBody().addChild(partyOMElement);
         }
 
         if (operationName.equals(ACTION_GET_PROJECTS)) {
-            OMElement partyOMElement = factory.createOMElement(OMELEMENT_GET_PROJECT_NAME, defaultOMNamespace);
-            OMElement partyIdOMElement = factory.createOMElement(OME_PRO_NLA_ID_NAME, defaultOMNamespace);
+            OMNamespace projectOMNamespace = factory.createOMNamespace(GET_PROJECTS_NAMESPACE, DEFAULT_ELEMENT_NAMESPACE_PREFIX);
+            OMElement partyOMElement = factory.createOMElement(OMELEMENT_GET_PROJECT_NAME, projectOMNamespace);
+            OMElement partyIdOMElement = factory.createOMElement(OME_PRO_NLA_ID_NAME, projectOMNamespace);
             partyIdOMElement.setText(param);
             partyOMElement.addChild(partyIdOMElement);
             reqEnvelope.getBody().addChild(partyOMElement);
         }
 
         if (operationName.equals(ACTION_GET_ACTIVITY_OBJECT)) {
-            OMElement partyOMElement = factory.createOMElement(OMELEMENT_GET_ACTIVITY_NAME, defaultOMNamespace);
-            OMElement partyIdOMElement = factory.createOMElement(OME_ACTIVITY_ID_NAME, defaultOMNamespace);
+            OMNamespace activityOMNamespace = factory.createOMNamespace(GET_ACTIVITY_NAMESPACE, DEFAULT_ELEMENT_NAMESPACE_PREFIX);
+            OMElement partyOMElement = factory.createOMElement(OMELEMENT_GET_ACTIVITY_NAME, activityOMNamespace);
+            OMElement partyIdOMElement = factory.createOMElement(OME_ACTIVITY_ID_NAME, activityOMNamespace);
             partyIdOMElement.setText(param);
             partyOMElement.addChild(partyIdOMElement);
             reqEnvelope.getBody().addChild(partyOMElement);
@@ -788,15 +797,18 @@ public class RmWsClient extends Stub {
         try {
             //
             // nlaid = ws.getNlaId("virginig");
-            // nlaid = ws.getNlaId("pisaac");
+            //  nlaid = ws.getNlaId("pisaac");
             // nlaid = ws.getNlaId("virginig");
-            nlaid = ws.getNlaId("jberinge");
-            //nlaid = ws.getNlaId("xiyu");
+            // nlaid = ws.getNlaId("jberinge");
+
+            nlaid = ws.getNlaId("xiyu");
             System.out.println("====> getNlaid: " + nlaid);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // nlaid = "MON:0000015173";
 
+        // nlaid = "MON:0000079309";
         long time2 = System.currentTimeMillis();
 
         for (int i = 0; i < 1; i++) {
@@ -818,8 +830,10 @@ public class RmWsClient extends Stub {
         try {
             List<ProjectBean> projs = ws.getProjects(nlaid);
             for (ProjectBean p : projs) {
-                System.out.println(" project summary - key: " + p.getActivityKey() + " - applied date: " + p.getAppliedDate() + " - grant code: "
-                        + p.getGrantCode() + " - title: " + p.getTitle());
+                if (p != null) {
+                    System.out.println(" project summary - key: " + p.getActivityKey() + " - applied date: " + p.getAppliedDate() + " - grant code: "
+                            + p.getGrantCode() + " - title: " + p.getTitle());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -828,7 +842,7 @@ public class RmWsClient extends Stub {
         long time4 = System.currentTimeMillis();
         for (int i = 0; i < 1; i++) {
             try {
-                ActivityBean ab = ws.getActivityRegistryObject("MON:2010002282");
+                ActivityBean ab = ws.getActivityRegistryObject("MON:2009001018");
                 System.out.println("====> activity - key: " + ab.getActivityKey() + " - group: " + ab.getGroupName() + " - identifier type: "
                         + ab.getIdentifierType() + " - identifier value: " + ab.getIdentifierValue() + " - orig type:  "
                         + ab.getOriginateSourceType() + " - orig source value: " + ab.getOriginateSourceValue() + " - name part title: "
@@ -846,5 +860,4 @@ public class RmWsClient extends Stub {
         System.out.println(" ws time3: " + (time4 - time3) / 1000);
         System.out.println(" ws time4: " + (time5 - time4) / 1000);
     }
-
 }
