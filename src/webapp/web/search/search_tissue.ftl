@@ -45,7 +45,7 @@
             <@s.iterator status="tissStat" value="humanGeneExpressionList" id="tissueResult">
             <tr>
                 <@s.if test="#tissStat.first == true">
-                    <th>Gene Name</th>
+                    <th>Gene</th>
                     <th>Probe Id</th>
                     <@s.iterator status="headerStat" value="#tissueResult.tissueExpressionList" id="headerVal">
                         <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>
@@ -90,7 +90,7 @@
             <@s.iterator status="tissStat" value="mouseGeneExpressionList" id="tissueResult">
             <tr>
                 <@s.if test="#tissStat.first == true">
-                    <th>Gene Name</th>
+                    <th>Gene</th>
                     <th>Probe Id</th>
                     <@s.iterator status="headerStat" value="#tissueResult.tissueExpressionList" id="headerVal">
                         <th class="tissues"><@s.property value='#headerVal.tissue.tissueId' /></th>

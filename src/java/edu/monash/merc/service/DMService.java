@@ -263,6 +263,8 @@ public interface DMService {
 
     public List<TissueExpression> getTissueByTissueId(String tissueId);
 
+    public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue);
+
     public TissueCounter importAllTissues(List<TissueExpression> tissues);
 
     public void importTissue(TissueBean tissueBean);

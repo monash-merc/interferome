@@ -31,6 +31,8 @@ package edu.monash.merc.service.impl;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.dao.impl.TissueExpressionDAO;
+import edu.monash.merc.domain.Probe;
+import edu.monash.merc.domain.Tissue;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.service.TissueExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,5 +108,8 @@ public class TissueExpressionServiceImpl implements TissueExpressionService {
         return this.tissueExpressionDAO.getTissueByProbeId(probeId);
     }
 
-
+    @Override
+    public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue){
+        return this.tissueExpressionDAO.getTissueExpressionByProbeAndTissue(probe, tissue);
+    }
 }

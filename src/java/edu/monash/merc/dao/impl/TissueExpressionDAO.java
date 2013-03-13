@@ -30,6 +30,8 @@ package edu.monash.merc.dao.impl;
 
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
+import edu.monash.merc.domain.Probe;
+import edu.monash.merc.domain.Tissue;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.TissueExpression;
 import edu.monash.merc.repository.ITissueExpressionRepository;
@@ -65,14 +67,19 @@ import java.util.List;
             return criteria.list();
         }
 
-//  @Override
-//  public TissueExpression getTissueByTissueId(String tissueId) {
-//      Criteria criteria = this.session().createCriteria(this.persistClass);
-//      criteria.add(Restrictions.eq("tissueId", tissueId));
+       @SuppressWarnings("unchecked")
+       @Override
+       public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue) {
+       Criteria criteria = this.session().createCriteria(this.persistClass);
+       Criteria tissueCriteria = criteria.createCriteria("tissue");
+       tissueCriteria.add(Restrictions.eq("id", tissue.getId()));
+       Criteria probeCriteria = criteria.createCriteria("probe");
+       probeCriteria.add(Restrictions.eq("id", probe.getId()));
+       return (TissueExpression) criteria.uniqueResult();
 //      TissueExpression result = (TissueExpression) criteria.uniqueResult();
 //      this.session().evict(result);
 //      return result;
-//  }
+       }
 
     @SuppressWarnings("unchecked")
     @Override

@@ -85,8 +85,8 @@ function ChromosomeImage(){
     if (rowh != 0 && rowm !=0){
         mmPaper = new Raphael(document.getElementById('mm_chromosome_container'), 500, 350);
         hsPaper = new Raphael(document.getElementById('hs_chromosome_container'), 500, 350);
-        drawChromosome(mmPaper, hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
-        drawChromosome(hsPaper, mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
+        drawChromosome(hsPaper, hsChrom, document.getElementById("hsGenePos"), "Human Chromosomal Locations");
+        drawChromosome(mmPaper, mmChrom, document.getElementById("mmGenePos"), "Mouse Chromosomal Locations");
         saveChromosome(hsPaper, "hs_saveimage", "human");
         saveChromosome(mmPaper, "mm_saveimage", "mouse");
 

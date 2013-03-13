@@ -30,6 +30,8 @@ package edu.monash.merc.service;
 
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.sql.OrderBy;
+import edu.monash.merc.domain.Probe;
+import edu.monash.merc.domain.Tissue;
 import edu.monash.merc.domain.TissueExpression;
 
 import java.util.List;
@@ -60,4 +62,6 @@ public interface TissueExpressionService {
     public List<TissueExpression> getTissueByProbeId(String probeId);
 
     public List<TissueExpression> getTissueByTissueId(String tissueId);
+
+    public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue);
 }

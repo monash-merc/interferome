@@ -1307,6 +1307,12 @@ public class DMServiceImpl implements DMService {
     }
 
     @Override
+    public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue){
+        return this.tissueExpressionService.getTissueExpressionByProbeAndTissue(probe, tissue);
+    }
+
+
+    @Override
     public TissueCounter importAllTissues(List<TissueExpression> tissues){
         int countUpdated = 0;
         int countNew = 0;
@@ -1319,7 +1325,7 @@ public class DMServiceImpl implements DMService {
             tissueExpressions.setTissue(tissueN);
             tissueExpressions.setProbe(probeId);
             if (probeId != null) {
-                 TissueExpression existingTissue = this.getTissueExpressionById(tissueExpressions.getId());
+            TissueExpression existingTissue = this.getTissueExpressionByProbeAndTissue(tissueExpressions.getProbe(),tissueExpressions.getTissue());
                   if (existingTissue  != null)  {
                       tissueExpressions.setId(existingTissue.getId());
                       this.updateTissueExpression(tissueExpressions);
