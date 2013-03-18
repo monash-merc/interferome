@@ -67,27 +67,24 @@ import java.util.List;
             return criteria.list();
         }
 
-       @SuppressWarnings("unchecked")
-       @Override
-       public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue) {
-       Criteria criteria = this.session().createCriteria(this.persistClass);
-       Criteria tissueCriteria = criteria.createCriteria("tissue");
-       tissueCriteria.add(Restrictions.eq("id", tissue.getId()));
-       Criteria probeCriteria = criteria.createCriteria("probe");
-       probeCriteria.add(Restrictions.eq("id", probe.getId()));
-       return (TissueExpression) criteria.uniqueResult();
-//      TissueExpression result = (TissueExpression) criteria.uniqueResult();
-//      this.session().evict(result);
-//      return result;
-       }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<TissueExpression> getTissueByTissueId(String tissueId) {
+        @SuppressWarnings("unchecked")
+        @Override
+        public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue) {
         Criteria criteria = this.session().createCriteria(this.persistClass);
-        // create the alias for tissues
-        Criteria probeCriteria = criteria.createAlias("tissueId","tissueId");
-        probeCriteria.add(Restrictions.eq("tissue.tissueId", tissueId));
-        return criteria.list();
-    }
-  }
+        Criteria tissueCriteria = criteria.createCriteria("tissue");
+        tissueCriteria.add(Restrictions.eq("id", tissue.getId()));
+        Criteria probeCriteria = criteria.createCriteria("probe");
+        probeCriteria.add(Restrictions.eq("id", probe.getId()));
+        return (TissueExpression) criteria.uniqueResult();
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<TissueExpression> getTissueByTissueId(String tissueId) {
+            Criteria criteria = this.session().createCriteria(this.persistClass);
+            // create the alias for tissues
+            Criteria probeCriteria = criteria.createAlias("tissueId","tissueId");
+            probeCriteria.add(Restrictions.eq("tissue.tissueId", tissueId));
+            return criteria.list();
+        }
+ }

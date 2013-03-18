@@ -1185,9 +1185,6 @@ public class SearchAction extends DMBaseAction {
         try {
             ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
             csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
-
-            System.out.println("Ready to write CSV");
-
             //write the conditions
             csvWriter.writeNext(new String[]{"Search Conditions"});
             //write new empty line
@@ -1808,7 +1805,7 @@ public class SearchAction extends DMBaseAction {
                     double pvalue = (Double) objarray[2];
                     this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
                     //write total records
-                    csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), "N/A"});
+                    csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), String.valueOf(pvalue)});
                 }
                 //write empty line
                 csvWriter.writeNext(new String[]{""});

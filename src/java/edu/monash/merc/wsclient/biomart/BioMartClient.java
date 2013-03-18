@@ -292,7 +292,7 @@ public class BioMartClient {
         query.append("<Attribute name = 'strand' />");
         query.append("<Attribute name = 'band' />");
         query.append("<Attribute name = 'unigene' />");
-        ///query.append("<Attribute name = 'protein_id' />");
+        query.append("<Attribute name = 'protein_id' />");
         query.append("<Attribute name = 'entrezgene' />");
         query.append("</Dataset>").append("</Query>");
         return query.toString();

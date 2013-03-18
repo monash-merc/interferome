@@ -48,6 +48,7 @@ import java.util.List;
  * @version 2.0
  */
 public interface SearchDataService {
+
     Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
 
     Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy);
