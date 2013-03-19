@@ -467,7 +467,7 @@ body {
 }
 
 .line_span {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .button_div {
@@ -602,7 +602,7 @@ body {
 }
 
 .input_field_normal {
-    height: 18px;
+    height: 20px;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #FFFFFF;
     border: 1px solid #E9E9E9;
@@ -612,7 +612,7 @@ body {
 }
 
 .input_select_normal {
-    height: 18px;
+    height: 20px;
     width: 120px;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #FFFFFF;

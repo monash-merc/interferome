@@ -29,10 +29,10 @@
         <thead>
         <tr class="search_result_header">
             <td align="center">Ensembl Id</td>
-            <td align="center">Gene Name</td>
+            <td align="center">Gene Symbol</td>
             <td align="center">Description</td>
             <td align="center">Entrez</td>
-            <td align="center">Genbank</td>
+            <td align="center">GenBank</td>
             <td align="center">UniGene</td>
         </tr>
         </thead>

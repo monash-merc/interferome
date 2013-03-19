@@ -59,7 +59,7 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
     @SuppressWarnings("unchecked")
     @Override
     public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
-        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.probe prob INNER JOIN prob.genes g LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
+        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
         String dataHql = "SELECT d, ds, p, g FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType WHERE ds.id =:dsId";
         Query countQuery = this.session().createQuery(countHql);
         countQuery.setParameter("dsId", dsId);
@@ -103,7 +103,7 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "probeid")) {
-            return " ORDER BY prob.probeId " + sortBy;
+            return " ORDER BY p.probeId " + sortBy;
         }
         return null;
     }

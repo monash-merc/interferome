@@ -95,12 +95,13 @@ public class DatasetAction extends DMBaseAction {
         pageSizeMap.put(200, 200);
 
         // orderby values
-        orderByMap.put("dataId", "id");
-        orderByMap.put("foldchange", "fold change");
-        orderByMap.put("genename", "gene name");
-        orderByMap.put("genbank", "genbank id");
-        orderByMap.put("ensemblid", "ensembl id");
-        orderByMap.put("probeid", "probe id");
+        orderByMap.clear();
+        orderByMap.put("dataId", "Id");
+        orderByMap.put("foldchange", "Fold Change");
+        orderByMap.put("genename", "Gene Symbol");
+        orderByMap.put("genbank", "GenBank");
+        orderByMap.put("ensemblid", "Ensembl Id");
+        orderByMap.put("probeid", "Probe Id");
         // orderby type values
         orderByTypeMap.put("ASC", "asc");
         orderByTypeMap.put("DESC", "desc");
@@ -109,7 +110,7 @@ public class DatasetAction extends DMBaseAction {
     //set the default pagination parameters
     protected void setDefaultPageParams() {
         if (StringUtils.isBlank(orderBy)) {
-            orderBy = "dataId";
+            orderBy = "genename";
         }
         if (StringUtils.isBlank(orderByType)) {
             orderByType = ActionConts.ASC_SORT_TYPE;

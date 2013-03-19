@@ -259,7 +259,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
         return null;
     }
-
+    @SuppressWarnings("unchecked")
     @Override
     public Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         boolean noneDsQuery = searchBean.isNoneDsCondition();
@@ -274,13 +274,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @SuppressWarnings("unchecked")
     @Override
     public Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
-        //just for testing
-        //List<String> probes = new ArrayList<String>();
-        //probes.add("A_33_P3277674");
-        //probes.add("A_33_P3818959");
-        //probes.add("A_23_P105923");
-        //probes.add("A_23_P105923");
-
 
         int searchCount=0, gbCount=0, ensCount=0, gCount = 0;
         String species = searchBean.getSpecies();
@@ -297,63 +290,49 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             gCount = searchBean.getGenes().split(",|\t|\n").length;
             searchCount += gCount;
         }
-       // System.out.println("found genes size: " + searchCount);
-       // System.out.println("found genes size: " + gCount+" found Ens size: "+ensCount+" found GeneBank size: "+gbCount);
-       // System.out.println("found genes string: " + searchBean.getGenes()+" found Ens string: "+searchBean.getEnsembls()+" found GeneBank string: "+searchBean.getGenBanks());
-
-       // if(searchCount < gbCount || searchCount < ensCount || searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
-        //  if(searchCount < gbCount && searchCount < ensCount && searchCount < gCount)  searchCount = gbCount+ensCount+gCount;
-        //  else if(searchCount < gbCount && searchCount < ensCount) searchCount = gbCount + ensCount;
-        //  else if(searchCount < ensCount && searchCount < gCount) searchCount = ensCount + gCount;
-        //  else if(searchCount < gbCount && searchCount < gCount) searchCount = gbCount + gCount;
-        //  else if(searchCount < gbCount) searchCount = gbCount;
-        //  else if(searchCount < ensCount) searchCount = ensCount;
-        //  else if(searchCount < gCount) searchCount = gCount;
-        //}
-        //else if (StringUtils.contains(species, "Homo sapiens") || StringUtils.contains(species, "Mus musculus")){
-         //if(searchCount < ensCount)  searchCount = ensCount;
-         //if(searchCount < gCount)  searchCount = gCount;
-         //if(searchCount < gbCount)  searchCount = gbCount;
-        }
+    }
 
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-
         List<Probe> probes = uniqueProbesPages.getPageResults();
-
         if (probes.size() > 0) {
-            //  String geneBaseHQL = "SELECT g FROM gene g INNER JOIN probe_gene pb ON g.id = pb.gene_id  INNER JOIN probe p on p.id = pb.probe_id " +
-            //         " WHERE p.probeset IN (:probes) GROUP BY g.id";
+
             String geneCountHQL = "SELECT COUNT(DISTINCT g) FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes)";
-            // String geneOntologyCountHQL = "SELECT COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.gene g INNER JOIN go.ontology o INNER o.goDomain gdom WHERE g.ensgAccession IN (:ensgacs) AND gdom.namespace = :namespace";
-
-
             Query geneCountQuery = this.session().createQuery(geneCountHQL);
             geneCountQuery.setParameterList(("probes"), probes);
-
             int total = ((Long) geneCountQuery.uniqueResult()).intValue();
             if (total == 0) {
-
                 return new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             }
-
-            // System.out.println("================= found total genes size: " + total);
 
             String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) ORDER BY g." + orderBy + " " + sortBy;
             Query geneQuery = this.session().createQuery(geneHQL);
             geneQuery.setParameterList(("probes"), probes);
 
             Pagination<Gene> genePagination = new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
+            String orderByCond = createGeneOrderBy(orderBy, sortBy);
+            if (StringUtils.isNotBlank(orderByCond)) {
+                geneHQL += orderByCond;
+            }
             geneQuery.setFirstResult(genePagination.getFirstResult());
             geneQuery.setMaxResults(genePagination.getSizePerPage());
 
-
             List<Gene> geneList = geneQuery.list();
-            //System.out.println("================= found total genes list size: " + total);
+            //System.out.println("================= found total genes list size: " + geneList.size());
             genePagination.setPageResults(geneList);
             return genePagination;
         } else {
             return new Pagination<Gene>(startPageNo, recordPerPage, 0, searchCount);
         }
+    }
+
+    private String createGeneOrderBy(String orderBy, String sortBy) {
+        if (StringUtils.equalsIgnoreCase(orderBy, "geneName")) {
+            return " ORDER BY g.geneName " + sortBy;
+        }
+        if (StringUtils.equalsIgnoreCase(orderBy, "ensemblid")) {
+            return " ORDER BY g.ensgAccession " + sortBy;
+        }
+        return null;
     }
 
 
@@ -476,7 +455,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 tg3Query.setParameterList(("t3ProbeList"), t3ProbeList);
                 t3GeneList = tg3Query.list();
             }
-            //TODO: for sam, please figure out the logic How to count the unique member of each list. I just fixed the query syntax.
 
             //Count Unique members of each list
             //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
@@ -738,7 +716,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     private Pagination<SearchResultRow> searchDataWithDs(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         //query the dataset first
         List<Long> foundDsIds = queryDatasets(searchBean);
-        // System.out.println("============> ***** found dataset id list size: " + foundDsIds.size());
 
         //just return if no dataset found
         if (foundDsIds.size() == 0) {

@@ -494,8 +494,6 @@ public class SearchAction extends DMBaseAction {
             } else {
                 viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
             }
-            orderBy = "geneName";
-            orderByType = ActionConts.ASC_SORT_TYPE;
             //validation failed
             if (!validConds()) {
                 //sub type post process
@@ -507,14 +505,11 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             genePagination = this.searchDataService.searchGenes(searchBean, pageNo, pageSize, orderBy, orderByType);
-            List<Gene> geneList = genePagination.getPageResults();
 
             //set the searched flag as true
             searched = true;
             searchType = GENE_TYPE;
             //sub type post process
-
-
             subTypePostProcess();
             storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
 
@@ -2869,22 +2864,22 @@ public class SearchAction extends DMBaseAction {
     protected void initDataPagination() {
         // orderby values
         orderByMap.clear();
-        orderByMap.put("dataset", "dataset");
-        orderByMap.put("foldchange", "fold change");
-        orderByMap.put("ifntype", "interferon type");
-        orderByMap.put("ttime", "treatment time");
-        orderByMap.put("geneName", "geneName");
-        orderByMap.put("genbank", "genbank id");
-        orderByMap.put("ensemblid", "ensembl id");
-        orderByMap.put("probeid", "probe id");
+        orderByMap.put("dataset", "Dataset");
+        orderByMap.put("foldchange", "Fold Change");
+        orderByMap.put("ifntype", "Interferon Type");
+        orderByMap.put("ttime", "Treatment Time");
+        orderByMap.put("geneName", "Gene Symbol");
+        orderByMap.put("genbank", "GenBank");
+        orderByMap.put("ensemblid", "Ensembl Id");
+        orderByMap.put("probeid", "Probe Id");
     }
 
     //initialize the pagination parameters
     protected void initGenePagination() {
         // orderby values
         orderByMap.clear();
-        orderByMap.put("geneName", "geneName");
-        orderByMap.put("ensgAccession", "ensembl id");
+        orderByMap.put("geneName", "Gene Symbol");
+        orderByMap.put("ensgAccession", "Ensembl Id");
     }
 
 
@@ -2894,10 +2889,10 @@ public class SearchAction extends DMBaseAction {
         pageLink = "search/searchData.jspx";
         pageSuffix = ActionConts.PAGINATION_SUFFUX;
         if (StringUtils.isBlank(orderBy)) {
-            orderBy = "dataset";
+            orderBy = "geneName";
         }
         if (StringUtils.isBlank(orderByType)) {
-            orderByType = ActionConts.DESC_SORT_TYPE;
+            orderByType = ActionConts.ASC_SORT_TYPE;
         }
         if (pageNo == 0) {
             pageNo = 1;
@@ -2916,7 +2911,7 @@ public class SearchAction extends DMBaseAction {
             orderBy = "geneName";
         }
         if (StringUtils.isBlank(orderByType)) {
-            orderByType = ActionConts.DESC_SORT_TYPE;
+            orderByType = ActionConts.ASC_SORT_TYPE;
         }
         if (pageNo == 0) {
             pageNo = 1;

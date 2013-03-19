@@ -93,24 +93,13 @@ public class GeneDAO extends HibernateGenericDAO<Gene> implements IGeneRepositor
     p.setPageResults(repList);
     return p;
 }
-
+    @SuppressWarnings("unchecked")
     @Override
     public Gene getGenesByEnsgAccession(String ensgAccession) {
         Criteria Criteria = this.session().createCriteria(this.persistClass);
         Criteria.add(Restrictions.eq("ensgAccession", ensgAccession).ignoreCase());
         return (Gene) Criteria.uniqueResult();
     }
-
-//    @SuppressWarnings("unchecked")
-//    @Override
-//    public Gene getGenesByProbeId(String probeId) {
-//        Criteria criteria = this.session().createCriteria(this.persistClass);
-//        Criteria geneCrit = criteria.createAlias("probes", "probes");
-//        geneCrit.add(Restrictions.eq("probeId", probeId));
-//        Gene result = (Gene) geneCrit.uniqueResult();
-//        this.session().evict(result);
-//        return result;
-//    }
 
    @SuppressWarnings("unchecked")
    @Override

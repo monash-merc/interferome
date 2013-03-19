@@ -15,12 +15,12 @@
             <thead>
                 <tr class="dataset_result_header">
                     <td align="center" width="50">Id</td>
-                    <td align="center">FoldChange</td>
+                    <td align="center">Fold Change</td>
                     <td align="center">Interferon Type</td>
                     <td align="center">Treatment Time</td>
-                    <td align="center">Gene Name</td>
+                    <td align="center">Gene Symbol</td>
                     <td align="center" width="180">Description</td>
-                    <td align="center">GenBank ID</td>
+                    <td align="center">GenBank</td>
                     <td align="center">Ensembl ID</td>
                     <td align="center">Probe ID</td>
                 </tr>
