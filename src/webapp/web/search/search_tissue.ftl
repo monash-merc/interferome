@@ -119,9 +119,10 @@
           </p>
           <p>The first two columns show the name of the gene returned in the result set and the name of probe asociated
               with this gene within the BioGPS dataset</p>
-          <p>The IRG list resulting from the search is plotted against expression in these tissues and cells; deep red
-              indicates very high expression, pale red indicates moderately high expression, pale blue indicates
-              moderately low expresison, and deep blue indicates very low expression.</p>
+          <p>The IRG list resulting from the search is plotted against expression in these tissues and cells; deep red indicates very high expression, pale red
+              indicates moderately high expression, pale blue indicates moderately low
+              expression, and deep blue indicates very low expression.  Boxes that
+              appear to be white have expression values very close to the median for that tissue.</p>
           <p>Some gene names are associated with more than one probe within the BioGPS data set, in which case data from
               both probes are presented on different rows.</p>
     </span>

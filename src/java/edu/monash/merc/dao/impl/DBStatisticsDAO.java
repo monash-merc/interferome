@@ -68,10 +68,10 @@ public class DBStatisticsDAO extends HibernateGenericDAO<DBStats> {
         stats.datasetsIII = countQuery("select count(distinct ds) from Dataset ds inner join ds.data d inner join ds.ifnType t where t.typeName = 'III' AND d.probe.species.speciesName = :speciesName", species);
 
         // Number of genes that have been shown to be regulated by interferon greater than x2 fold change
-        stats.fc = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.value >= 2 and d.probe.species.speciesName = :speciesName", species);
-        stats.fcI = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.value >= 2 and d.dataset.ifnType.typeName = 'I' and d.probe.species.speciesName = :speciesName", species);
-        stats.fcII = countQuery("SELECT  count(distinct g) from Data d inner join d.probe.genes g where d.value >= 2 and d.dataset.ifnType.typeName = 'II' and d.probe.species.speciesName = :speciesName", species);
-        stats.fcIII = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.value >= 2 and d.dataset.ifnType.typeName = 'III' and d.probe.species.speciesName = :speciesName", species);
+        stats.fc = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where abs(d.value) >= 2 and d.probe.species.speciesName = :speciesName", species);
+        stats.fcI = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where abs(d.value) >= 2 and d.dataset.ifnType.typeName = 'I' and d.probe.species.speciesName = :speciesName", species);
+        stats.fcII = countQuery("SELECT  count(distinct g) from Data d inner join d.probe.genes g where abs(d.value) >= 2 and d.dataset.ifnType.typeName = 'II' and d.probe.species.speciesName = :speciesName", species);
+        stats.fcIII = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where abs(d.value) >= 2 and d.dataset.ifnType.typeName = 'III' and d.probe.species.speciesName = :speciesName", species);
 
         // Number of genes that have been shown to be regulated by interferon
         stats.allData = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.probe.species.speciesName = :speciesName", species);
