@@ -58,10 +58,13 @@ public class DBStatisticsDAO extends HibernateGenericDAO<DBStats> {
 
     private DBSpeciesStats querySpecies(String species) {
         DBSpeciesStats stats = new DBSpeciesStats();
+        // Number of Experiments
         stats.experiments = countQuery("SELECT count(distinct e) from Experiment e inner join e.datasets ds inner join ds.data d where d.probe.species.speciesName = :speciesName", species);
         stats.experimentsI = countQuery("select count(distinct e) from Experiment e inner join e.datasets ds inner join ds.ifnType t inner join ds.data d where t.typeName = 'I' and d.probe.species.speciesName = :speciesName", species);
         stats.experimentsII = countQuery("select count(distinct e) from Experiment e inner join e.datasets ds inner join ds.ifnType t inner join ds.data d where t.typeName = 'II' and d.probe.species.speciesName = :speciesName", species);
         stats.experimentsIII = countQuery("select count(distinct e) from Experiment e inner join e.datasets ds inner join ds.ifnType t inner join ds.data d where t.typeName = 'III' and d.probe.species.speciesName = :speciesName", species);
+
+        // Number of datasets in DB
         stats.datasets = countQuery("select count(distinct ds) from Dataset ds inner join ds.data d where d.probe.species.speciesName = :speciesName", species);
         stats.datasetsI = countQuery("select count(distinct ds) from Dataset ds inner join ds.data d inner join ds.ifnType t where t.typeName = 'I' AND d.probe.species.speciesName = :speciesName", species);
         stats.datasetsII = countQuery("select count(distinct ds) from Dataset ds inner join ds.data d inner join ds.ifnType t where t.typeName = 'II' AND d.probe.species.speciesName = :speciesName", species);
@@ -73,11 +76,11 @@ public class DBStatisticsDAO extends HibernateGenericDAO<DBStats> {
         stats.fcII = countQuery("SELECT  count(distinct g) from Data d inner join d.probe.genes g where abs(d.value) >= 2 and d.dataset.ifnType.typeName = 'II' and d.probe.species.speciesName = :speciesName", species);
         stats.fcIII = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where abs(d.value) >= 2 and d.dataset.ifnType.typeName = 'III' and d.probe.species.speciesName = :speciesName", species);
 
-        // Number of genes that have been shown to be regulated by interferon
-        stats.allData = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.probe.species.speciesName = :speciesName", species);
-        stats.allDataI = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.dataset.ifnType.typeName = 'I' and d.probe.species.speciesName = :speciesName", species);
-        stats.allDataII = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.dataset.ifnType.typeName = 'II' and d.probe.species.speciesName = :speciesName", species);
-        stats.allDataIII = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.dataset.ifnType.typeName = 'III' and d.probe.species.speciesName = :speciesName", species);
+        // Number of ALL genes that have been shown to be regulated by interferon in DB
+    //    stats.allData = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.probe.species.speciesName = :speciesName", species);
+    //    stats.allDataI = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.dataset.ifnType.typeName = 'I' and d.probe.species.speciesName = :speciesName", species);
+    //    stats.allDataII = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.dataset.ifnType.typeName = 'II' and d.probe.species.speciesName = :speciesName", species);
+    //    stats.allDataIII = countQuery("SELECT count(distinct g) from Data d inner join d.probe.genes g where d.dataset.ifnType.typeName = 'III' and d.probe.species.speciesName = :speciesName", species);
 
         return stats;
     }

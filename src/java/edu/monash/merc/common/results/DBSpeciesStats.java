@@ -45,11 +45,11 @@ public class DBSpeciesStats {
     public long fcI;
     public long fcII;
     public long fcIII;
-    public long allDataI;
-    public long allDataII;
-    public long allDataIII;
+   // public long allDataI;
+   // public long allDataII;
+   // public long allDataIII;
     public long experiments;
     public long datasets;
     public long fc;
-    public long allData;
+  //  public long allData;
 }
