@@ -25,7 +25,7 @@
 <div class="search_table_div">
     <div id="human_picture_container"
          style="margin-right: auto; margin-left: auto; padding: 15px; border: thin solid teal;">
-        <h3>Human Tissue Expression   </h3>
+        <h3>Human Expression in Unstimulated Tissues </h3>
             <div class="export_options" style="float: right;">
                 <span class="saveimage">
                     <a href-lang='image/svg+xml' target='_blank' href="">
@@ -67,7 +67,7 @@
 
     <div id="mouse_picture_container"
          style="margin-right: auto; margin-left: auto; padding: 15px; border: thin solid teal;">
-        <h3>Mouse Tissue Expression</h3>
+        <h3>Mouse Expression in Unstimulated Tissues</h3>
 
         <div class="export_options" style="float: right;">
                 <span class="saveimage">

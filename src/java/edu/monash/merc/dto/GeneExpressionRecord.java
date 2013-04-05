@@ -46,7 +46,7 @@ public class GeneExpressionRecord {
     private List<TissueExpression> tissueExpressionList = new ArrayList<TissueExpression>();
     private String speciesName;
 
-    public GeneExpressionRecord(TissueExpression t, String geneName, String speciesName){
+    public GeneExpressionRecord(String geneName, TissueExpression t, String speciesName){
         this.geneName = geneName;
         this.tissueExpression = t;
         this.speciesName = speciesName;

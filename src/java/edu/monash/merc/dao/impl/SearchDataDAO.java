@@ -54,6 +54,9 @@ import java.text.DecimalFormat;
  *
  * @author Simon Yu - Xiaoming.Yu@monash.edu
  * @version 2.0
+ *
+ * @author Irina Rusinova - irina.rusinova@monash.edu
+ * @version 2.01
  */
 @Scope("prototype")
 @Repository
@@ -151,14 +154,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
             for (List<String> factors : factorLists) {
                 String factorHQL = baseDatasetHql + " fvs.factorValue IN (:factorvalues) GROUP BY ds HAVING COUNT(fvs) = :fv_count";
-                // System.out.println("=============== ***** with factors: dataset hql string: " + factorHQL);
-
                 Query findDsQuery = this.session().createQuery(factorHQL);
-
                 findDsQuery.setParameterList(("factorvalues"), factors);
                 findDsQuery.setInteger(("fv_count"), factors.size());
                 List<Long> foundTmp = findDsQuery.list();
-                //System.out.println("=============== ***** search with factors: dataset size: " + foundTmp.size());
 
                 for (Long tmpdsid : foundTmp) {
                     if (!foundDsIds.contains(tmpdsid)) {
@@ -167,7 +166,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 }
             }
         } else {
-            // System.out.println("=============== ****** without factor dataset hql string: " + baseDatasetHql);
             Query findDsQuery = this.session().createQuery(baseDatasetHql);
             foundDsIds = findDsQuery.list();
         }
@@ -317,7 +315,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             geneQuery.setMaxResults(genePagination.getSizePerPage());
 
             List<Gene> geneList = geneQuery.list();
-            //System.out.println("================= found total genes list size: " + geneList.size());
             genePagination.setPageResults(geneList);
             return genePagination;
         } else {
@@ -343,12 +340,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         List<Probe> probes = uniqueProbesPages.getPageResults();
         if (probes.size() > 0) {
             List<Gene> gnenNameList = new ArrayList<Gene>();
-            String gnHQL = "SELECT g.geneName  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) GROUP BY g.geneName ORDER BY g";
+            String gnHQL = "SELECT DISTINCT g.geneName  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) GROUP BY g.geneName ORDER BY g";
             Query gnQuery = this.session().createQuery(gnHQL);
             gnQuery.setParameterList(("probes"), probes);
             gnenNameList = gnQuery.list();
 
-            String teHQL ="SELECT te, g.geneName, s.speciesName FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.species s INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList) ORDER BY te.tissue.tissueId";
+            String teHQL ="SELECT DISTINCT g.geneName, te, s.speciesName FROM TissueExpression te INNER JOIN te.probe pbs INNER JOIN pbs.species s INNER JOIN pbs.genes g WHERE g.geneName IN (:gnenNameList) ORDER BY te.tissue.tissueId";
             Query teQuery = this.session().createQuery(teHQL);
             teQuery.setParameterList(("gnenNameList"), gnenNameList);
 
@@ -356,7 +353,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             for (Object rowObject : teQuery.list()) {
                 Object[] row = (Object[]) rowObject;
                 assert row.length == 3;
-                geneExpressionRecords.add(new GeneExpressionRecord((TissueExpression) row[0], (String) row[1], (String) row[2]));
+                geneExpressionRecords.add(new GeneExpressionRecord((String) row[0], (TissueExpression) row[1],  (String) row[2]));
             }
             return geneExpressionRecords;
 
@@ -369,14 +366,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @Override
     public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-
         List<Probe> probes = uniqueProbesPages.getPageResults();
-
         if (probes.size() > 0) {
             String chrHQL = "SELECT g.chromosome, count(DISTINCT g)  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) AND g.ensgAccession like 'ENSG' GROUP BY g.chromosome ORDER BY count(distinct g) DESC";
             Query chrQuery = this.session().createQuery(chrHQL);
             chrQuery.setParameterList(("probes"), probes);
-
 
             List<Object[]> chromosomeList = chrQuery.list();
             return chromosomeList;
@@ -523,9 +517,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     @Override
     public List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
-
         List<Probe> probes = uniqueProbesPages.getPageResults();
-
         if (probes.size() > 0) {
             String chrHQL = "SELECT g  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) ORDER BY g.chromosome";
             Query chrQuery = this.session().createQuery(chrHQL);
@@ -574,12 +566,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             String goCellularTotalHQL = "SELECT o, COUNT(DISTINCT g) FROM  GeneOntology go INNER JOIN go.ontology o INNER JOIN go.gene g GROUP BY o";
             Query goCellularTotalQuery = this.session().createQuery(goCellularTotalHQL);
             List<Object[]> cellResult = goCellularTotalQuery.list();
-            //System.out.println("Result Size: " + cellResult.size());
             Iterator<Object[]> totCountItr = cellResult.iterator();
             while (totCountItr.hasNext()) {
                 Object[] ontCountRes = totCountItr.next();
                 countHash.put(((Ontology) (ontCountRes[0])).getGoTermAccession(), (Long) ontCountRes[1]);
-                // System.out.println("Adding To Hash: " + ((Ontology)(ontCountRes[0])).getGoTermAccession());
             }
 
 
@@ -636,17 +626,14 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //This assumption has not been tested and may be incorrect
         //For each GO id found with this search (goList)
         ArrayList<Object[]> returnVal = new ArrayList<Object[]>();
-        //System.out.println(goCategoryCounts.size());
         Iterator<Object[]> goItr = goList.iterator();
         while (goItr.hasNext()) {
             Object[] goVal = goItr.next();
-            //  System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
             Long m = goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession());
             Double pvalue = null;
             if (m != null) {
                 pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, (Long) goVal[1]);
             } else {
-                // System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
                 pvalue = (double) 1;
             }
             returnVal.add(new Object[]{goVal[0], goVal[1], pvalue});
@@ -660,8 +647,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         Double pvalue = (binomialCoefficient(m,k)*binomialCoefficient((N-m),(n-k)))/ binomialCoefficient(N,n);
         DecimalFormat df = new DecimalFormat("#.##E0");
         return (Double.valueOf(df.format(pvalue)));
-        //return N*1.0;
-       // return ((m/k)*((N-m)/(n-k)))/((N/n)+1);
     }
     private Double binomialCoefficient(long a, long b){
         if (b < 0 || b > a){
@@ -689,7 +674,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         List<Probe> probes = uniqueProbesPages.getPageResults();
 
         if (probes.size() > 0) {
-            //Search Cellular
+            //Search
             String goTFHQL = "SELECT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes)";
             Query goTFQuery = this.session().createQuery(goTFHQL);
             goTFQuery.setParameterList(("probes"), probes);
@@ -786,14 +771,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //create query
         String countQLStr = countQL.toString();
-        // System.out.println("=================================> ds level data cout ql string: " + countQLStr);
         Query dataCountQuery = this.session().createQuery(countQLStr);
         String orderByCond = createOrderBy(orderBy, sortBy);
         if (StringUtils.isNotBlank(orderByCond)) {
             dataQL.append(orderByCond);
         }
         String dataQLStr = dataQL.toString();
-        // System.out.println("=================================> ds level data query ql string: " + dataQLStr);
         Query dataQuery = this.session().createQuery(dataQLStr);
 
         if (searchGenes.length > 0) {
@@ -933,9 +916,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         dataQuery.setMaxResults(dataPagination.getSizePerPage());
 
         dataPagination.setPageResults(SearchResultRow.listFromQuery(dataQuery));
-
-        // System.out.println("===========> ds level found total data size: " + dataPagination.getTotalRecords());
-        //System.out.println("===========> ds level found total data pages: " + dataPagination.getTotalPages());
         return dataPagination;
     }
 
@@ -1043,7 +1023,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //create count query
         String countQLStr = countQL.toString();
-        //  System.out.println("=================================> data only count ql string: " + countQLStr);
         Query dataCountQuery = this.session().createQuery(countQLStr);
 
         String orderByCond = createOrderBy(orderBy, sortBy);
@@ -1052,7 +1031,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
         //create pagination query
         String dataQLStr = dataQL.toString();
-        // System.out.println("=================================> data only query ql string: " + dataQLStr);
         Query dataQuery = this.session().createQuery(dataQLStr);
 
         if (searchGenes.length > 0) {
@@ -1133,11 +1111,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         dataQuery.setFirstResult(dataPagination.getFirstResult());
         dataQuery.setMaxResults(dataPagination.getSizePerPage());
-
         dataPagination.setPageResults(SearchResultRow.listFromQuery(dataQuery));
-
-        // System.out.println("===========> data only query found total data size: " + dataPagination.getTotalRecords());
-        // System.out.println("===========>  data only query found total data pages: " + dataPagination.getTotalPages());
         return dataPagination;
     }
 
@@ -1146,7 +1120,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     private Pagination<Probe> searchProbeDataAndDsLevel(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         //query the dataset first
         List<Long> foundDsIds = queryDatasets(searchBean);
-        // System.out.println("============> ***** found dataset id list size: " + foundDsIds.size());
 
         //just return if no dataset found
         if (foundDsIds.size() == 0) {
@@ -1217,14 +1190,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //create query
         String countQLStr = countQL.toString();
-        //  System.out.println("=================================> ds level probe cout ql string: " + countQLStr);
         Query probeCountQuery = this.session().createQuery(countQLStr);
         String orderByCond = createOrderBy(orderBy, sortBy);
         if (StringUtils.isNotBlank(orderByCond)) {
             probeQL.append(orderByCond);
         }
         String probeQLStr = probeQL.toString();
-        //System.out.println("=================================> ds level probe query ql string: " + probeQLStr);
         Query probeQuery = this.session().createQuery(probeQLStr);
 
         if (searchGenes.length > 0) {
@@ -1372,8 +1343,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         probeQuery.setMaxResults(probePagination.getSizePerPage());
         List<Probe> probeList = probeQuery.list();
         probePagination.setPageResults(probeList);
-        // System.out.println("===========> ds level found total probe size: " + probePagination.getTotalRecords());
-        // System.out.println("===========> ds level found total probe pages: " + probePagination.getTotalPages());
         return probePagination;
     }
 
@@ -1438,7 +1407,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         //create count query
         String countQLStr = countQL.toString();
-        //System.out.println("=================================> data level only probe count string: " + countQLStr);
         Query probeCountQuery = this.session().createQuery(countQLStr);
 
         String orderByCond = createOrderBy(orderBy, sortBy);
@@ -1447,7 +1415,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         }
         //create pagination query
         String probeQLStr = probeQL.toString();
-        //  System.out.println("=================================> data level only probe query string: " + probeQLStr);
         Query probeQuery = this.session().createQuery(probeQLStr);
 
         if (searchGenes.length > 0) {
@@ -1535,8 +1502,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         probeQuery.setMaxResults(probPagination.getSizePerPage());
         List<Probe> dataList = probeQuery.list();
         probPagination.setPageResults(dataList);
-        // System.out.println("===========> data level only query found total probe size: " + probPagination.getTotalRecords());
-        // System.out.println("===========>  data level only query found total probe pages: " + probPagination.getTotalPages());
         return probPagination;
     }
 

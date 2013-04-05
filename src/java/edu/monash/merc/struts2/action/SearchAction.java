@@ -31,6 +31,7 @@ package edu.monash.merc.struts2.action;
 import au.com.bytecode.opencsv.CSVWriter;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.results.SearchResultRow;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.GeneExpressionRecord;
@@ -421,7 +422,7 @@ public class SearchAction extends DMBaseAction {
         }
     }
 
-
+    @SuppressWarnings("unchecked")
     public String showSearch() {
         try {
             user = getCurrentUser();
@@ -484,7 +485,7 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
-
+    @SuppressWarnings("unchecked")
     public String searchGenes() {
         try {
             //get the logged in user if existed
@@ -520,7 +521,7 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
-
+    @SuppressWarnings("unchecked")
     public String searchOntology() {
         try {
             //get the logged in user if existed
@@ -553,7 +554,7 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
-
+    @SuppressWarnings("unchecked")
     public String searchTFSite() {
         try {
             //get the logged in user if existed
@@ -639,7 +640,7 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
-
+    @SuppressWarnings("unchecked")
     public String searchTissueExpression() {
         try {
             //get the logged in user if existed
@@ -776,7 +777,7 @@ public class SearchAction extends DMBaseAction {
             dataPagination = this.searchDataService.search(searchBean, 1, maxRecords, orderBy, orderByType);
             System.out.println("dataPagination: " + dataPagination);
             this.csvInputStream = createCSVFile(searchBean, dataPagination);
-            System.out.println("file created");
+
             String csvFileName = MercUtil.genCurrentTimestamp();
 
             this.contentDisposition = "attachment;filename=\"" + csvFileName + "_DataSearchResults.txt" + "\"";
@@ -1068,8 +1069,8 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             List<GeneExpressionRecord> te = this.searchDataService.searchTissueExpression(searchBean, 1, maxRecords, orderBy, orderByType);
-            this.humanGeneExpressionList = combineByGeneAndProbe(te, "human");
-            this.mouseGeneExpressionList = combineByGeneAndProbe(te, "mouse");
+            this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
+            this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
             this.csvInputStream = createCSVFileTissueExpression(searchBean, humanGeneExpressionList, mouseGeneExpressionList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
@@ -2003,7 +2004,6 @@ public class SearchAction extends DMBaseAction {
             Iterator<Map.Entry<String, List<TFSite>>> it = tfSiteList.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, List<TFSite>> mapEntry = it.next();
-                // System.out.println("==== key: " + mapEntry.getKey());
                 String tfgene = mapEntry.getKey();
                 csvWriter.writeNext(new String[]{tfgene});
                 List<TFSite> tfSites1 = mapEntry.getValue();
@@ -2206,7 +2206,7 @@ public class SearchAction extends DMBaseAction {
             }
             //write new empty line
             csvWriter.writeNext(new String[]{""});
-            if (StringUtils.equals(species, "-1")) {
+            if (StringUtils.equals(species, "-1")|| StringUtils.contains(species, "Homo sapiens")) {
                 csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
                 csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
                 //write data result
@@ -2225,46 +2225,10 @@ public class SearchAction extends DMBaseAction {
                         finishedHGenes.add(ensembl);
                     }
                 }
-                csvWriter.writeNext(new String[]{""});
-                csvWriter.writeNext(new String[]{"Mouse Chromosomal Location"});
-                csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
-                List<String> finishedMGenes = new ArrayList<String>();
-                for (Gene chr : chromosomeGeneList) {
-                    String ensemblM = chr.getEnsgAccession();
-                    if (!finishedMGenes.contains(ensemblM)) {
-                        if (StringUtils.startsWith(ensemblM, "ENSMUSG")) {
-                            //This is mouse
-                            String GeneName = chr.getGeneName();
-                            String Chromosome = chr.getChromosome();
-                            long StartPosition = chr.getStartPosition();
-                            long EndPosition = chr.getEndPosition();
-                            csvWriter.writeNext(new String[]{GeneName, Chromosome, String.valueOf(StartPosition), String.valueOf(EndPosition), ensemblM});
-                        }
-                        finishedMGenes.add(ensemblM);
-                    }
-                }
-            } else {
-                if (StringUtils.contains(species, "Homo sapiens")) {
-                    csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
-                    csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
-                    //write data result
-                    List<String> finishedHGenes = new ArrayList<String>();
-                    for (Gene chr : chromosomeGeneList) {
-                        String ensembl = chr.getEnsgAccession();
-                        if (!finishedHGenes.contains(ensembl)) {
-                            if (StringUtils.startsWith(ensembl, "ENSG")) {
-                                //This is humman
-                                String GeneName = chr.getGeneName();
-                                String Chromosome = chr.getChromosome();
-                                long StartPosition = chr.getStartPosition();
-                                long EndPosition = chr.getEndPosition();
-                                csvWriter.writeNext(new String[]{GeneName, Chromosome, String.valueOf(StartPosition), String.valueOf(EndPosition), ensembl});
-                            }
-                            finishedHGenes.add(ensembl);
-                        }
-                    }
-                }
-                if (StringUtils.contains(species, "Mus musculus")) {
+
+            }
+            csvWriter.writeNext(new String[]{""});
+                if (StringUtils.equals(species, "-1")|| StringUtils.contains(species, "Mus musculus")) {
                     csvWriter.writeNext(new String[]{"Mouse Chromosomal Location"});
                     csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
                     List<String> finishedMGenes = new ArrayList<String>();
@@ -2283,7 +2247,7 @@ public class SearchAction extends DMBaseAction {
                         }
                     }
                 }
-            }
+
 
             //flush out
             csvWriter.flush();
@@ -2686,8 +2650,8 @@ public class SearchAction extends DMBaseAction {
             }
             //write new empty line
             csvWriter.writeNext(new String[]{""});
-            if (StringUtils.equals(species, "-1")) {
-                csvWriter.writeNext(new String[]{"Human Tissue Expression"});
+            if (StringUtils.equals(species, "-1") || StringUtils.contains(species, "Homo sapiens")) {
+                csvWriter.writeNext(new String[]{"Human Expression in Unstimulated Tissues"});
                 if (!humanGeneExpressionList.isEmpty()) {
                     //write data result
                     List<String> hmheads = new ArrayList<String>();
@@ -2717,71 +2681,11 @@ public class SearchAction extends DMBaseAction {
                         csvWriter.writeNext(hrowvalues.toArray(new String[hrowvalues.size()]));
                     }
                 }
-                if (!mouseGeneExpressionList.isEmpty()) {
-                    csvWriter.writeNext(new String[]{""});
-                    csvWriter.writeNext(new String[]{"Mouse Tissue Expression"});
-                    //write data result
-                    List<String> mmheads = new ArrayList<String>();
-                    mmheads.add("Gene Name");
-                    mmheads.add("Probe Id");
-                    //will be a head of csv file
-                    List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
 
-                    for (TissueExpression mheadesList : mmHeades) {
-                        Tissue mtissue = mheadesList.getTissue();
-                        String mtissueVal = mtissue.getTissueId();
-                        mmheads.add(mtissueVal);
-                    }
-                    csvWriter.writeNext(mmheads.toArray(new String[mmheads.size()]));
-                    //for individual row in csv file
-                    for (GeneExpressionRecord mgerecord : mouseGeneExpressionList) {
-                        List<String> mrowvalues = new ArrayList<String>();
-                        // add the first two columns - probe and gene id
-                        mrowvalues.add(mgerecord.getGeneName());
-                        mrowvalues.add(mgerecord.getProbe().getProbeId());
-                        // add the list of expressions
-                        List<TissueExpression> mtissueExpressions = mgerecord.getTissueExpressionList();
-                        for (TissueExpression mtissueExpression : mtissueExpressions) {
-                            double mexpression = mtissueExpression.getExpression();
-                            mrowvalues.add(String.valueOf(mexpression));
-                        }
-                        csvWriter.writeNext(mrowvalues.toArray(new String[mrowvalues.size()]));
-                    }
-                }
-            } else {
-                if (StringUtils.contains(species, "Homo sapiens")) {
-                    csvWriter.writeNext(new String[]{"Human Tissue Expression"});
-
-                    //write data result
-                    List<String> hmheads = new ArrayList<String>();
-                    hmheads.add("Gene Name");
-                    hmheads.add("Probe Id");
-                    //will be a head of csv file
-                    List<TissueExpression> hmHeades = humanGeneExpressionList.get(0).getTissueExpressionList();
-
-                    for (TissueExpression hmheadesList : hmHeades) {
-                        Tissue tissue = hmheadesList.getTissue();
-                        String tissueVal = tissue.getTissueId();
-                        hmheads.add(tissueVal);
-                    }
-                    csvWriter.writeNext(hmheads.toArray(new String[hmheads.size()]));
-                    //for individual row in csv file
-                    for (GeneExpressionRecord hgerecord : humanGeneExpressionList) {
-                        List<String> hrowvalues = new ArrayList<String>();
-                        // add the first two columns - probe and gene id
-                        hrowvalues.add(hgerecord.getGeneName());
-                        hrowvalues.add(hgerecord.getProbe().getProbeId());
-                        // add the list of expressions
-                        List<TissueExpression> htissueExpressions = hgerecord.getTissueExpressionList();
-                        for (TissueExpression htissueExpression : htissueExpressions) {
-                            double expression = htissueExpression.getExpression();
-                            hrowvalues.add(String.valueOf(expression));
-                        }
-                        csvWriter.writeNext(hrowvalues.toArray(new String[hrowvalues.size()]));
-                    }
-                }
-                if (StringUtils.contains(species, "Mus musculus")) {
-                    csvWriter.writeNext(new String[]{"Mouse Tissue Expression"});
+            }
+            csvWriter.writeNext(new String[]{""});
+                if (StringUtils.equals(species, "-1") ||StringUtils.contains(species, "Mus musculus")) {
+                    csvWriter.writeNext(new String[]{"Mouse Expression in Unstimulated Tissues"});
                     //write data result
                     List<String> mmheads = new ArrayList<String>();
                     mmheads.add("Gene Name");
@@ -2810,7 +2714,7 @@ public class SearchAction extends DMBaseAction {
                         csvWriter.writeNext(mrowvalues.toArray(new String[mrowvalues.size()]));
                     }
                 }
-            }
+
             //flush out
             csvWriter.flush();
             this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
@@ -3247,5 +3151,9 @@ public class SearchAction extends DMBaseAction {
 
     public void setHumanGeneExpressionList(List<GeneExpressionRecord> tissueExpressioList) {
         this.humanGeneExpressionList = tissueExpressioList;
+    }
+
+    public void setMouseGeneExpressionList(List<GeneExpressionRecord> tissueExpressioList) {
+        this.mouseGeneExpressionList = tissueExpressioList;
     }
 }
