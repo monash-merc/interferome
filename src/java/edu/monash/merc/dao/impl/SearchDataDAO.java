@@ -566,6 +566,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             String goCellularTotalHQL = "SELECT o, COUNT(DISTINCT g) FROM  GeneOntology go INNER JOIN go.ontology o INNER JOIN go.gene g GROUP BY o";
             Query goCellularTotalQuery = this.session().createQuery(goCellularTotalHQL);
             List<Object[]> cellResult = goCellularTotalQuery.list();
+
             Iterator<Object[]> totCountItr = cellResult.iterator();
             while (totCountItr.hasNext()) {
                 Object[] ontCountRes = totCountItr.next();
@@ -577,9 +578,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //Search Cellular
             //************************
             //Get the matching genes for each ontology (k)
+
+            //TODO: to fix the exception: java.lang.NumberFormatException: For input string: "?"
             String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goCellularQuery = this.session().createQuery(goCellularHQL);
             goCellularQuery.setParameterList(("probes"), probes);
+
             List<Object[]> goCellularList = goCellularQuery.list();
             if (goCellularList.size() > 0) {
                 goHash.add(addGOProbability(goCellularList, countHash, searchedGenen, totalGeneN));

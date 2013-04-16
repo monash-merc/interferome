@@ -516,7 +516,7 @@ public class SearchAction extends DMBaseAction {
 
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.data.failed"));
+            addActionError(getText("data.search.genes.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -549,7 +549,7 @@ public class SearchAction extends DMBaseAction {
 
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.data.failed"));
+            addActionError(getText("data.search.ontology.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -600,7 +600,7 @@ public class SearchAction extends DMBaseAction {
 
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.data.failed"));
+            addActionError(getText("data.search.tf.analysis.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -635,7 +635,7 @@ public class SearchAction extends DMBaseAction {
 
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.data.failed"));
+            addActionError(getText("data.search.chromosome.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -672,7 +672,7 @@ public class SearchAction extends DMBaseAction {
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.error(ex);
-            addActionError(getText("data.search.data.failed"));
+            addActionError(getText("data.search.tissue.expression.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -743,7 +743,7 @@ public class SearchAction extends DMBaseAction {
 
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.data.failed"));
+            addActionError(getText("data.search.subtype.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -790,7 +790,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.data.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -836,7 +836,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.gene.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -881,7 +881,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.ontology.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -944,7 +944,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.tf.analysis.csv.file.failed"));
             return ERROR;
         }
         return SUCCESS;
@@ -991,7 +991,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.chromosome.csv.file.failed "));
             return ERROR;
         }
         return SUCCESS;
@@ -1037,7 +1037,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.subtype.csv.file.failed "));
             return ERROR;
         }
         return SUCCESS;
@@ -1084,7 +1084,7 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.txt.file.failed"));
+            addActionError(getText("data.search.export.tissue.expression.csv.file.failed "));
             return ERROR;
         }
         return SUCCESS;
