@@ -33,10 +33,10 @@
                 </ul>
             </div>
         <@s.if test="#onResults[0].goDomain.id == 3">
-            <span style="font-size: 12pt;font-weight: bold;">Cellular Component</span>
+            <span style="font-size: 12pt;font-weight: bold;">Molecular Function</span>
         </@s.if>
         <@s.if test="#onResults[0].goDomain.id == 2">
-            <span style="font-size: 12pt;font-weight: bold;">Molecular Function</span>
+            <span style="font-size: 12pt;font-weight: bold;">Cellular Component</span>
         </@s.if>
         <@s.if test="#onResults[0].goDomain.id == 1">
             <span style="font-size: 12pt;font-weight: bold;">Biological Process</span>

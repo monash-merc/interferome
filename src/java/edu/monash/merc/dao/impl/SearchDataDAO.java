@@ -28,8 +28,8 @@
 
 package edu.monash.merc.dao.impl;
 
-import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.GeneExpressionRecord;
@@ -43,11 +43,13 @@ import org.hibernate.Query;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.text.DecimalFormat;
 
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
@@ -572,8 +574,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 Object[] ontCountRes = totCountItr.next();
                 countHash.put(((Ontology) (ontCountRes[0])).getGoTermAccession(), (Long) ontCountRes[1]);
             }
-
-
             //************************
             //Search Cellular
             //************************
@@ -583,7 +583,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goCellularQuery = this.session().createQuery(goCellularHQL);
             goCellularQuery.setParameterList(("probes"), probes);
-
             List<Object[]> goCellularList = goCellularQuery.list();
             if (goCellularList.size() > 0) {
                 goHash.add(addGOProbability(goCellularList, countHash, searchedGenen, totalGeneN));
@@ -633,10 +632,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         Iterator<Object[]> goItr = goList.iterator();
         while (goItr.hasNext()) {
             Object[] goVal = goItr.next();
-            Long m = goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession());
+            BigDecimal m = new BigDecimal( goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession()));
             Double pvalue = null;
             if (m != null) {
-                pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, (Long) goVal[1]);
+                Long gvTemp= (Long) goVal[1];
+                BigDecimal gv1 = new BigDecimal(gvTemp);
+                pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, gv1);
             } else {
                 pvalue = (double) 1;
             }
@@ -646,25 +647,41 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         return returnVal;
     }
 
-    private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
-        //return "N/A";
-        Double pvalue = (binomialCoefficient(m,k)*binomialCoefficient((N-m),(n-k)))/ binomialCoefficient(N,n);
+    private Double calculateGOEnrichPValue(long N, long n, BigDecimal m, BigDecimal k) {
+
+        BigDecimal bdN = new BigDecimal(N);
+        BigDecimal bdn = new BigDecimal(n);
+        BigDecimal NsubM = bdN.subtract(m);
+        BigDecimal nsubk = bdn.subtract(k);
+
+        BigDecimal mk  = binomialCoefficient(m,k);
+        BigDecimal Nn = binomialCoefficient(bdN,bdn);
+        BigDecimal NMsk = binomialCoefficient(NsubM,nsubk);
+        BigDecimal mkMultNMsk=NMsk.multiply(mk);
+        BigDecimal pval = mkMultNMsk.divide(Nn, 5, RoundingMode.CEILING);
+        Double pvalue = pval.doubleValue();
         DecimalFormat df = new DecimalFormat("#.##E0");
         return (Double.valueOf(df.format(pvalue)));
     }
-    private Double binomialCoefficient(long a, long b){
-        if (b < 0 || b > a){
+
+    private BigDecimal binomialCoefficient(BigDecimal a, BigDecimal b){
+        int res1 = b.compareTo(new BigDecimal(0));
+        int res2 = b.compareTo(a);
+        int res3 = b.compareTo(a.subtract(b));
+        BigDecimal c = a.subtract((b));
+        if (res1==-1 || res2==1){
         return null;
         }
-        if (b > (a - b))  {       // take advantage of symmetry
-        b = a - b;
+
+        if (res3 ==1)  {       // take advantage of symmetry
+            b = a.subtract(b);
         }
-        Double coeff = 1.0;
-        for (long i = a - b + 1; i <= a; i++) {
-            coeff *= i;
+        BigDecimal coeff = new BigDecimal(1.0);
+        for (BigDecimal i = c.add(new BigDecimal(1)); i.compareTo(a)!=1; i=i.add(BigDecimal.ONE)  )    {
+            coeff = coeff.multiply(i);
         }
-        for (long i = 1; i <= b; i++) {
-            coeff /= i;
+        for (BigDecimal i = new BigDecimal(1); i.compareTo(b)!=1; i=i.add(BigDecimal.ONE) ) {
+            coeff = coeff.divide(i);
         }
         return coeff;
     }
