@@ -36,7 +36,9 @@
                     <!-- <tr>
                         <td>Genes with p-value &lt;0.05</td> <td align="center"><@s.property value="stats.human.allDataI" /></td>     <td align="center"><@s.property value="stats.human.allDataII" /></td> <td align="center"><@s.property value="stats.human.allDataIII" /></td> <td align="center"><@s.property value="stats.human.allData" /></td>
                     </tr> -->
-                    </tbody></table>
+                    </tbody>
+                </table>
+                <div class="blank_separator"></div>
                 <div class="table_title_div">
                     Mus musculus statistics
                 </div>
