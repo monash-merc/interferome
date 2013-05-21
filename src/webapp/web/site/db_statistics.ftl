@@ -17,10 +17,10 @@
 	        <div class="blank_separator"></div>
 
             <div class="summary">
-                <div class="parag_title_div">
+                <div class="table_title_div">
                     Homo sapiens statistics
                 </div>
-                <table class="datatable" border="1" width="90%" style="margin-left: auto; margin-right: auto;">
+                <table class="stat_table">
                     <tbody><tr>
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>
@@ -37,10 +37,10 @@
                         <td>Genes with p-value &lt;0.05</td> <td align="center"><@s.property value="stats.human.allDataI" /></td>     <td align="center"><@s.property value="stats.human.allDataII" /></td> <td align="center"><@s.property value="stats.human.allDataIII" /></td> <td align="center"><@s.property value="stats.human.allData" /></td>
                     </tr> -->
                     </tbody></table>
-                <div class="parag_title_div">
+                <div class="table_title_div">
                     Mus musculus statistics
                 </div>
-                <table class="datatable" border="1"  width="90%" style="margin-left: auto; margin-right: auto;">
+                <table class="stat_table">
                     <tbody><tr>
                         <th>Data base contents</th>  <th>Interferon Type I</th>    <th>Interferon Type II</th>   <th>Interferon Type III</th>   <th>Total</th>
                     </tr>

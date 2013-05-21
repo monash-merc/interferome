@@ -370,12 +370,13 @@ body {
     font-weight: normal;
     text-align: center;
 }
-.nojava{
+
+.nojava {
     font-size: 11px;
     color: #858585
 }
 
-.IE8{
+.IE8 {
     font-size: 11px;
     color: #858585
 }
@@ -1628,6 +1629,7 @@ body {
     padding-left: 5px;
     margin-left: 160px;
 }
+
 .search_field_value_block {
     display: block;
     color: #212121;
@@ -1635,7 +1637,6 @@ body {
     padding-left: 5px;
     margin-left: 160px;
 }
-
 
 .search_field_list {
     display: block;
@@ -2016,6 +2017,39 @@ body {
     padding-right: 10px;
 }
 
+.summary {
+    padding: 5px;
+}
+
+.table_title_div {
+    color: #858585;
+    border: 1px solid #E9E9E9;
+    padding: 5px;
+    background: #F0F0F0;
+}
+
+.stat_table {
+    padding: 5px;
+    width: 100%;
+    border: solid 1px #E9E9E9;
+    border-collapse: collapse;
+}
+
+.stat_table th {
+    border-bottom: solid 1px #E9E9E9;
+    border-right: solid 1px #E9E9E9;
+    padding: 4px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.stat_table td {
+    border-bottom: solid 1px #E9E9E9;
+    border-right: solid 1px #E9E9E9;
+    padding: 4px;
+    text-align: left;
+}
+
 /** pagination **/
 .page_style {
     margin: 5px auto;
@@ -2129,19 +2163,19 @@ body {
     text-align: center;
 }
 
+#tooltip {
+    position: absolute;
+    border: 1px solid gray;
+    background-color: blue;
+    padding: 3px;
+}
 
+​
 
-#tooltip{
-    position : absolute;
-    border : 1px solid gray;
-    background-color : blue;
-    padding : 3px;
-}​
-
-div#tissueexp_container{
-     width: 100%;
-     height: 40px;
-     overflow:scroll;
-     background: #90BADE;
-     border-color: #90BADE;
- }
+div#tissueexp_container {
+    width: 100%;
+    height: 40px;
+    overflow: scroll;
+    background: #90BADE;
+    border-color: #90BADE;
+}
