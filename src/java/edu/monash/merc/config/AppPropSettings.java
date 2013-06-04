@@ -115,6 +115,8 @@ public class AppPropSettings {
 
     public static String LDAP_BASE_DN = "ldap.base.dn";
 
+    public static String LDAP_BIND_BASE_DN_REQUIRED = "ldap.bind.base.dn.required";
+
     public static String LDAP_SECURITY_PROTOCOL = "ldap.security.protocol";
 
     public static String LDAP_AUTHENTICATION = "ldap.authentication";

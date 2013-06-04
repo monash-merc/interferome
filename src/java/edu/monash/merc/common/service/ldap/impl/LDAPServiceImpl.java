@@ -72,6 +72,7 @@ public class LDAPServiceImpl implements LDAPService {
         ldapProp.setProtocol(appSettings.getPropValue(AppPropSettings.LDAP_SECURITY_PROTOCOL));
         ldapProp.setAuthentication(appSettings.getPropValue(AppPropSettings.LDAP_AUTHENTICATION));
         ldapProp.setBaseDN(appSettings.getPropValue(AppPropSettings.LDAP_BASE_DN));
+        ldapProp.setBindBaseDnRequired(Boolean.valueOf(appSettings.getPropValue(AppPropSettings.LDAP_BIND_BASE_DN_REQUIRED)));
         ldapProp.setAttUID(appSettings.getPropValue(AppPropSettings.LDAP_UID_ATTR_NAME));
         ldapProp.setAttMail(appSettings.getPropValue(AppPropSettings.LDAP_MAIL_ATTR_NAME));
         ldapProp.setAttGender(appSettings.getPropValue(AppPropSettings.LDAP_GENDER_ATTR_NAME));
