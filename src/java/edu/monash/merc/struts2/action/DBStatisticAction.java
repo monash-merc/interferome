@@ -28,7 +28,11 @@
 
 package edu.monash.merc.struts2.action;
 
+import edu.monash.merc.common.results.DBStats;
+import edu.monash.merc.service.DBStatisticsService;
+import edu.monash.merc.service.impl.DBStatisticsServiceImpl;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -47,14 +51,29 @@ public class DBStatisticAction extends DMBaseAction {
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
+    @Autowired
+    private DBStatisticsService dbStatisticsService;
+    private DBStats stats;
+
+    public void setDbStatisticsService(DBStatisticsService dbStatisticsService) {
+        this.dbStatisticsService = dbStatisticsService;
+    }
+
+    public DBStats getStats() {
+        return stats;
+    }
+
     public String dbStat() {
         try {
             user = getCurrentUser();
+            stats = dbStatisticsService.getDBStatistics();
         } catch (Exception ex) {
-            logger.error(ex);
+            ex.printStackTrace();
+            //logger.error(ex);
             addActionError(getText("interferome.site.show.db.statistic.failed"));
             return ERROR;
         }
         return SUCCESS;
     }
+
 }

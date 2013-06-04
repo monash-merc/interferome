@@ -29,6 +29,7 @@
 package edu.monash.merc.dao.impl;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.dao.HibernateGenericDAO;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.repository.IDataRepository;
@@ -36,8 +37,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * DataDAO class which provides data access functionality for Data domain object
@@ -59,13 +58,13 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
 
     @SuppressWarnings("unchecked")
     @Override
-    public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
-        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
-        String dataHql = "SELECT d FROM Data d INNER JOIN d.reporter rep LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType WHERE ds.id =:dsId";
+    public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy) {
+        String countHql = "SELECT count(d) FROM " + this.persistClass.getSimpleName() + " d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds WHERE ds.id=:dsId";
+        String dataHql = "SELECT d, ds, p, g FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g LEFT JOIN d.dataset ds JOIN ds.ifnType ifnType WHERE ds.id =:dsId";
         Query countQuery = this.session().createQuery(countHql);
         countQuery.setParameter("dsId", dsId);
         int total = ((Long) countQuery.uniqueResult()).intValue();
-        Pagination<Data> p = new Pagination<Data>(startPageNo, recordsPerPage, total);
+        Pagination<SearchResultRow> p = new Pagination<SearchResultRow>(startPageNo, recordsPerPage, total);
         //create an order by conditions if any
         String orderByCond = createOrderBy(orderBy, sortBy);
         if (StringUtils.isNotBlank(orderByCond)) {
@@ -75,8 +74,10 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
         dataQuery.setParameter("dsId", dsId);
         dataQuery.setFirstResult(p.getFirstResult());
         dataQuery.setMaxResults(p.getSizePerPage());
-        List<Data> dataList = dataQuery.list();
-        p.setPageResults(dataList);
+
+
+        p.setPageResults(SearchResultRow.listFromQuery(dataQuery));
+
         return p;
     }
 
@@ -85,8 +86,8 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
             return " ORDER BY d.id " + sortBy;
         }
 
-        if (StringUtils.equalsIgnoreCase(orderBy, "genesymbol")) {
-            return " ORDER BY rep.geneSymbol " + sortBy;
+        if (StringUtils.equalsIgnoreCase(orderBy, "geneName")) {
+            return " ORDER BY g.geneName " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "foldchange")) {
@@ -94,15 +95,15 @@ public class DataDAO extends HibernateGenericDAO<Data> implements IDataRepositor
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "genbank")) {
-            return " ORDER BY rep.genBankAccession " + sortBy;
+           return " ORDER BY g.genbankId " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "ensemblid")) {
-            return " ORDER BY rep.ensembl " + sortBy;
+            return " ORDER BY g.ensgAccession " + sortBy;
         }
 
         if (StringUtils.equalsIgnoreCase(orderBy, "probeid")) {
-            return " ORDER BY rep.probeId " + sortBy;
+            return " ORDER BY p.probeId " + sortBy;
         }
         return null;
     }

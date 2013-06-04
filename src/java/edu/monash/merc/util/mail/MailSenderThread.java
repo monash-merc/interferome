@@ -98,6 +98,7 @@ public class MailSenderThread implements Runnable {
     /**
      * Thread Run Method.
      */
+    @Override
     public void run() {
         Thread runThread = Thread.currentThread();
         if ((senderThread != null) && (senderThread == runThread)) {

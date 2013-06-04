@@ -36,133 +36,143 @@ import java.io.Serializable;
  * @version 2.0
  */
 public class LDAPProperty implements Serializable {
-	private boolean ldapSupported;
+    private boolean ldapSupported;
 
-	private String ldapFactory;
+    private String ldapFactory;
 
-	private String ldapServer;
+    private String ldapServer;
 
-	private String protocol;
+    private String protocol;
 
-	private String authentication;
+    private String authentication;
 
-	private String baseDN;
+    private String baseDN;
 
-	private String attUID;
+    private boolean bindBaseDnRequired;
 
-	private String attMail;
+    private String attUID;
 
-	private String attCN;
+    private String attMail;
 
-	private String attGender;
+    private String attCN;
 
-	private String attPersonalTitle;
+    private String attGender;
 
-	private String attSn;
+    private String attPersonalTitle;
 
-	private String attGivenname;
+    private String attSn;
 
-	public boolean isLdapSupported() {
-		return ldapSupported;
-	}
+    private String attGivenname;
 
-	public void setLdapSupported(boolean ldapSupported) {
-		this.ldapSupported = ldapSupported;
-	}
+    public boolean isLdapSupported() {
+        return ldapSupported;
+    }
 
-	public String getLdapFactory() {
-		return ldapFactory;
-	}
+    public void setLdapSupported(boolean ldapSupported) {
+        this.ldapSupported = ldapSupported;
+    }
 
-	public void setLdapFactory(String ldapFactory) {
-		this.ldapFactory = ldapFactory;
-	}
+    public String getLdapFactory() {
+        return ldapFactory;
+    }
 
-	public String getLdapServer() {
-		return ldapServer;
-	}
+    public void setLdapFactory(String ldapFactory) {
+        this.ldapFactory = ldapFactory;
+    }
 
-	public void setLdapServer(String ldapServer) {
-		this.ldapServer = ldapServer;
-	}
+    public String getLdapServer() {
+        return ldapServer;
+    }
 
-	public String getProtocol() {
-		return protocol;
-	}
+    public void setLdapServer(String ldapServer) {
+        this.ldapServer = ldapServer;
+    }
 
-	public void setProtocol(String protocol) {
-		this.protocol = protocol;
-	}
+    public String getProtocol() {
+        return protocol;
+    }
 
-	public String getAuthentication() {
-		return authentication;
-	}
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
 
-	public void setAuthentication(String authentication) {
-		this.authentication = authentication;
-	}
+    public String getAuthentication() {
+        return authentication;
+    }
 
-	public String getBaseDN() {
-		return baseDN;
-	}
+    public void setAuthentication(String authentication) {
+        this.authentication = authentication;
+    }
 
-	public void setBaseDN(String baseDN) {
-		this.baseDN = baseDN;
-	}
+    public String getBaseDN() {
+        return baseDN;
+    }
 
-	public String getAttUID() {
-		return attUID;
-	}
+    public void setBaseDN(String baseDN) {
+        this.baseDN = baseDN;
+    }
 
-	public void setAttUID(String attUID) {
-		this.attUID = attUID;
-	}
+    public boolean isBindBaseDnRequired() {
+        return bindBaseDnRequired;
+    }
 
-	public String getAttMail() {
-		return attMail;
-	}
+    public void setBindBaseDnRequired(boolean bindBaseDnRequired) {
+        this.bindBaseDnRequired = bindBaseDnRequired;
+    }
 
-	public void setAttMail(String attMail) {
-		this.attMail = attMail;
-	}
+    public String getAttUID() {
+        return attUID;
+    }
 
-	public String getAttCN() {
-		return attCN;
-	}
+    public void setAttUID(String attUID) {
+        this.attUID = attUID;
+    }
 
-	public void setAttCN(String attCN) {
-		this.attCN = attCN;
-	}
+    public String getAttMail() {
+        return attMail;
+    }
 
-	public String getAttGender() {
-		return attGender;
-	}
+    public void setAttMail(String attMail) {
+        this.attMail = attMail;
+    }
 
-	public void setAttGender(String attGender) {
-		this.attGender = attGender;
-	}
+    public String getAttCN() {
+        return attCN;
+    }
 
-	public String getAttPersonalTitle() {
-		return attPersonalTitle;
-	}
+    public void setAttCN(String attCN) {
+        this.attCN = attCN;
+    }
 
-	public void setAttPersonalTitle(String attPersonalTitle) {
-		this.attPersonalTitle = attPersonalTitle;
-	}
+    public String getAttGender() {
+        return attGender;
+    }
 
-	public String getAttSn() {
-		return attSn;
-	}
+    public void setAttGender(String attGender) {
+        this.attGender = attGender;
+    }
 
-	public void setAttSn(String attSn) {
-		this.attSn = attSn;
-	}
+    public String getAttPersonalTitle() {
+        return attPersonalTitle;
+    }
 
-	public String getAttGivenname() {
-		return attGivenname;
-	}
+    public void setAttPersonalTitle(String attPersonalTitle) {
+        this.attPersonalTitle = attPersonalTitle;
+    }
 
-	public void setAttGivenname(String attGivenname) {
-		this.attGivenname = attGivenname;
-	}
+    public String getAttSn() {
+        return attSn;
+    }
+
+    public void setAttSn(String attSn) {
+        this.attSn = attSn;
+    }
+
+    public String getAttGivenname() {
+        return attGivenname;
+    }
+
+    public void setAttGivenname(String attGivenname) {
+        this.attGivenname = attGivenname;
+    }
 }

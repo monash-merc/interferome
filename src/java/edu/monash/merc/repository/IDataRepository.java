@@ -29,6 +29,7 @@
 package edu.monash.merc.repository;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.domain.Data;
 
 /**
@@ -41,5 +42,5 @@ public interface IDataRepository {
 
     public void deleteDataById(long dataId);
 
-    public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
+    public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
 }

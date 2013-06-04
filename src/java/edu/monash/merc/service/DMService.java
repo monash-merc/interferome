@@ -28,11 +28,13 @@
 package edu.monash.merc.service;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.*;
 import edu.monash.merc.util.interferome.dataset.BaseDataset;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -187,6 +189,7 @@ public interface DMService {
 
     public void saveMetaRegInfo(MDRegistrationBean mdRegistrationBean);
 
+    //Reporters
     public void saveReporter(Reporter reporter);
 
     public void mergeReporter(Reporter reporter);
@@ -201,6 +204,86 @@ public interface DMService {
 
     public void importReporters(ReporterBean reporterBean);
 
+    //Probe
+    Probe getProbeById(long id);
+
+    public List<Probe> getProbesByGeneAccession(String geneAccession);
+
+    public List<Probe> getProbeBySpecies(String speciesName);
+
+    public List<Probe> getProbesByGeneId(long geneId);
+
+    public void saveProbe(Probe probe);
+
+    public void mergeProbe(Probe probe);
+
+    public void updateProbe(Probe probe);
+
+    public Pagination<Probe> getProbes(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
+
+    public Probe getProbeByProbeId(String probeId);
+
+    public ProbCounter importAllProbes(List<Probe> probes);
+
+    public void importProbe(ProbeBean probeBeans);
+
+    public void importProbes(List<ProbeGeneBean> probeGeneBeans);
+
+    public List<Probe> getProbeImportErrors();
+
+    public List<String> getProbeImportErrorMessages();
+
+    // TFSite
+    public void saveTFSite(TFSite tfSite);
+
+    public void mergeTFSite(TFSite tfSite);
+
+    public void updateTFSite(TFSite tfSite);
+
+    public void importTFSite(TFSiteBean tfSiteBean);
+
+    public TfSiteCounter importAllTFSites(List<TFSite> tfSites);
+
+    public TFSite getTFSite(TFSite tfSite);
+
+    // Tissues
+    public TissueExpression getTissueExpressionById(long id);
+
+    public Tissue getTissueByName(String tissueId);
+
+    public void saveTissueExpression(TissueExpression tissueExpression);
+
+    public void updateTissueExpression(TissueExpression tissueExpression);
+
+    public void mergeTissueExpression(TissueExpression tissueExpression);
+
+    public void deleteTissueExpression(TissueExpression tissueExpression);
+
+    public List<TissueExpression> getTissueByProbeId(String probeId);
+
+    public List<TissueExpression> getTissueByTissueId(String tissueId);
+
+    public TissueExpression getTissueExpressionByProbeAndTissue(Probe probe, Tissue tissue);
+
+    public TissueCounter importAllTissues(List<TissueExpression> tissues);
+
+    public void importTissue(TissueBean tissueBean);
+
+    //Species
+
+    public Species getSpeciesById(long id);
+
+    public void saveSpecies(Species species);
+
+    public void mergeSpecies(Species species);
+
+    public void updateSpecies(Species species);
+
+    public Species getSpeciesByName(String speciesName);
+
+    public Pagination<Species> getSpecies(int startPageNo, int recordsPerPage, OrderBy[] orderBys);
+
+    //Dataset
     public void saveDataset(Dataset dataset);
 
     public Dataset getDataset(long dsId);
@@ -215,9 +298,9 @@ public interface DMService {
 
     public int getTotalDatasetsNumber(long expId);
 
-    public Pagination<Data> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
+    public Pagination<SearchResultRow> getDataByDatasetId(long dsId, int startPageNo, int recordsPerPage, String orderBy, String sortBy);
 
-    public Dataset importExpDataset(Experiment experiment, BaseDataset txtDataset);
+    public String importExpDataset(Experiment experiment, BaseDataset txtDataset);
 
     public void saveFactorValue(ExperimentFactorValue efv);
 
@@ -244,4 +327,77 @@ public interface DMService {
     public void saveIFNVariation(IFNVariation ifnVariation);
 
     public List<String> getAbnormalFactors();
+
+
+     // Genes
+    public Gene getGeneById(long id);
+
+    public void saveGene(Gene gene);
+
+    public void mergeGene(Gene gene);
+
+    public void updateGene(Gene gene);
+
+    public void deleteGene(Gene gene);
+
+    public Gene getGeneByEnsgAccession(String ensgAccession);
+
+    public List<Gene> getGenesByProbeId(String probeId);
+
+    void importGenes(List<Gene> genes, Date importedTime);
+
+    //Evidence Code
+
+    EvidenceCode getEvidenceCodeById(long id);
+
+    void saveEvidenceCode(EvidenceCode evidenceCode);
+
+    void mergeEvidenceCode(EvidenceCode evidenceCode);
+
+    void updateEvidenceCode(EvidenceCode evidenceCode);
+
+    void deleteEvidenceCode(EvidenceCode evidenceCode);
+
+    EvidenceCode getEvidenceCodeByCode(String code);
+
+    //GeneOntology
+    GeneOntology getGeneOntologyById(long id);
+
+    void saveGeneOntology(GeneOntology geneOntology);
+
+    void mergeGeneOntology(GeneOntology geneOntology);
+
+    void updateGeneOntology(GeneOntology geneOntology);
+
+    void deleteGeneOntology(GeneOntology geneOntology);
+
+    GeneOntology getGeneOntologyByGeneAndOntology(String ensgAccession, String goTermAccession);
+
+    //GoDomain
+    GoDomain getGoDomainById(long id);
+
+    void saveGoDomain(GoDomain goDomain);
+
+    void mergeGoDomain(GoDomain goDomain);
+
+    void updateGoDomain(GoDomain goDomain);
+
+    void deleteGoDomain(GoDomain goDomain);
+
+    GoDomain getGoDomainByNamespace(String namespace);
+
+    //Ontology
+    Ontology getOntologyById(long id);
+
+    void saveOntology(Ontology ontology);
+
+    void mergeOntology(Ontology ontology);
+
+    void updateOntology(Ontology ontology);
+
+    void deleteOntology(Ontology ontology);
+
+    Ontology getOntologyByGoTermAccession(String goTermAccession);
+
+    void importGeneOntologies(List<GeneOntologyBean> geneOntologyBeans);
 }

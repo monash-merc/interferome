@@ -90,14 +90,6 @@ body {
     text-decoration: none
 }
 
-.logo_section_right {
-    position: static;
-    float: right;
-    margin-right: 5px;
-    margin-top: 60px;
-    padding-right: 15px;
-}
-
 .logo_section_right a {
     float: right;
     width: 60px;
@@ -143,10 +135,11 @@ body {
 .navlist li {
     display: block;
     float: left;
-    width: 16%;
+    width: 13.5%;
     margin: 0 auto;
     padding-bottom: 2px;
     padding-right: 2px;
+    padding-left: 2px;
 }
 
 .navlist li a {
@@ -192,6 +185,10 @@ body {
     background: #F0F0F0;
     text-align: center;
     font-weight: bold;
+}
+
+.current_link {
+    background: #b8d4de !important;
 }
 
 /** === START of Error Setction ==== **/
@@ -328,6 +325,22 @@ body {
     text-align: center;
 }
 
+.input_button_big {
+    background: none repeat scroll 0 0 #eff2f7;
+    border-left: solid 1px #E1E8F0;
+    border-top: solid 1px #E1E8F0;
+    border-right: solid 1px #C2C9D7;
+    border-bottom: solid 1px #C2C9D7;
+    text-decoration: none;
+    color: #3a4c66;
+    width: 90px;
+    height: 20px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    font-weight: normal;
+    text-align: center;
+}
+
 .linkbutton {
     margin: 0 auto;
     display: block;
@@ -356,6 +369,16 @@ body {
     cursor: pointer;
     font-weight: normal;
     text-align: center;
+}
+
+.nojava {
+    font-size: 11px;
+    color: #858585
+}
+
+.IE8 {
+    font-size: 11px;
+    color: #858585
 }
 
 .empty_div {
@@ -436,7 +459,6 @@ body {
     padding-right: 10px;
 }
 
-
 .result_title_div {
     color: #858585;
     border: 1px solid #E9E9E9;
@@ -446,7 +468,7 @@ body {
 }
 
 .line_span {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .button_div {
@@ -581,7 +603,7 @@ body {
 }
 
 .input_field_normal {
-    height: 18px;
+    height: 20px;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #FFFFFF;
     border: 1px solid #E9E9E9;
@@ -591,7 +613,7 @@ body {
 }
 
 .input_select_normal {
-    height: 18px;
+    height: 20px;
     width: 120px;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #FFFFFF;
@@ -1608,6 +1630,14 @@ body {
     margin-left: 160px;
 }
 
+.search_field_value_block {
+    display: block;
+    color: #212121;
+    line-height: 22px;
+    padding-left: 5px;
+    margin-left: 160px;
+}
+
 .search_field_list {
     display: block;
     color: #858585;
@@ -1669,6 +1699,27 @@ body {
     color: #003766;
 }
 
+.chromosome_result_tab {
+    width: 40%;
+    border: solid 1px #E9E9E9;
+    border-collapse: collapse;
+    color: #212121;
+    font-size: 11px;
+}
+
+.chromosome_result_tab td {
+    border-bottom: solid 1px #E9E9E9;
+    border-right: solid 1px #E9E9E9;
+    padding: 4px;
+}
+
+.chromosome_result_header td {
+    background: none repeat scroll 0 0 #F0F0F0;
+    height: 15px;
+    line-height: 15px;
+    color: #003766;
+}
+
 .remove_td {
     width: 50px;
     text-align: center;
@@ -1680,7 +1731,8 @@ body {
     display: inline;
     color: #858585;
 }
-.dose_range_div a{
+
+.dose_range_div a {
     text-decoration: none;
 }
 
@@ -1751,6 +1803,67 @@ body {
     color: #003766;
 }
 
+.expand_collapse {
+    background: none repeat scroll 0 0 #F0F0F0;
+    border: 1px solid #E9E9E9;
+    color: #858585;
+    margin: 5px 10px;
+    text-align: left;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 100px;
+    cursor: pointer;
+}
+
+.search_sub_menue {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 1px solid #E9E9E9;
+}
+
+.search_menu_link {
+    display: inline;
+    float: left;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    padding: 2px;
+}
+
+.search_menu_link a {
+    background: none repeat scroll 0 0 #F0F0F0;
+    color: #3A4C66;
+    margin: 0 auto;
+    padding: 2px 2px;
+    display: block;
+    width: 110px;
+    height: 16px;
+    line-height: 16px;
+    border: 1px solid #E9E9E9;
+    font-size: 12px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.search_menu_link a:hover {
+    color: #ffffff;
+    background: #90BADE;
+    border-color: #90BADE;
+}
+
+.search_result_link a {
+    color: #003766;
+}
+
+.search_result_link a:hover {
+    text-decoration: underline;
+}
+
 .s_ds_link a {
     color: #003766;
 }
@@ -1760,6 +1873,12 @@ body {
 }
 
 .export_div {
+    color: #7d7d7d;
+    float: right;
+    display: block;
+}
+
+.export_pic {
     color: #7d7d7d;
     float: right;
     display: block;
@@ -1809,7 +1928,7 @@ body {
     text-align: justify;
 }
 
-.help_faq{
+.help_faq {
 
 }
 
@@ -1838,7 +1957,7 @@ body {
     padding-right: 10px;
 }
 
-.db_stat_div p{
+.db_stat_div p {
     text-align: justify;
 }
 
@@ -1848,7 +1967,6 @@ body {
     color: #3A4C66;
     font-size: 11px;
 }
-
 
 .contactus_data_title {
     padding-top: 2px;
@@ -1887,6 +2005,7 @@ body {
     /** background-image: url('../images/help_bg.png'); **/
     background-repeat: repeat;
 }
+
 .help_row_div {
     margin-left: 10px;
     margin-right: 10px;
@@ -1896,6 +2015,39 @@ body {
     padding-bottom: 5px;
     padding-left: 10px;
     padding-right: 10px;
+}
+
+.summary {
+    padding: 5px;
+}
+
+.table_title_div {
+    color: #858585;
+    border: 1px solid #E9E9E9;
+    padding: 5px;
+    background: #F0F0F0;
+}
+
+.stat_table {
+    padding: 5px;
+    width: 100%;
+    border: solid 1px #E9E9E9;
+    border-collapse: collapse;
+}
+
+.stat_table th {
+    border-bottom: solid 1px #E9E9E9;
+    border-right: solid 1px #E9E9E9;
+    padding: 4px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.stat_table td {
+    border-bottom: solid 1px #E9E9E9;
+    border-right: solid 1px #E9E9E9;
+    padding: 4px;
+    text-align: left;
 }
 
 /** pagination **/
@@ -1960,6 +2112,40 @@ body {
 /** end of pagination **/
 
 /** footer section **/
+
+.login_section {
+    text-align: center;
+    font-weight: normal;
+    font-size: 10px;
+
+}
+
+.login {
+    display: inline-block;
+    margin: 5px;
+}
+
+.login a {
+    background: none repeat scroll 0 0 #F0F0F0;
+    color: #3A4C66;
+    margin: 0 auto;
+    padding: 2px 2px;
+    display: block;
+    width: 80px;
+    height: 16px;
+    line-height: 16px;
+    border: 1px solid #DDDDDD;
+    font-size: 12px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.login a:hover {
+    color: #ffffff;
+    background: #90BADE;
+    border-color: #90BADE;
+}
+
 .footer {
     margin: 0 auto;
     width: 1024px;
@@ -1975,4 +2161,21 @@ body {
     color: #000000;
     line-height: 22px;
     text-align: center;
+}
+
+#tooltip {
+    position: absolute;
+    border: 1px solid gray;
+    background-color: blue;
+    padding: 3px;
+}
+
+​
+
+div#tissueexp_container {
+    width: 100%;
+    height: 40px;
+    overflow: scroll;
+    background: #90BADE;
+    border-color: #90BADE;
 }

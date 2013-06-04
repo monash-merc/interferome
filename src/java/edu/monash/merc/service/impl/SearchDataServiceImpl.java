@@ -29,14 +29,19 @@
 package edu.monash.merc.service.impl;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.dao.impl.SearchDataDAO;
-import edu.monash.merc.domain.Data;
+import edu.monash.merc.domain.Gene;
+import edu.monash.merc.domain.Probe;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.service.SearchDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * SearchDataService Service Implementation class
@@ -57,8 +62,51 @@ public class SearchDataServiceImpl implements SearchDataService {
     }
 
     @Override
-    public Pagination<Data> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public Pagination<SearchResultRow> search(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         return this.searchDataDao.search(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchProbes(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public Pagination<Gene> searchGenes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchGenes(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public List<Object[]> searchChromosome(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchChromosome(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public List<GeneExpressionRecord> searchTissueExpression(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchTissueExpression(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public List<Gene> searchChromosomeGeneList(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchChromosomeGeneList(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+
+
+    @Override
+    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchTFSite(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+    @Override
+    public List<List<Object[]>> searchOntology(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchOntology(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
+    }
+
+
+    @Override
+    public Object[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+        return this.searchDataDao.searchSubtypes(searchBean, startPageNo, recordPerPage, orderBy, sortBy);
     }
 
 }

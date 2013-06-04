@@ -29,6 +29,7 @@
 package edu.monash.merc.struts2.action;
 
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Dataset;
@@ -59,7 +60,7 @@ public class DatasetAction extends DMBaseAction {
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private Pagination<Data> dataPagination;
+    private Pagination<SearchResultRow> dataPagination;
 
     /**
      * genbank link
@@ -94,12 +95,13 @@ public class DatasetAction extends DMBaseAction {
         pageSizeMap.put(200, 200);
 
         // orderby values
-        orderByMap.put("dataId", "id");
-        orderByMap.put("foldchange", "fold change");
-        orderByMap.put("genesymbol", "gene symbol");
-        orderByMap.put("genbank", "genbank id");
-        orderByMap.put("ensemblid", "ensembl id");
-        orderByMap.put("probeid", "probe id");
+        orderByMap.clear();
+        orderByMap.put("dataId", "Id");
+        orderByMap.put("foldchange", "Fold Change");
+        orderByMap.put("genename", "Gene Symbol");
+        orderByMap.put("genbank", "GenBank");
+        orderByMap.put("ensemblid", "Ensembl Id");
+        orderByMap.put("probeid", "Probe Id");
         // orderby type values
         orderByTypeMap.put("ASC", "asc");
         orderByTypeMap.put("DESC", "desc");
@@ -108,7 +110,7 @@ public class DatasetAction extends DMBaseAction {
     //set the default pagination parameters
     protected void setDefaultPageParams() {
         if (StringUtils.isBlank(orderBy)) {
-            orderBy = "dataId";
+            orderBy = "genename";
         }
         if (StringUtils.isBlank(orderByType)) {
             orderByType = ActionConts.ASC_SORT_TYPE;
@@ -295,11 +297,11 @@ public class DatasetAction extends DMBaseAction {
         this.viewExpActName = viewExpActName;
     }
 
-    public Pagination<Data> getDataPagination() {
+    public Pagination<SearchResultRow> getDataPagination() {
         return dataPagination;
     }
 
-    public void setDataPagination(Pagination<Data> dataPagination) {
+    public void setDataPagination(Pagination<SearchResultRow> dataPagination) {
         this.dataPagination = dataPagination;
     }
 

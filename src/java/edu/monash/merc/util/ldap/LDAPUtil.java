@@ -69,6 +69,8 @@ public class LDAPUtil {
 
     private String baseDn;
 
+    private boolean bindBaseDnRequired;
+
     private String uidAttrName;
 
     private String mailAttrName;
@@ -103,7 +105,9 @@ public class LDAPUtil {
             throw new DCSecurityException("no ldap server url specified");
         }
         if (baseDn != null && !"".equals(baseDn.trim())) {
-            environment.put(Context.SECURITY_PRINCIPAL, baseDn);
+            if (bindBaseDnRequired) {
+                environment.put(Context.SECURITY_PRINCIPAL, baseDn);
+            }
         } else {
             throw new DCSecurityException("no ldap server base dn specified");
         }
@@ -124,6 +128,7 @@ public class LDAPUtil {
         this.protocol = ldapProp.getProtocol();
         this.authentication = ldapProp.getAuthentication();
         this.baseDn = ldapProp.getBaseDN();
+        this.bindBaseDnRequired = ldapProp.isBindBaseDnRequired();
         this.uidAttrName = ldapProp.getAttUID();
         this.mailAttrName = ldapProp.getAttMail();
         this.cnAttrName = ldapProp.getAttCN();
@@ -358,6 +363,14 @@ public class LDAPUtil {
         this.baseDn = baseDn;
     }
 
+    public boolean isBindBaseDnRequired() {
+        return bindBaseDnRequired;
+    }
+
+    public void setBindBaseDnRequired(boolean bindBaseDnRequired) {
+        this.bindBaseDnRequired = bindBaseDnRequired;
+    }
+
     public String getUidAttrName() {
         return uidAttrName;
     }
@@ -467,7 +480,7 @@ public class LDAPUtil {
         String usrdn = ldap.findUserDn("xiyu");
         System.out.println("user dn: " + usrdn);
 
-        LDAPUser luser = ldap.findUserInfo("Virginia.Gutierre@monash.edu");
+        LDAPUser luser = ldap.findUserInfo("Paul Hertzog");
         if (luser != null) {
             System.out.println("title: " + luser.getTitle());
             System.out.println("display name: " + luser.getDisplayName());
@@ -477,7 +490,7 @@ public class LDAPUtil {
             System.out.println("gender : " + luser.getGender());
             System.out.println("mail: " + luser.getMail());
         }
-        LDAPUser usr = ldap.validateLdapUser("mercsaka", "merc27jira");
+        LDAPUser usr = ldap.validateLdapUser("xiyu", "");
         if (usr == null) {
             System.out.println("user is not found");
         } else {

@@ -30,11 +30,11 @@ package edu.monash.merc.struts2.action;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import edu.monash.merc.common.page.Pagination;
+import edu.monash.merc.common.results.SearchResultRow;
+import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.config.AppPropSettings;
-import edu.monash.merc.domain.Data;
-import edu.monash.merc.domain.Dataset;
-import edu.monash.merc.domain.IFNType;
-import edu.monash.merc.domain.Reporter;
+import edu.monash.merc.domain.*;
+import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.RangeCondition;
 import edu.monash.merc.dto.SearchBean;
 import edu.monash.merc.dto.VariationCondtion;
@@ -49,13 +49,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 
 /**
@@ -156,20 +151,39 @@ public class SearchAction extends DMBaseAction {
     /**
      * search result dataset
      */
-    private Pagination<Data> dataPagination;
+    private Pagination<SearchResultRow> dataPagination;
 
     private String viewDsAct;
 
     /**
      * genbank link
      */
-    private String genBankLink;
+    private String geneBankLink;
 
     /**
      * ensembl link
      */
     private String ensemblLink;
 
+    /**
+     * Entrez Id link
+     */
+    private String entrezIdLink;
+
+    /**
+     * Refseq Id link
+     */
+    private String refseqIdLink;
+
+    /**
+     * GO link
+     */
+    private String goLink;
+
+    /**
+     * pic file inputstream
+     */
+    private InputStream imageStream;
 
     // For searching result csv file exporting
     private String contentType;
@@ -196,11 +210,76 @@ public class SearchAction extends DMBaseAction {
     private int maxRecords;
 
     /**
+     * search result gene
+     */
+    private Pagination<Gene> genePagination;
+
+
+    private Pagination<Probe> probePagination;
+
+    /**
+     * TFSite Search Results
+     */
+
+    private HashMap<String, List<TFSite>> tfSiteList;
+
+    /**
+     *
+     */
+
+    private List<List<Object[]>> ontologyList;
+
+    /**
+     *
+     */
+
+    private List<Object[]> chromosomeList;
+
+    /**
+     *
+     */
+
+    private List<Gene> chromosomeGeneList;
+
+    /**
+     *
+     */
+
+    private List<GeneExpressionRecord> humanGeneExpressionList;
+    private List<GeneExpressionRecord> mouseGeneExpressionList;
+
+
+//    private List<TissueExpression> tissueExprList;
+
+    private Object[] subtypeList;
+
+    /**
+     * Search Type: 1. gene,  2. data, 3. geneOntology, 4. chromosome, 5. transcript, 6. subtype
+     */
+    private String searchType;
+
+    protected Map<String, String> dataOrderByMap = new HashMap<String, String>();
+
+    /**
      * Logger
      */
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private static String SEMICOLON = ";";
+    private static final String SEMICOLON = ";";
+
+    private static final String GENE_TYPE = "gene";
+
+    private static final String DATA_TYPE = "data";
+
+    private static final String GO_TYPE = "geneontology";
+
+    private static final String CHROM_TYPE = "chromosome";
+
+    private static final String TRANS_TYPE = "transcript";
+
+    private static final String SUBTYPE_TYPE = "subtype";
+
+    private static final String TISSUE_EXP_TYPE = "tissueexp";
 
     public void setSearchDataService(SearchDataService searchDataService) {
         this.searchDataService = searchDataService;
@@ -226,11 +305,11 @@ public class SearchAction extends DMBaseAction {
         //pre-define the up or down option
         populateUpDown();
 
-        //for pagination
-        initDataPagination();
+        //init pageSizeMap
+        initPageSizeMap();
 
-        //set the default search pagination params
-        setDefaultPageParams();
+        //init OrderByMap
+        initOrderByMap();
 
         try {
             //maximum search records to a csv file
@@ -257,7 +336,10 @@ public class SearchAction extends DMBaseAction {
 
     private void loadResourceLinks() {
         this.ensemblLink = this.appSetting.getPropValue(AppPropSettings.ENSEMBL_SUMMARY_LINK);
-        this.genBankLink = this.appSetting.getPropValue(AppPropSettings.GENBANK_SUMMARY_LINK);
+        this.geneBankLink = this.appSetting.getPropValue(AppPropSettings.GENBANK_SUMMARY_LINK);
+        this.entrezIdLink = this.appSetting.getPropValue(AppPropSettings.ENTREZ_ID_LINK);
+        this.refseqIdLink = this.appSetting.getPropValue(AppPropSettings.REFSEQ_ID_LINK);
+        this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
     }
 
     private void populateINFTypes() {
@@ -340,7 +422,7 @@ public class SearchAction extends DMBaseAction {
         }
     }
 
-
+    @SuppressWarnings("unchecked")
     public String showSearch() {
         try {
             user = getCurrentUser();
@@ -369,7 +451,7 @@ public class SearchAction extends DMBaseAction {
 
 
     @SuppressWarnings("unchecked")
-    public String search() {
+    public String searchData() {
         try {
             //get the logged in user if existed
             user = getCurrentUser();
@@ -384,13 +466,18 @@ public class SearchAction extends DMBaseAction {
                 subTypePostProcess();
                 return ERROR;
             }
+            //set the data pagination parameters
+            setDataPageParams();
             //query the data by pagination
             dataPagination = this.searchDataService.search(searchBean, pageNo, pageSize, orderBy, orderByType);
             //set the searched flag as true
             searched = true;
+            searchType = DATA_TYPE;
+
             //sub type post process
             subTypePostProcess();
             storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
         } catch (Exception ex) {
             logger.error(ex);
             addActionError(getText("data.search.data.failed"));
@@ -398,7 +485,269 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
+    @SuppressWarnings("unchecked")
+    public String searchGenes() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+            //set gene pagination parameters
+            setGenePageParams();
 
+            //query the data by pagination
+            genePagination = this.searchDataService.searchGenes(searchBean, pageNo, pageSize, orderBy, orderByType);
+
+            //set the searched flag as true
+            searched = true;
+            searchType = GENE_TYPE;
+            //sub type post process
+            subTypePostProcess();
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.genes.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+    @SuppressWarnings("unchecked")
+    public String searchOntology() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data by pagination
+            ontologyList = this.searchDataService.searchOntology(searchBean, pageNo, pageSize, orderBy, orderByType);
+
+            //set the searched flag as true
+            searched = true;
+            searchType = GO_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.ontology.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+    @SuppressWarnings("unchecked")
+    public String searchTFSite() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data
+            List<Object[]> results = this.searchDataService.searchTFSite(searchBean, pageNo, pageSize, orderBy, orderByType);
+
+            //Convert results into Hash of object[x][4] with gene as hash and
+            //start, end, core match, matrix match ad
+
+            tfSiteList = new HashMap<String, List<TFSite>>();
+
+            for (Object[] row : results) {
+                String geneName = ((Gene) row[0]).getGeneName();
+                if (tfSiteList.containsKey(geneName)) {
+                    List<TFSite> existingResults = tfSiteList.get(geneName);
+                    existingResults.add((TFSite) row[1]);
+                } else {
+                    List<TFSite> newTFSiteList = new ArrayList<TFSite>();
+                    newTFSiteList.add((TFSite) row[1]);
+                    tfSiteList.put(geneName, newTFSiteList);
+                }
+            }
+
+            // System.out.println("TF Site Size: " + tfSiteList.size());
+
+            //set the searched flag as true
+            searched = true;
+            searchType = TRANS_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.tf.analysis.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    @SuppressWarnings("unchecked")
+    public String searchChromosome() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data by pagination
+            chromosomeList = this.searchDataService.searchChromosome(searchBean, pageNo, pageSize, orderBy, orderByType);
+            chromosomeGeneList = this.searchDataService.searchChromosomeGeneList(searchBean, pageNo, pageSize, orderBy, orderByType);
+
+
+            //set the searched flag as true
+            searched = true;
+            searchType = CHROM_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.chromosome.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+    @SuppressWarnings("unchecked")
+    public String searchTissueExpression() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+            List<GeneExpressionRecord> te = this.searchDataService.searchTissueExpression(searchBean, pageNo, pageSize, orderBy, orderByType);
+            if (searchBean.getSpecies().equalsIgnoreCase("Homo sapiens")) {
+                this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
+            } else if (searchBean.getSpecies().equalsIgnoreCase("Mus musculus")) {
+                this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
+            } else {
+                this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
+                this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
+            }
+            //set the searched flag as true
+            searched = true;
+            searchType = TISSUE_EXP_TYPE;
+            //sub type post process
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            logger.error(ex);
+            addActionError(getText("data.search.tissue.expression.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    /**
+     * GeneExpressionRecords are uniquely identified by their probe and gene.
+     * <p/>
+     * What we need is for each unique gene and probe, a list of the related tissue expressions and tissue names.
+     * <p/>
+     * Therefore, we use a HashMap to combine the tissue expression values and names from all our retrieved rows
+     *
+     * @param species Only use this species name
+     * @return A list of gene expression records with their lists of matching tissues filled out
+     */
+    private ArrayList<GeneExpressionRecord> combineByGeneAndProbe(List<GeneExpressionRecord> te, String species) {
+        ArrayList<GeneExpressionRecord> geneExpressionRecords = new ArrayList<GeneExpressionRecord>();
+        Iterator<GeneExpressionRecord> i = te.iterator();
+        HashMap<GeneExpressionRecord, GeneExpressionRecord> geneAndProbe = new HashMap<GeneExpressionRecord, GeneExpressionRecord>();
+
+        while (i.hasNext()) {
+            GeneExpressionRecord current = i.next();
+            if (!current.getSpeciesName().equalsIgnoreCase(species)) {
+                continue;
+            }
+            if (geneAndProbe.containsKey(current)) {
+                GeneExpressionRecord stored = geneAndProbe.get(current);
+                stored.addTissueExpression(current.getTissueExpression());
+            } else {
+                geneAndProbe.put(current, current);
+            }
+        }
+
+        for (GeneExpressionRecord geneExpressionRecord : geneAndProbe.keySet()) {
+            geneExpressionRecords.add(geneExpressionRecord);
+        }
+
+        return geneExpressionRecords;
+
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public String searchSubtypes() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                return ERROR;
+            }
+
+            //query the data by pagination
+            //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
+            subtypeList = this.searchDataService.searchSubtypes(searchBean, pageNo, pageSize, orderBy, orderByType);
+
+            //set the searched flag as true
+            searched = true;
+            searchType = SUBTYPE_TYPE;
+            //sub type post process
+
+            storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.subtype.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
 
     public String exportCsvFile() {
         try {
@@ -426,10 +775,12 @@ public class SearchAction extends DMBaseAction {
 
             //query the data by pagination
             dataPagination = this.searchDataService.search(searchBean, 1, maxRecords, orderBy, orderByType);
+            System.out.println("dataPagination: " + dataPagination);
             this.csvInputStream = createCSVFile(searchBean, dataPagination);
+
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_searchResults.csv" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_DataSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 
@@ -439,10 +790,303 @@ public class SearchAction extends DMBaseAction {
             subTypePostProcess();
         } catch (Exception ex) {
             logger.error(ex);
-            addActionError(getText("data.search.export.csv.file.failed"));
+            addActionError(getText("data.search.export.data.csv.file.failed"));
             return ERROR;
         }
+        return SUCCESS;
+    }
 
+    public String exportCsvFileGene() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+
+            int maxRecordLimit = Integer.valueOf(appSetting.getPropValue(AppPropSettings.SEARCH_RESULT_TO_CSV_MAX_RECORD));
+
+            if (maxRecords == 0) {
+                maxRecords = maxRecordLimit;
+            }
+            if (maxRecords > maxRecordLimit) {
+                maxRecords = maxRecordLimit;
+            }
+
+            //query the data by pagination
+            genePagination = this.searchDataService.searchGenes(searchBean, 1, maxRecords, orderBy, orderByType);
+            this.csvInputStream = createCSVFileGene(searchBean, genePagination);
+            String csvFileName = MercUtil.genCurrentTimestamp();
+
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_GeneSearchResults.txt" + "\"";
+            this.bufferSize = 20480;
+            this.contentType = "application/octet-stream";
+
+            //set the searched flag as true
+            searched = true;
+            //sub type post process
+            subTypePostProcess();
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.export.gene.csv.file.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    public String exportCsvFileOntology() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+            int maxRecordLimit = Integer.valueOf(appSetting.getPropValue(AppPropSettings.SEARCH_RESULT_TO_CSV_MAX_RECORD));
+
+            if (maxRecords == 0) {
+                maxRecords = maxRecordLimit;
+            }
+            if (maxRecords > maxRecordLimit) {
+                maxRecords = maxRecordLimit;
+            }
+
+            //query the data by pagination
+            ontologyList = this.searchDataService.searchOntology(searchBean, 1, maxRecords, orderBy, orderByType);
+            this.csvInputStream = createCSVFileOntology(searchBean, ontologyList);
+            String csvFileName = MercUtil.genCurrentTimestamp();
+
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_OntologySearchResults.txt" + "\"";
+            this.bufferSize = 20480;
+            this.contentType = "application/octet-stream";
+
+            //set the searched flag as true
+            searched = true;
+            //sub type post process
+            subTypePostProcess();
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.export.ontology.csv.file.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    public String exportCsvFileTFanalysis() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+            int maxRecordLimit = Integer.valueOf(appSetting.getPropValue(AppPropSettings.SEARCH_RESULT_TO_CSV_MAX_RECORD));
+
+            if (maxRecords == 0) {
+                maxRecords = maxRecordLimit;
+            }
+            if (maxRecords > maxRecordLimit) {
+                maxRecords = maxRecordLimit;
+            }
+
+            //query the data by pagination
+            List<Object[]> results = this.searchDataService.searchTFSite(searchBean, 1, maxRecords, orderBy, orderByType);
+            //Convert results into Hash of object[x][4] with gene as hash and
+            //start, end, core match, matrix match ad
+
+            tfSiteList = new HashMap<String, List<TFSite>>();
+
+            for (Object[] row : results) {
+                String geneName = ((Gene) row[0]).getGeneName();
+                if (tfSiteList.containsKey(geneName)) {
+                    List<TFSite> existingResults = tfSiteList.get(geneName);
+                    existingResults.add((TFSite) row[1]);
+                } else {
+                    List<TFSite> newTFSiteList = new ArrayList<TFSite>();
+                    newTFSiteList.add((TFSite) row[1]);
+                    tfSiteList.put(geneName, newTFSiteList);
+                }
+            }
+
+
+            this.csvInputStream = createCSVFileTFanalysis(searchBean, tfSiteList);
+            String FileName = MercUtil.genCurrentTimestamp();
+
+            this.contentDisposition = "attachment;filename=\"" + FileName + "_TFanalysisSearchResults.txt" + "\"";
+            this.bufferSize = 20480;
+            this.contentType = "application/octet-stream";
+
+            //set the searched flag as true
+            searched = true;
+            //sub type post process
+            subTypePostProcess();
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.export.tf.analysis.csv.file.failed"));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    public String exportCsvFileChromosome() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+            int maxRecordLimit = Integer.valueOf(appSetting.getPropValue(AppPropSettings.SEARCH_RESULT_TO_CSV_MAX_RECORD));
+
+            if (maxRecords == 0) {
+                maxRecords = maxRecordLimit;
+            }
+            if (maxRecords > maxRecordLimit) {
+                maxRecords = maxRecordLimit;
+            }
+
+            //query the data by pagination
+            chromosomeList = this.searchDataService.searchChromosome(searchBean, 1, maxRecords, orderBy, orderByType);
+            chromosomeGeneList = this.searchDataService.searchChromosomeGeneList(searchBean, 1, maxRecords, orderBy, orderByType);
+
+            this.csvInputStream = createCSVFileChromosome(searchBean, chromosomeGeneList, chromosomeList);
+            String csvFileName = MercUtil.genCurrentTimestamp();
+
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_ChromosomeSearchResults.txt" + "\"";
+            this.bufferSize = 20480;
+            this.contentType = "application/octet-stream";
+
+            //set the searched flag as true
+            searched = true;
+            //sub type post process
+            subTypePostProcess();
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.export.chromosome.csv.file.failed "));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    public String exportCsvFileSubtypes() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+            int maxRecordLimit = Integer.valueOf(appSetting.getPropValue(AppPropSettings.SEARCH_RESULT_TO_CSV_MAX_RECORD));
+
+            if (maxRecords == 0) {
+                maxRecords = maxRecordLimit;
+            }
+            if (maxRecords > maxRecordLimit) {
+                maxRecords = maxRecordLimit;
+            }
+
+            //query the data by pagination
+            subtypeList = this.searchDataService.searchSubtypes(searchBean, 1, maxRecords, orderBy, orderByType);
+
+            this.csvInputStream = createCSVFileSubtypes(searchBean, subtypeList);
+            String csvFileName = MercUtil.genCurrentTimestamp();
+
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_SubtypesSearchResults.txt" + "\"";
+            this.bufferSize = 20480;
+            this.contentType = "application/octet-stream";
+
+            //set the searched flag as true
+            searched = true;
+            //sub type post process
+            subTypePostProcess();
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.export.subtype.csv.file.failed "));
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    public String exportCsvFileTissueExpression() {
+        try {
+            //get the logged in user if existed
+            user = getCurrentUser();
+            if (user != null) {
+                viewDsAct = ActionConts.VIEW_DATASET_ACTION;
+            } else {
+                viewDsAct = ActionConts.VIEW_PUB_DATASET_ACTION;
+            }
+            //validation failed
+            if (!validConds()) {
+                //sub type post process
+                subTypePostProcess();
+                return ERROR;
+            }
+            int maxRecordLimit = Integer.valueOf(appSetting.getPropValue(AppPropSettings.SEARCH_RESULT_TO_CSV_MAX_RECORD));
+
+            if (maxRecords == 0) {
+                maxRecords = maxRecordLimit;
+            }
+            if (maxRecords > maxRecordLimit) {
+                maxRecords = maxRecordLimit;
+            }
+
+            //query the data by pagination
+            List<GeneExpressionRecord> te = this.searchDataService.searchTissueExpression(searchBean, 1, maxRecords, orderBy, orderByType);
+            this.humanGeneExpressionList = combineByGeneAndProbe(te, "Human");
+            this.mouseGeneExpressionList = combineByGeneAndProbe(te, "Mouse");
+            this.csvInputStream = createCSVFileTissueExpression(searchBean, humanGeneExpressionList, mouseGeneExpressionList);
+            String csvFileName = MercUtil.genCurrentTimestamp();
+
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_TissueExpressionSearchResults.txt" + "\"";
+            this.bufferSize = 20480;
+            this.contentType = "application/octet-stream";
+
+            //set the searched flag as true
+            searched = true;
+            //sub type post process
+            subTypePostProcess();
+        } catch (Exception ex) {
+            logger.error(ex);
+            addActionError(getText("data.search.export.tissue.expression.csv.file.failed "));
+            return ERROR;
+        }
         return SUCCESS;
     }
 
@@ -454,13 +1098,27 @@ public class SearchAction extends DMBaseAction {
                 searchBean = new SearchBean();
             }
         }
+        boolean hasError = false;
+        //check at least one non-default conditon is provided
         boolean defaultSearch = searchBean.isDefaultSearchCondition();
         if (user == null && defaultSearch) {
             addFieldError("onecondreq", getText("data.search.at.least.one.condition.required"));
+            hasError = true;
+        }
+        //check at least one of Gene list. Gene Bank list and Gene Ensembl Id list is provide
+        boolean selectOneOfThree = searchBean.selectOneOfThreeList();
+
+        if (user == null && !selectOneOfThree) {
+            addFieldError("oneofthreecondreq", getText("data.search.at.least.one.of.three.conditions.required"));
+            hasError = true;
+        }
+        //if not meet the above condition, we just return back immediately
+        if (hasError) {
             return false;
         }
 
-        boolean hasError = false;
+        //check individual conditions
+        hasError = false;
         RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
         if (doseRangeCond.isRangeProvided()) {
             double fromDose = doseRangeCond.getFromValue();
@@ -497,31 +1155,20 @@ public class SearchAction extends DMBaseAction {
             }
         }
 
-        String anyFoldRange = searchBean.getAnyRangeFold();
-        boolean upProvided = searchBean.isUpProvided();
-        boolean downProvided = searchBean.isDownProvided();
 
-        if (StringUtils.equals("byrange", anyFoldRange)) {
-            if (!upProvided && !downProvided) {
-                addFieldError("updownValue", getText("data.search.fold.change.range.not.specified"));
-                hasError = true;
-            }
+        double upValue = searchBean.getUpValue();
+        if (upValue < 1) {
+            addFieldError("upValue", getText("data.search.invalid.foldchange.up.value"));
+            hasError = true;
         }
 
-        if (upProvided) {
-            double upValue = searchBean.getUpValue();
-            if (upProvided && upValue < 1) {
-                addFieldError("upValue", getText("data.search.invalid.foldchange.up.value"));
-                hasError = true;
-            }
+
+        double downValue = searchBean.getDownValue();
+        if (downValue < 1) {
+            addFieldError("downValue", getText("data.search.invalid.foldchange.down.value"));
+            hasError = true;
         }
-        if (downProvided) {
-            double downValue = searchBean.getDownValue();
-            if (downProvided && downValue < 1) {
-                addFieldError("downValue", getText("data.search.invalid.foldchange.down.value"));
-                hasError = true;
-            }
-        }
+
         //if validation has an error, just return false
         if (hasError) {
             return false;
@@ -529,7 +1176,7 @@ public class SearchAction extends DMBaseAction {
         return true;
     }
 
-    private InputStream createCSVFile(SearchBean searchBean, Pagination<Data> dPagination) {
+    private InputStream createCSVFile(SearchBean searchBean, Pagination<SearchResultRow> dPagination) {
         CSVWriter csvWriter = null;
         try {
             ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
@@ -676,20 +1323,12 @@ public class SearchAction extends DMBaseAction {
             }
 
             //fold changes
-            boolean upProvided = searchBean.isUpProvided();
-            boolean downProvided = searchBean.isDownProvided();
-            if (!upProvided && !downProvided) {
-                csvWriter.writeNext(new String[]{"Fold Change", "Any"});
-            } else {
-                if (upProvided) {
-                    double upValue = searchBean.getUpValue();
-                    csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
-                }
-                if (downProvided) {
-                    double downValue = searchBean.getDownValue();
-                    csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
-                }
-            }
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
             //gene symbol ids
             String genes = searchBean.getGenes();
             if (StringUtils.isNotBlank(genes)) {
@@ -715,27 +1354,28 @@ public class SearchAction extends DMBaseAction {
             csvWriter.writeNext(new String[]{"Found a total of " + dPagination.getTotalRecords() + " Data"});
             //write empty line
             csvWriter.writeNext(new String[]{""});
-
             //write a search results data column headers
-            csvWriter.writeNext(new String[]{"Dataset ID", "Fold Change", "Inteferome Type", "Treatment Time", "Gene Symbol", "Gene Description", "GenBank Accession", "Ensembl ID", "Probe ID"});
-            List<Data> dataList = dPagination.getPageResults();
-            for (Data data : dataList) {
+            csvWriter.writeNext(new String[]{"Dataset ID", "Fold Change", "Inteferome Type", "Treatment Time", "Gene Name", "Description", "GenBank Accession", "Ensembl ID", "Probe ID"});
+
+            List<SearchResultRow> dataList = dPagination.getPageResults();
+            for (SearchResultRow searchResultRow : dataList) {
                 //get dataset
-                Dataset dataset = data.getDataset();
+                Dataset dataset = searchResultRow.dataset;
                 long datasetId = dataset.getId();
-                double foldChange = data.getValue();
+                double foldChange = searchResultRow.data.getValue();
                 String searchIfnType = dataset.getIfnType().getTypeName();
                 double treatmentTime = dataset.getTreatmentTime();
 
-                //report
-                Reporter reporter = data.getReporter();
-                String geneSymbol = reporter.getGeneSymbol();
-                String geneDesc = reporter.getGeneTitle();
-                String genBankId = reporter.getGenBankAccession();
-                String ensemblId = reporter.getEnsembl();
-                String probeId = reporter.getProbeId();
-                //write the csv into OutputStream
-                csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneSymbol, geneDesc, genBankId, ensemblId, probeId});
+                //get Probe /reporter
+                Probe probe = searchResultRow.probe;
+                String probeId = probe.getProbeId();
+
+                Gene gene = searchResultRow.gene;
+                String geneName = gene.getGeneName();
+                String geneDesc = gene.getDescription();
+                String genBankId = gene.getGenbankId();
+                String ensemblId = gene.getEnsgAccession();
+                csvWriter.writeNext(new String[]{String.valueOf(datasetId), String.valueOf(foldChange), searchIfnType, String.valueOf(treatmentTime), geneName, geneDesc, genBankId, ensemblId, probeId});
             }
             //flush out
             csvWriter.flush();
@@ -755,6 +1395,1346 @@ public class SearchAction extends DMBaseAction {
 
     }
 
+    private InputStream createCSVFileGene(SearchBean searchBean, Pagination<Gene> gPagination) {
+        CSVWriter csvWriter = null;
+        try {
+            ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+            csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
+            //write the conditions
+            csvWriter.writeNext(new String[]{"Search Conditions"});
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+
+            //interferome type
+            String ifnType = searchBean.getIfnType();
+            if (StringUtils.equals("-1", ifnType)) {
+                ifnType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome Type", ifnType});
+
+            //interferome sub-type
+            String subType = searchBean.getIfnSubType();
+            if (StringUtils.equals("-1", subType)) {
+                subType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome SubType", subType});
+
+            //treatment concentration
+            RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
+            if (doseRangeCond.isRangeProvided()) {
+                double fromDose = doseRangeCond.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Concentration From", String.valueOf(fromDose)});
+
+                double toDose = doseRangeCond.getToValue();
+                if (toDose > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Concentration To", String.valueOf(toDose)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Concentration", "Any"});
+            }
+
+            //treatment time
+            RangeCondition ttimeRange = searchBean.getTimeRangeCondition();
+            if (ttimeRange.isRangeProvided()) {
+                double fromTime = ttimeRange.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Time From", String.valueOf(fromTime)});
+                double toTime = ttimeRange.getToValue();
+                if (toTime > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Time To", String.valueOf(toTime)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Time", "Any"});
+            }
+
+            //vivo vitro
+            String vivoVitro = searchBean.getVivoVitro();
+            if (StringUtils.equals(vivoVitro, "-1")) {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", vivoVitro});
+            }
+
+            //sepcies
+            String species = searchBean.getSpecies();
+            if (StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{"Species", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Species", species});
+            }
+
+            //system
+            String system = searchBean.getSystem();
+            if (StringUtils.equals(system, "-1")) {
+                csvWriter.writeNext(new String[]{"System", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"System", system});
+            }
+
+            //organ
+            List<String> organs = searchBean.getOrgans();
+            String organTemp = "";
+            int i = 0;
+            for (String organ : organs) {
+                organTemp += organ;
+                if (!StringUtils.equals(organ, "-1")) {
+                    if (i < organs.size() - 1) {
+                        organTemp += SEMICOLON;
+                    }
+                }
+                i++;
+            }
+            if (StringUtils.equals("-1", organTemp)) {
+                csvWriter.writeNext(new String[]{"Organ", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Organ", organTemp});
+            }
+
+            //cell
+            List<String> cells = searchBean.getCells();
+            String cellTemp = "";
+            int j = 0;
+            for (String cell : cells) {
+                cellTemp += cell;
+                if (!StringUtils.equals(cell, "-1")) {
+                    if (j < cells.size() - 1) {
+                        cellTemp += SEMICOLON;
+                    }
+                }
+                j++;
+            }
+            if (StringUtils.equals("-1", cellTemp)) {
+                csvWriter.writeNext(new String[]{"Cell", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell", cellTemp});
+            }
+
+            //cellLine
+            List<String> cellLines = searchBean.getCellLines();
+            String cellLineTemp = "";
+            int k = 0;
+            for (String cline : cellLines) {
+                cellLineTemp += cline;
+                if (StringUtils.equals(cline, "-1")) {
+                    if (k < cellLines.size() - 1) {
+                        cellLineTemp += SEMICOLON;
+                    }
+                }
+                k++;
+            }
+            if (StringUtils.equals("-1", cellLineTemp)) {
+                csvWriter.writeNext(new String[]{"Cell Line", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell Line", cellLineTemp});
+            }
+
+            //normal or abnormal or any variations
+            VariationCondtion variationCondtion = searchBean.getVariationCondtion();
+            if (!variationCondtion.isVarProvided()) {
+                csvWriter.writeNext(new String[]{"Normal/Abnormal", "Any"});
+            } else {
+                //if it's abnormal, we need to set it as abnormal and a value for abnormal
+                if (variationCondtion.isAbnormal()) {
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Abnormal"});
+                    csvWriter.writeNext(new String[]{"Abnormal", variationCondtion.getVarValue()});
+                } else { //just set it as normal
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Normal"});
+                }
+            }
+
+            //fold changes
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
+            //gene symbol ids
+            String genes = searchBean.getGenes();
+            if (StringUtils.isNotBlank(genes)) {
+                String newDelimGenes = MercUtil.replaceAllDelimsByNewDelim(genes, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Gene Symbol List", newDelimGenes});
+            }
+            //gen bank ids
+            String genBanks = searchBean.getGenBanks();
+            if (StringUtils.isNotBlank(genBanks)) {
+                String newDelimGenBanks = MercUtil.replaceAllDelimsByNewDelim(genBanks, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"GenBank Accession List", newDelimGenBanks});
+            }
+
+            //ensembl ids
+            String ensembls = searchBean.getEnsembls();
+            if (StringUtils.isNotBlank(ensembls)) {
+                String newDelimEnsembls = MercUtil.replaceAllDelimsByNewDelim(ensembls, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
+            }
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+            //wrtie total records
+            csvWriter.writeNext(new String[]{"Found a total of " + gPagination.getTotalRecords() + " Gene(s)"});
+            //write empty line
+            csvWriter.writeNext(new String[]{""});
+            //write a search results data column headers
+            csvWriter.writeNext(new String[]{"Ensembl Id", "Gene Name", "Description", "Entrez", "Genbank", "UniGene"});
+            List<Gene> geneList = gPagination.getPageResults();
+            for (Gene gene : geneList) {
+                //get geneTable
+                String geneName = gene.getGeneName();
+                String description = gene.getDescription();
+                String genbankId = gene.getGenbankId();
+                String ensgAccession = gene.getEnsgAccession();
+                String unigene = gene.getUnigene();
+                String entrezId = gene.getEntrezId();
+                //write the csv into OutputStream
+                csvWriter.writeNext(new String[]{ensgAccession, geneName, description, entrezId, genbankId, unigene});
+            }
+            //flush out
+            csvWriter.flush();
+            this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
+            return this.csvInputStream;
+        } catch (Exception ex) {
+            throw new DCException(ex);
+        } finally {
+            if (csvWriter != null) {
+                try {
+                    csvWriter.close();
+                } catch (Exception cex) {
+                    //ignore whatever
+                }
+            }
+        }
+
+    }
+
+    private InputStream createCSVFileOntology(SearchBean searchBean, List<List<Object[]>> ontologyList) {
+        CSVWriter csvWriter = null;
+        try {
+            ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+            csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
+            //write the conditions
+            csvWriter.writeNext(new String[]{"Search Conditions"});
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+
+            //interferome type
+            String ifnType = searchBean.getIfnType();
+            if (StringUtils.equals("-1", ifnType)) {
+                ifnType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome Type", ifnType});
+
+            //interferome sub-type
+            String subType = searchBean.getIfnSubType();
+            if (StringUtils.equals("-1", subType)) {
+                subType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome SubType", subType});
+
+            //treatment concentration
+            RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
+            if (doseRangeCond.isRangeProvided()) {
+                double fromDose = doseRangeCond.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Concentration From", String.valueOf(fromDose)});
+
+                double toDose = doseRangeCond.getToValue();
+                if (toDose > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Concentration To", String.valueOf(toDose)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Concentration", "Any"});
+            }
+
+            //treatment time
+            RangeCondition ttimeRange = searchBean.getTimeRangeCondition();
+            if (ttimeRange.isRangeProvided()) {
+                double fromTime = ttimeRange.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Time From", String.valueOf(fromTime)});
+                double toTime = ttimeRange.getToValue();
+                if (toTime > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Time To", String.valueOf(toTime)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Time", "Any"});
+            }
+
+            //vivo vitro
+            String vivoVitro = searchBean.getVivoVitro();
+            if (StringUtils.equals(vivoVitro, "-1")) {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", vivoVitro});
+            }
+
+            //sepcies
+            String species = searchBean.getSpecies();
+            if (StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{"Species", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Species", species});
+            }
+
+            //system
+            String system = searchBean.getSystem();
+            if (StringUtils.equals(system, "-1")) {
+                csvWriter.writeNext(new String[]{"System", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"System", system});
+            }
+
+            //organ
+            List<String> organs = searchBean.getOrgans();
+            String organTemp = "";
+            int i = 0;
+            for (String organ : organs) {
+                organTemp += organ;
+                if (!StringUtils.equals(organ, "-1")) {
+                    if (i < organs.size() - 1) {
+                        organTemp += SEMICOLON;
+                    }
+                }
+                i++;
+            }
+            if (StringUtils.equals("-1", organTemp)) {
+                csvWriter.writeNext(new String[]{"Organ", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Organ", organTemp});
+            }
+
+            //cell
+            List<String> cells = searchBean.getCells();
+            String cellTemp = "";
+            int j = 0;
+            for (String cell : cells) {
+                cellTemp += cell;
+                if (!StringUtils.equals(cell, "-1")) {
+                    if (j < cells.size() - 1) {
+                        cellTemp += SEMICOLON;
+                    }
+                }
+                j++;
+            }
+            if (StringUtils.equals("-1", cellTemp)) {
+                csvWriter.writeNext(new String[]{"Cell", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell", cellTemp});
+            }
+
+            //cellLine
+            List<String> cellLines = searchBean.getCellLines();
+            String cellLineTemp = "";
+            int k = 0;
+            for (String cline : cellLines) {
+                cellLineTemp += cline;
+                if (StringUtils.equals(cline, "-1")) {
+                    if (k < cellLines.size() - 1) {
+                        cellLineTemp += SEMICOLON;
+                    }
+                }
+                k++;
+            }
+            if (StringUtils.equals("-1", cellLineTemp)) {
+                csvWriter.writeNext(new String[]{"Cell Line", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell Line", cellLineTemp});
+            }
+
+            //normal or abnormal or any variations
+            VariationCondtion variationCondtion = searchBean.getVariationCondtion();
+            if (!variationCondtion.isVarProvided()) {
+                csvWriter.writeNext(new String[]{"Normal/Abnormal", "Any"});
+            } else {
+                //if it's abnormal, we need to set it as abnormal and a value for abnormal
+                if (variationCondtion.isAbnormal()) {
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Abnormal"});
+                    csvWriter.writeNext(new String[]{"Abnormal", variationCondtion.getVarValue()});
+                } else { //just set it as normal
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Normal"});
+                }
+            }
+
+            //fold changes
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
+            //gene symbol ids
+            String genes = searchBean.getGenes();
+            if (StringUtils.isNotBlank(genes)) {
+                String newDelimGenes = MercUtil.replaceAllDelimsByNewDelim(genes, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Gene Symbol List", newDelimGenes});
+            }
+            //gen bank ids
+            String genBanks = searchBean.getGenBanks();
+            if (StringUtils.isNotBlank(genBanks)) {
+                String newDelimGenBanks = MercUtil.replaceAllDelimsByNewDelim(genBanks, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"GenBank Accession List", newDelimGenBanks});
+            }
+
+            //ensembl ids
+            String ensembls = searchBean.getEnsembls();
+            if (StringUtils.isNotBlank(ensembls)) {
+                String newDelimEnsembls = MercUtil.replaceAllDelimsByNewDelim(ensembls, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
+            }
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+            //create Go Functions (Cellular component, Molecular Function, Biological process)
+            String[] goFunctions = new String[]{"Cellular component", "Molecular Function", "Biological process"};
+            int it = 0;
+            List<List<Object[]>> ontologyResult = ontologyList;
+            for (List<Object[]> list1 : ontologyResult) {
+                //write Go Functions (Cellular component, Molecular Function, Biological process)
+                csvWriter.writeNext(new String[]{"Search GO " + goFunctions[it]});
+                //write a search results data column headers
+                csvWriter.writeNext(new String[]{"Accession", "Link", "Term Name", "Term Definition", "Gene Count", "p Value"});
+                for (Object[] objarray : list1) {
+                    Ontology ont1 = (Ontology) objarray[0];
+                    //get String
+                    String TermAccession = ont1.getGoTermAccession();
+                    String TermName = ont1.getGoTermName();
+                    String newDelimTermName = MercUtil.replaceAllDelimsByNewDelim(TermName, SEMICOLON, new String[]{",", "\t", "\n"});
+                    String TermDefinition = ont1.getGoTermDefinition();
+                    String newDelimTermDefinition = MercUtil.replaceAllDelimsByNewDelim(TermDefinition, SEMICOLON, new String[]{",", "\t", "\n"});
+                    //get result
+                    long gCount = (Long) objarray[1];
+                    double pvalue = (Double) objarray[2];
+                    this.goLink = this.appSetting.getPropValue(AppPropSettings.GO_LINK);
+                    //write total records
+                    csvWriter.writeNext(new String[]{TermAccession, goLink + TermAccession, newDelimTermName, newDelimTermDefinition, String.valueOf(gCount), String.valueOf(pvalue)});
+                }
+                //write empty line
+                csvWriter.writeNext(new String[]{""});
+                it++;
+            }
+            //flush out
+            csvWriter.flush();
+            this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
+            return this.csvInputStream;
+        } catch (Exception ex) {
+            throw new DCException(ex);
+        } finally {
+            if (csvWriter != null) {
+                try {
+                    csvWriter.close();
+                } catch (Exception cex) {
+                    //ignore whatever
+                }
+            }
+        }
+
+    }
+
+    private InputStream createCSVFileTFanalysis(SearchBean searchBean, HashMap<String, List<TFSite>> tfSiteList) {
+        CSVWriter csvWriter = null;
+        try {
+            ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+            csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
+            //write the conditions
+            csvWriter.writeNext(new String[]{"Search Conditions"});
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+
+            //interferome type
+            String ifnType = searchBean.getIfnType();
+            if (StringUtils.equals("-1", ifnType)) {
+                ifnType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome Type", ifnType});
+
+            //interferome sub-type
+            String subType = searchBean.getIfnSubType();
+            if (StringUtils.equals("-1", subType)) {
+                subType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome SubType", subType});
+
+            //treatment concentration
+            RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
+            if (doseRangeCond.isRangeProvided()) {
+                double fromDose = doseRangeCond.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Concentration From", String.valueOf(fromDose)});
+
+                double toDose = doseRangeCond.getToValue();
+                if (toDose > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Concentration To", String.valueOf(toDose)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Concentration", "Any"});
+            }
+
+            //treatment time
+            RangeCondition ttimeRange = searchBean.getTimeRangeCondition();
+            if (ttimeRange.isRangeProvided()) {
+                double fromTime = ttimeRange.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Time From", String.valueOf(fromTime)});
+                double toTime = ttimeRange.getToValue();
+                if (toTime > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Time To", String.valueOf(toTime)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Time", "Any"});
+            }
+
+            //vivo vitro
+            String vivoVitro = searchBean.getVivoVitro();
+            if (StringUtils.equals(vivoVitro, "-1")) {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", vivoVitro});
+            }
+
+            //sepcies
+            String species = searchBean.getSpecies();
+            if (StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{"Species", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Species", species});
+            }
+
+            //system
+            String system = searchBean.getSystem();
+            if (StringUtils.equals(system, "-1")) {
+                csvWriter.writeNext(new String[]{"System", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"System", system});
+            }
+
+            //organ
+            List<String> organs = searchBean.getOrgans();
+            String organTemp = "";
+            int i = 0;
+            for (String organ : organs) {
+                organTemp += organ;
+                if (!StringUtils.equals(organ, "-1")) {
+                    if (i < organs.size() - 1) {
+                        organTemp += SEMICOLON;
+                    }
+                }
+                i++;
+            }
+            if (StringUtils.equals("-1", organTemp)) {
+                csvWriter.writeNext(new String[]{"Organ", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Organ", organTemp});
+            }
+
+            //cell
+            List<String> cells = searchBean.getCells();
+            String cellTemp = "";
+            int j = 0;
+            for (String cell : cells) {
+                cellTemp += cell;
+                if (!StringUtils.equals(cell, "-1")) {
+                    if (j < cells.size() - 1) {
+                        cellTemp += SEMICOLON;
+                    }
+                }
+                j++;
+            }
+            if (StringUtils.equals("-1", cellTemp)) {
+                csvWriter.writeNext(new String[]{"Cell", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell", cellTemp});
+            }
+
+            //cellLine
+            List<String> cellLines = searchBean.getCellLines();
+            String cellLineTemp = "";
+            int k = 0;
+            for (String cline : cellLines) {
+                cellLineTemp += cline;
+                if (StringUtils.equals(cline, "-1")) {
+                    if (k < cellLines.size() - 1) {
+                        cellLineTemp += SEMICOLON;
+                    }
+                }
+                k++;
+            }
+            if (StringUtils.equals("-1", cellLineTemp)) {
+                csvWriter.writeNext(new String[]{"Cell Line", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell Line", cellLineTemp});
+            }
+
+            //normal or abnormal or any variations
+            VariationCondtion variationCondtion = searchBean.getVariationCondtion();
+            if (!variationCondtion.isVarProvided()) {
+                csvWriter.writeNext(new String[]{"Normal/Abnormal", "Any"});
+            } else {
+                //if it's abnormal, we need to set it as abnormal and a value for abnormal
+                if (variationCondtion.isAbnormal()) {
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Abnormal"});
+                    csvWriter.writeNext(new String[]{"Abnormal", variationCondtion.getVarValue()});
+                } else { //just set it as normal
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Normal"});
+                }
+            }
+
+            //fold changes
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
+            //gene symbol ids
+            String genes = searchBean.getGenes();
+            if (StringUtils.isNotBlank(genes)) {
+                String newDelimGenes = MercUtil.replaceAllDelimsByNewDelim(genes, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Gene Name List", newDelimGenes});
+            }
+            //gen bank ids
+            String genBanks = searchBean.getGenBanks();
+            if (StringUtils.isNotBlank(genBanks)) {
+                String newDelimGenBanks = MercUtil.replaceAllDelimsByNewDelim(genBanks, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"GenBank Accession List", newDelimGenBanks});
+            }
+
+            //ensembl ids
+            String ensembls = searchBean.getEnsembls();
+            if (StringUtils.isNotBlank(ensembls)) {
+                String newDelimEnsembls = MercUtil.replaceAllDelimsByNewDelim(ensembls, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
+            }
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+
+            csvWriter.writeNext(new String[]{"GeneName", "Site", "Core Match", "Matrix Match"});
+            Iterator<Map.Entry<String, List<TFSite>>> it = tfSiteList.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, List<TFSite>> mapEntry = it.next();
+                String tfgene = mapEntry.getKey();
+                csvWriter.writeNext(new String[]{tfgene});
+                List<TFSite> tfSites1 = mapEntry.getValue();
+                for (TFSite tfSite2 : tfSites1) {
+                    String site = tfSite2.getFactor();
+                    double coreMatch = tfSite2.getCoreMatch();
+                    double matrixMatch = tfSite2.getMatrixMatch();
+                    csvWriter.writeNext(new String[]{"", site, String.valueOf(coreMatch), String.valueOf(matrixMatch)});
+                }
+            }
+            //flush out
+            csvWriter.flush();
+            this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
+            return this.csvInputStream;
+        } catch (Exception ex) {
+            throw new DCException(ex);
+        } finally {
+            if (csvWriter != null) {
+                try {
+                    csvWriter.close();
+                } catch (Exception cex) {
+                    //ignore whatever
+                }
+            }
+        }
+
+    }
+
+    private InputStream createCSVFileChromosome(SearchBean searchBean, List<Gene> chromosomeGeneList, List<Object[]> chromosomeList) {
+        CSVWriter csvWriter = null;
+        try {
+            ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+            csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
+            //write the conditions
+            csvWriter.writeNext(new String[]{"Search Conditions"});
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+
+            //interferome type
+            String ifnType = searchBean.getIfnType();
+            if (StringUtils.equals("-1", ifnType)) {
+                ifnType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome Type", ifnType});
+
+            //interferome sub-type
+            String subType = searchBean.getIfnSubType();
+            if (StringUtils.equals("-1", subType)) {
+                subType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome SubType", subType});
+
+            //treatment concentration
+            RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
+            if (doseRangeCond.isRangeProvided()) {
+                double fromDose = doseRangeCond.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Concentration From", String.valueOf(fromDose)});
+
+                double toDose = doseRangeCond.getToValue();
+                if (toDose > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Concentration To", String.valueOf(toDose)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Concentration", "Any"});
+            }
+
+            //treatment time
+            RangeCondition ttimeRange = searchBean.getTimeRangeCondition();
+            if (ttimeRange.isRangeProvided()) {
+                double fromTime = ttimeRange.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Time From", String.valueOf(fromTime)});
+                double toTime = ttimeRange.getToValue();
+                if (toTime > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Time To", String.valueOf(toTime)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Time", "Any"});
+            }
+
+            //vivo vitro
+            String vivoVitro = searchBean.getVivoVitro();
+            if (StringUtils.equals(vivoVitro, "-1")) {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", vivoVitro});
+            }
+
+            //sepcies
+            String species = searchBean.getSpecies();
+            if (StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{"Species", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Species", species});
+            }
+
+            //system
+            String system = searchBean.getSystem();
+            if (StringUtils.equals(system, "-1")) {
+                csvWriter.writeNext(new String[]{"System", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"System", system});
+            }
+
+            //organ
+            List<String> organs = searchBean.getOrgans();
+            String organTemp = "";
+            int i = 0;
+            for (String organ : organs) {
+                organTemp += organ;
+                if (!StringUtils.equals(organ, "-1")) {
+                    if (i < organs.size() - 1) {
+                        organTemp += SEMICOLON;
+                    }
+                }
+                i++;
+            }
+            if (StringUtils.equals("-1", organTemp)) {
+                csvWriter.writeNext(new String[]{"Organ", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Organ", organTemp});
+            }
+
+            //cell
+            List<String> cells = searchBean.getCells();
+            String cellTemp = "";
+            int j = 0;
+            for (String cell : cells) {
+                cellTemp += cell;
+                if (!StringUtils.equals(cell, "-1")) {
+                    if (j < cells.size() - 1) {
+                        cellTemp += SEMICOLON;
+                    }
+                }
+                j++;
+            }
+            if (StringUtils.equals("-1", cellTemp)) {
+                csvWriter.writeNext(new String[]{"Cell", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell", cellTemp});
+            }
+
+            //cellLine
+            List<String> cellLines = searchBean.getCellLines();
+            String cellLineTemp = "";
+            int k = 0;
+            for (String cline : cellLines) {
+                cellLineTemp += cline;
+                if (StringUtils.equals(cline, "-1")) {
+                    if (k < cellLines.size() - 1) {
+                        cellLineTemp += SEMICOLON;
+                    }
+                }
+                k++;
+            }
+            if (StringUtils.equals("-1", cellLineTemp)) {
+                csvWriter.writeNext(new String[]{"Cell Line", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell Line", cellLineTemp});
+            }
+
+            //normal or abnormal or any variations
+            VariationCondtion variationCondtion = searchBean.getVariationCondtion();
+            if (!variationCondtion.isVarProvided()) {
+                csvWriter.writeNext(new String[]{"Normal/Abnormal", "Any"});
+            } else {
+                //if it's abnormal, we need to set it as abnormal and a value for abnormal
+                if (variationCondtion.isAbnormal()) {
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Abnormal"});
+                    csvWriter.writeNext(new String[]{"Abnormal", variationCondtion.getVarValue()});
+                } else { //just set it as normal
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Normal"});
+                }
+            }
+
+            //fold changes
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
+            //gene symbol ids
+            String genes = searchBean.getGenes();
+            if (StringUtils.isNotBlank(genes)) {
+                String newDelimGenes = MercUtil.replaceAllDelimsByNewDelim(genes, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Gene Symbol List", newDelimGenes});
+            }
+            //gen bank ids
+            String genBanks = searchBean.getGenBanks();
+            if (StringUtils.isNotBlank(genBanks)) {
+                String newDelimGenBanks = MercUtil.replaceAllDelimsByNewDelim(genBanks, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"GenBank Accession List", newDelimGenBanks});
+            }
+
+            //ensembl ids
+            String ensembls = searchBean.getEnsembls();
+            if (StringUtils.isNotBlank(ensembls)) {
+                String newDelimEnsembls = MercUtil.replaceAllDelimsByNewDelim(ensembls, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
+            }
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+            if (StringUtils.equals(species, "-1")|| StringUtils.contains(species, "Homo sapiens")) {
+                csvWriter.writeNext(new String[]{"Human Chromosomal Location"});
+                csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
+                //write data result
+                List<String> finishedHGenes = new ArrayList<String>();
+                for (Gene chr : chromosomeGeneList) {
+                    String ensembl = chr.getEnsgAccession();
+                    if (!finishedHGenes.contains(ensembl)) {
+                        if (StringUtils.startsWith(ensembl, "ENSG")) {
+                            //This is humman
+                            String GeneName = chr.getGeneName();
+                            String Chromosome = chr.getChromosome();
+                            long StartPosition = chr.getStartPosition();
+                            long EndPosition = chr.getEndPosition();
+                            csvWriter.writeNext(new String[]{GeneName, Chromosome, String.valueOf(StartPosition), String.valueOf(EndPosition), ensembl});
+                        }
+                        finishedHGenes.add(ensembl);
+                    }
+                }
+
+            }
+            csvWriter.writeNext(new String[]{""});
+                if (StringUtils.equals(species, "-1")|| StringUtils.contains(species, "Mus musculus")) {
+                    csvWriter.writeNext(new String[]{"Mouse Chromosomal Location"});
+                    csvWriter.writeNext(new String[]{"GeneName", "Chromosome", "Start Position", "End Position", "Ensembl Id"});
+                    List<String> finishedMGenes = new ArrayList<String>();
+                    for (Gene chr : chromosomeGeneList) {
+                        String ensemblM = chr.getEnsgAccession();
+                        if (!finishedMGenes.contains(ensemblM)) {
+                            if (StringUtils.startsWith(ensemblM, "ENSMUSG")) {
+                                //This is mouse
+                                String GeneName = chr.getGeneName();
+                                String Chromosome = chr.getChromosome();
+                                long StartPosition = chr.getStartPosition();
+                                long EndPosition = chr.getEndPosition();
+                                csvWriter.writeNext(new String[]{GeneName, Chromosome, String.valueOf(StartPosition), String.valueOf(EndPosition), ensemblM});
+                            }
+                            finishedMGenes.add(ensemblM);
+                        }
+                    }
+                }
+
+
+            //flush out
+            csvWriter.flush();
+            this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
+            return this.csvInputStream;
+        } catch (Exception ex) {
+            throw new DCException(ex);
+        } finally {
+            if (csvWriter != null) {
+                try {
+                    csvWriter.close();
+                } catch (Exception cex) {
+                    //ignore whatever
+                }
+            }
+        }
+
+    }
+
+    private InputStream createCSVFileSubtypes(SearchBean searchBean, Object[] subtypeList) {
+        CSVWriter csvWriter = null;
+        try {
+            ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+            csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
+            //write the conditions
+            csvWriter.writeNext(new String[]{"Search Conditions"});
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+
+            //interferome type
+            String ifnType = searchBean.getIfnType();
+            if (StringUtils.equals("-1", ifnType)) {
+                ifnType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome Type", ifnType});
+
+            //interferome sub-type
+            String subType = searchBean.getIfnSubType();
+            if (StringUtils.equals("-1", subType)) {
+                subType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome SubType", subType});
+
+            //treatment concentration
+            RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
+            if (doseRangeCond.isRangeProvided()) {
+                double fromDose = doseRangeCond.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Concentration From", String.valueOf(fromDose)});
+
+                double toDose = doseRangeCond.getToValue();
+                if (toDose > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Concentration To", String.valueOf(toDose)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Concentration", "Any"});
+            }
+
+            //treatment time
+            RangeCondition ttimeRange = searchBean.getTimeRangeCondition();
+            if (ttimeRange.isRangeProvided()) {
+                double fromTime = ttimeRange.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Time From", String.valueOf(fromTime)});
+                double toTime = ttimeRange.getToValue();
+                if (toTime > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Time To", String.valueOf(toTime)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Time", "Any"});
+            }
+
+            //vivo vitro
+            String vivoVitro = searchBean.getVivoVitro();
+            if (StringUtils.equals(vivoVitro, "-1")) {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", vivoVitro});
+            }
+
+            //sepcies
+            String species = searchBean.getSpecies();
+            if (StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{"Species", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Species", species});
+            }
+
+            //system
+            String system = searchBean.getSystem();
+            if (StringUtils.equals(system, "-1")) {
+                csvWriter.writeNext(new String[]{"System", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"System", system});
+            }
+
+            //organ
+            List<String> organs = searchBean.getOrgans();
+            String organTemp = "";
+            int i = 0;
+            for (String organ : organs) {
+                organTemp += organ;
+                if (!StringUtils.equals(organ, "-1")) {
+                    if (i < organs.size() - 1) {
+                        organTemp += SEMICOLON;
+                    }
+                }
+                i++;
+            }
+            if (StringUtils.equals("-1", organTemp)) {
+                csvWriter.writeNext(new String[]{"Organ", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Organ", organTemp});
+            }
+
+            //cell
+            List<String> cells = searchBean.getCells();
+            String cellTemp = "";
+            int j = 0;
+            for (String cell : cells) {
+                cellTemp += cell;
+                if (!StringUtils.equals(cell, "-1")) {
+                    if (j < cells.size() - 1) {
+                        cellTemp += SEMICOLON;
+                    }
+                }
+                j++;
+            }
+            if (StringUtils.equals("-1", cellTemp)) {
+                csvWriter.writeNext(new String[]{"Cell", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell", cellTemp});
+            }
+
+            //cellLine
+            List<String> cellLines = searchBean.getCellLines();
+            String cellLineTemp = "";
+            int k = 0;
+            for (String cline : cellLines) {
+                cellLineTemp += cline;
+                if (StringUtils.equals(cline, "-1")) {
+                    if (k < cellLines.size() - 1) {
+                        cellLineTemp += SEMICOLON;
+                    }
+                }
+                k++;
+            }
+            if (StringUtils.equals("-1", cellLineTemp)) {
+                csvWriter.writeNext(new String[]{"Cell Line", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell Line", cellLineTemp});
+            }
+
+            //normal or abnormal or any variations
+            VariationCondtion variationCondtion = searchBean.getVariationCondtion();
+            if (!variationCondtion.isVarProvided()) {
+                csvWriter.writeNext(new String[]{"Normal/Abnormal", "Any"});
+            } else {
+                //if it's abnormal, we need to set it as abnormal and a value for abnormal
+                if (variationCondtion.isAbnormal()) {
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Abnormal"});
+                    csvWriter.writeNext(new String[]{"Abnormal", variationCondtion.getVarValue()});
+                } else { //just set it as normal
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Normal"});
+                }
+            }
+
+            //fold changes
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
+            //gene symbol ids
+            String genes = searchBean.getGenes();
+            if (StringUtils.isNotBlank(genes)) {
+                String newDelimGenes = MercUtil.replaceAllDelimsByNewDelim(genes, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Gene Symbol List", newDelimGenes});
+            }
+            //gen bank ids
+            String genBanks = searchBean.getGenBanks();
+            if (StringUtils.isNotBlank(genBanks)) {
+                String newDelimGenBanks = MercUtil.replaceAllDelimsByNewDelim(genBanks, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"GenBank Accession List", newDelimGenBanks});
+            }
+
+            //ensembl ids
+            String ensembls = searchBean.getEnsembls();
+            if (StringUtils.isNotBlank(ensembls)) {
+                String newDelimEnsembls = MercUtil.replaceAllDelimsByNewDelim(ensembls, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
+            }
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+            //write table of Subtypes
+            int type1 = ((Integer) subtypeList[0]).intValue();
+            int type2 = ((Integer) subtypeList[1]).intValue();
+            int type3 = ((Integer) subtypeList[2]).intValue();
+            int type12 = ((Integer) subtypeList[3]).intValue();
+            int type13 = ((Integer) subtypeList[4]).intValue();
+            int type23 = ((Integer) subtypeList[5]).intValue();
+            int type123 = ((Integer) subtypeList[6]).intValue();
+
+            //write a search results data subtypes table
+            csvWriter.writeNext(new String[]{"Type I ", String.valueOf(type1)});
+            csvWriter.writeNext(new String[]{"Type II ", String.valueOf(type2)});
+            csvWriter.writeNext(new String[]{"Type III ", String.valueOf(type3)});
+            csvWriter.writeNext(new String[]{"Type I+II ", String.valueOf(type12)});
+            csvWriter.writeNext(new String[]{"Type I+III ", String.valueOf(type13)});
+            csvWriter.writeNext(new String[]{"Type II+III ", String.valueOf(type23)});
+            csvWriter.writeNext(new String[]{"Type I+II+III ", String.valueOf(type123)});
+            //flush out
+            csvWriter.flush();
+            this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
+            return this.csvInputStream;
+        } catch (Exception ex) {
+            throw new DCException(ex);
+        } finally {
+            if (csvWriter != null) {
+                try {
+                    csvWriter.close();
+                } catch (Exception cex) {
+                    //ignore whatever
+                }
+            }
+        }
+
+    }
+
+    private InputStream createCSVFileTissueExpression(SearchBean searchBean, List<GeneExpressionRecord> humanGeneExpressionList, List<GeneExpressionRecord> mouseGeneExpressionList) {
+        CSVWriter csvWriter = null;
+        try {
+            ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+            csvWriter = new CSVWriter(new OutputStreamWriter(csvOutputStream), '\t', CSVWriter.NO_QUOTE_CHARACTER);
+            //write the conditions
+            csvWriter.writeNext(new String[]{"Search Conditions"});
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+
+            //interferome type
+            String ifnType = searchBean.getIfnType();
+            if (StringUtils.equals("-1", ifnType)) {
+                ifnType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome Type", ifnType});
+
+            //interferome sub-type
+            String subType = searchBean.getIfnSubType();
+            if (StringUtils.equals("-1", subType)) {
+                subType = "Any";
+            }
+            csvWriter.writeNext(new String[]{"Interferome SubType", subType});
+
+            //treatment concentration
+            RangeCondition doseRangeCond = searchBean.getDoseRangeCondition();
+            if (doseRangeCond.isRangeProvided()) {
+                double fromDose = doseRangeCond.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Concentration From", String.valueOf(fromDose)});
+
+                double toDose = doseRangeCond.getToValue();
+                if (toDose > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Concentration To", String.valueOf(toDose)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Concentration", "Any"});
+            }
+
+            //treatment time
+            RangeCondition ttimeRange = searchBean.getTimeRangeCondition();
+            if (ttimeRange.isRangeProvided()) {
+                double fromTime = ttimeRange.getFromValue();
+                csvWriter.writeNext(new String[]{"Treatment Time From", String.valueOf(fromTime)});
+                double toTime = ttimeRange.getToValue();
+                if (toTime > 0) {
+                    csvWriter.writeNext(new String[]{"Treatment Time To", String.valueOf(toTime)});
+                }
+            } else {
+                csvWriter.writeNext(new String[]{"Treatment Time", "Any"});
+            }
+
+            //vivo vitro
+            String vivoVitro = searchBean.getVivoVitro();
+            if (StringUtils.equals(vivoVitro, "-1")) {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Vivo/Vitro", vivoVitro});
+            }
+
+            //sepcies
+            String species = searchBean.getSpecies();
+            if (StringUtils.equals(species, "-1")) {
+                csvWriter.writeNext(new String[]{"Species", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Species", species});
+            }
+
+            //system
+            String system = searchBean.getSystem();
+            if (StringUtils.equals(system, "-1")) {
+                csvWriter.writeNext(new String[]{"System", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"System", system});
+            }
+
+            //organ
+            List<String> organs = searchBean.getOrgans();
+            String organTemp = "";
+            int i = 0;
+            for (String organ : organs) {
+                organTemp += organ;
+                if (!StringUtils.equals(organ, "-1")) {
+                    if (i < organs.size() - 1) {
+                        organTemp += SEMICOLON;
+                    }
+                }
+                i++;
+            }
+            if (StringUtils.equals("-1", organTemp)) {
+                csvWriter.writeNext(new String[]{"Organ", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Organ", organTemp});
+            }
+
+            //cell
+            List<String> cells = searchBean.getCells();
+            String cellTemp = "";
+            int j = 0;
+            for (String cell : cells) {
+                cellTemp += cell;
+                if (!StringUtils.equals(cell, "-1")) {
+                    if (j < cells.size() - 1) {
+                        cellTemp += SEMICOLON;
+                    }
+                }
+                j++;
+            }
+            if (StringUtils.equals("-1", cellTemp)) {
+                csvWriter.writeNext(new String[]{"Cell", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell", cellTemp});
+            }
+
+            //cellLine
+            List<String> cellLines = searchBean.getCellLines();
+            String cellLineTemp = "";
+            int k = 0;
+            for (String cline : cellLines) {
+                cellLineTemp += cline;
+                if (StringUtils.equals(cline, "-1")) {
+                    if (k < cellLines.size() - 1) {
+                        cellLineTemp += SEMICOLON;
+                    }
+                }
+                k++;
+            }
+            if (StringUtils.equals("-1", cellLineTemp)) {
+                csvWriter.writeNext(new String[]{"Cell Line", "Any"});
+            } else {
+                csvWriter.writeNext(new String[]{"Cell Line", cellLineTemp});
+            }
+
+            //normal or abnormal or any variations
+            VariationCondtion variationCondtion = searchBean.getVariationCondtion();
+            if (!variationCondtion.isVarProvided()) {
+                csvWriter.writeNext(new String[]{"Normal/Abnormal", "Any"});
+            } else {
+                //if it's abnormal, we need to set it as abnormal and a value for abnormal
+                if (variationCondtion.isAbnormal()) {
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Abnormal"});
+                    csvWriter.writeNext(new String[]{"Abnormal", variationCondtion.getVarValue()});
+                } else { //just set it as normal
+                    csvWriter.writeNext(new String[]{"Normal/Abnormal", "Normal"});
+                }
+            }
+
+            //fold changes
+            double upValue = searchBean.getUpValue();
+            csvWriter.writeNext(new String[]{"Fold Change Up", String.valueOf(upValue)});
+
+            double downValue = searchBean.getDownValue();
+            csvWriter.writeNext(new String[]{"Fold Change Down", String.valueOf(downValue)});
+
+            //gene symbol ids
+            String genes = searchBean.getGenes();
+            if (StringUtils.isNotBlank(genes)) {
+                String newDelimGenes = MercUtil.replaceAllDelimsByNewDelim(genes, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Gene Symbol List", newDelimGenes});
+            }
+            //gen bank ids
+            String genBanks = searchBean.getGenBanks();
+            if (StringUtils.isNotBlank(genBanks)) {
+                String newDelimGenBanks = MercUtil.replaceAllDelimsByNewDelim(genBanks, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"GenBank Accession List", newDelimGenBanks});
+            }
+
+            //ensembl ids
+            String ensembls = searchBean.getEnsembls();
+            if (StringUtils.isNotBlank(ensembls)) {
+                String newDelimEnsembls = MercUtil.replaceAllDelimsByNewDelim(ensembls, SEMICOLON, new String[]{",", "\t", "\n"});
+                csvWriter.writeNext(new String[]{"Ensembl Id List", newDelimEnsembls});
+            }
+            //write new empty line
+            csvWriter.writeNext(new String[]{""});
+            if (StringUtils.equals(species, "-1") || StringUtils.contains(species, "Homo sapiens")) {
+                csvWriter.writeNext(new String[]{"Human Expression in Unstimulated Tissues"});
+                if (!humanGeneExpressionList.isEmpty()) {
+                    //write data result
+                    List<String> hmheads = new ArrayList<String>();
+                    hmheads.add("Gene Name");
+                    hmheads.add("Probe Id");
+                    //will be a head of csv file
+                    List<TissueExpression> hmHeades = humanGeneExpressionList.get(0).getTissueExpressionList();
+
+                    for (TissueExpression hmheadesList : hmHeades) {
+                        Tissue hmtissue = hmheadesList.getTissue();
+                        String hmtissueVal = hmtissue.getTissueId();
+                        hmheads.add(hmtissueVal);
+                    }
+                    csvWriter.writeNext(hmheads.toArray(new String[hmheads.size()]));
+                    //for individual row in csv file
+                    for (GeneExpressionRecord hgerecord : humanGeneExpressionList) {
+                        List<String> hrowvalues = new ArrayList<String>();
+                        // add the first two columns - probe and gene id
+                        hrowvalues.add(hgerecord.getGeneName());
+                        hrowvalues.add(hgerecord.getProbe().getProbeId());
+                        // add the list of expressions
+                        List<TissueExpression> htissueExpressions = hgerecord.getTissueExpressionList();
+                        for (TissueExpression htissueExpression : htissueExpressions) {
+                            double hmexpression = htissueExpression.getExpression();
+                            hrowvalues.add(String.valueOf(hmexpression));
+                        }
+                        csvWriter.writeNext(hrowvalues.toArray(new String[hrowvalues.size()]));
+                    }
+                }
+
+            }
+            csvWriter.writeNext(new String[]{""});
+                if (StringUtils.equals(species, "-1") ||StringUtils.contains(species, "Mus musculus")) {
+                    csvWriter.writeNext(new String[]{"Mouse Expression in Unstimulated Tissues"});
+                    //write data result
+                    List<String> mmheads = new ArrayList<String>();
+                    mmheads.add("Gene Name");
+                    mmheads.add("Probe Id");
+                    //will be a head of csv file
+                    List<TissueExpression> mmHeades = mouseGeneExpressionList.get(0).getTissueExpressionList();
+
+                    for (TissueExpression headesList : mmHeades) {
+                        Tissue tissue = headesList.getTissue();
+                        String tissueVal = tissue.getTissueId();
+                        mmheads.add(tissueVal);
+                    }
+                    csvWriter.writeNext(mmheads.toArray(new String[mmheads.size()]));
+                    //for individual row in csv file
+                    for (GeneExpressionRecord mgerecord : mouseGeneExpressionList) {
+                        List<String> mrowvalues = new ArrayList<String>();
+                        // add the first two columns - probe and gene id
+                        mrowvalues.add(mgerecord.getGeneName());
+                        mrowvalues.add(mgerecord.getProbe().getProbeId());
+                        // add the list of expressions
+                        List<TissueExpression> mtissueExpressions = mgerecord.getTissueExpressionList();
+                        for (TissueExpression mtissueExpression : mtissueExpressions) {
+                            double expression = mtissueExpression.getExpression();
+                            mrowvalues.add(String.valueOf(expression));
+                        }
+                        csvWriter.writeNext(mrowvalues.toArray(new String[mrowvalues.size()]));
+                    }
+                }
+
+            //flush out
+            csvWriter.flush();
+            this.csvInputStream = new ByteArrayInputStream(csvOutputStream.toByteArray());
+            return this.csvInputStream;
+        } catch (Exception ex) {
+            throw new DCException(ex);
+        } finally {
+            if (csvWriter != null) {
+                try {
+                    csvWriter.close();
+                } catch (Exception cex) {
+                    //ignore whatever
+                    cex.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+
     private void subTypePostProcess() {
         //Load the interferon subtypes based on the type selected
         //and if the type is not all value -1, then loaded the subtype again
@@ -768,8 +2748,7 @@ public class SearchAction extends DMBaseAction {
         }
     }
 
-    //initialize the pagination parameters
-    protected void initDataPagination() {
+    protected void initPageSizeMap() {
         // page size per page values
         pageSizeMap.put(20, 20);
         pageSizeMap.put(30, 30);
@@ -777,31 +2756,66 @@ public class SearchAction extends DMBaseAction {
         pageSizeMap.put(100, 100);
         pageSizeMap.put(150, 150);
         pageSizeMap.put(200, 200);
+    }
 
-        // orderby values
-        orderByMap.put("dataset", "dataset");
-        orderByMap.put("foldchange", "fold change");
-        orderByMap.put("ifntype", "interferon type");
-        orderByMap.put("ttime", "treatment time");
-        orderByMap.put("genesymbol", "gene symbol");
-        orderByMap.put("genbank", "genbank id");
-        orderByMap.put("ensemblid", "ensembl id");
-        orderByMap.put("probeid", "probe id");
-
+    protected void initOrderByMap() {
         // orderby type values
         orderByTypeMap.put("ASC", "asc");
         orderByTypeMap.put("DESC", "desc");
     }
 
+    //initialize the pagination parameters
+    protected void initDataPagination() {
+        // orderby values
+        orderByMap.clear();
+        orderByMap.put("dataset", "Dataset");
+        orderByMap.put("foldchange", "Fold Change");
+        orderByMap.put("ifntype", "Interferon Type");
+        orderByMap.put("ttime", "Treatment Time");
+        orderByMap.put("geneName", "Gene Symbol");
+        orderByMap.put("genbank", "GenBank");
+        orderByMap.put("ensemblid", "Ensembl Id");
+        orderByMap.put("probeid", "Probe Id");
+    }
+
+    //initialize the pagination parameters
+    protected void initGenePagination() {
+        // orderby values
+        orderByMap.clear();
+        orderByMap.put("geneName", "Gene Symbol");
+        orderByMap.put("ensgAccession", "Ensembl Id");
+    }
+
+
     //set the default pagination parameters
-    protected void setDefaultPageParams() {
-        pageLink = "search/search.jspx";
+    protected void setDataPageParams() {
+        initDataPagination();
+        pageLink = "search/searchData.jspx";
         pageSuffix = ActionConts.PAGINATION_SUFFUX;
         if (StringUtils.isBlank(orderBy)) {
-            orderBy = "dataset";
+            orderBy = "geneName";
         }
         if (StringUtils.isBlank(orderByType)) {
-            orderByType = ActionConts.DESC_SORT_TYPE;
+            orderByType = ActionConts.ASC_SORT_TYPE;
+        }
+        if (pageNo == 0) {
+            pageNo = 1;
+        }
+        if (pageSize == 0) {
+            pageSize = 30;
+        }
+    }
+
+    //set the default pagination parameters
+    protected void setGenePageParams() {
+        initGenePagination();
+        pageLink = "search/searchGene.jspx";
+        pageSuffix = ActionConts.PAGINATION_SUFFUX;
+        if (StringUtils.isBlank(orderBy)) {
+            orderBy = "geneName";
+        }
+        if (StringUtils.isBlank(orderByType)) {
+            orderByType = ActionConts.ASC_SORT_TYPE;
         }
         if (pageNo == 0) {
             pageNo = 1;
@@ -943,11 +2957,11 @@ public class SearchAction extends DMBaseAction {
         this.searched = searched;
     }
 
-    public Pagination<Data> getDataPagination() {
+    public Pagination<SearchResultRow> getDataPagination() {
         return dataPagination;
     }
 
-    public void setDataPagination(Pagination<Data> dataPagination) {
+    public void setDataPagination(Pagination<SearchResultRow> dataPagination) {
         this.dataPagination = dataPagination;
     }
 
@@ -967,12 +2981,12 @@ public class SearchAction extends DMBaseAction {
         this.conditionLoaded = conditionLoaded;
     }
 
-    public String getGenBankLink() {
-        return genBankLink;
+    public String getGeneBankLink() {
+        return geneBankLink;
     }
 
-    public void setGenBankLink(String genBankLink) {
-        this.genBankLink = genBankLink;
+    public void setGeneBankLink(String geneBankLink) {
+        this.geneBankLink = geneBankLink;
     }
 
     public String getEnsemblLink() {
@@ -981,6 +2995,30 @@ public class SearchAction extends DMBaseAction {
 
     public void setEnsemblLink(String ensemblLink) {
         this.ensemblLink = ensemblLink;
+    }
+
+    public String getEntrezIdLink() {
+        return entrezIdLink;
+    }
+
+    public void setEntrezIdLink(String entrezIdLink) {
+        this.entrezIdLink = entrezIdLink;
+    }
+
+    public String getRefseqIdLink() {
+        return refseqIdLink;
+    }
+
+    public void setRefseqIdLink(String refseqIdLink) {
+        this.refseqIdLink = refseqIdLink;
+    }
+
+    public String getGoLink() {
+        return goLink;
+    }
+
+    public void setGoLink(String goLink) {
+        this.goLink = goLink;
     }
 
     public String getContentType() {
@@ -997,6 +3035,14 @@ public class SearchAction extends DMBaseAction {
 
     public void setCsvInputStream(InputStream csvInputStream) {
         this.csvInputStream = csvInputStream;
+    }
+
+    public InputStream getImageStream() {
+        return imageStream;
+    }
+
+    public void setImageStream(InputStream imageStream) {
+        this.imageStream = imageStream;
     }
 
     public String getContentDisposition() {
@@ -1021,5 +3067,93 @@ public class SearchAction extends DMBaseAction {
 
     public void setMaxRecords(int maxRecords) {
         this.maxRecords = maxRecords;
+    }
+
+    public String getSearchType() {
+        return searchType;
+    }
+
+    public void setSearchType(String searchType) {
+        this.searchType = searchType;
+    }
+
+    public Map<String, String> getDataOrderByMap() {
+        return dataOrderByMap;
+    }
+
+    public void setDataOrderByMap(Map<String, String> dataOrderByMap) {
+        this.dataOrderByMap = dataOrderByMap;
+    }
+
+    public Pagination<Probe> getProbePagination() {
+        return probePagination;
+    }
+
+    public void setProbePagination(Pagination<Probe> probePagination) {
+        this.probePagination = probePagination;
+    }
+
+    public Pagination<Gene> getGenePagination() {
+        return genePagination;
+    }
+
+    public void setGenePagination(Pagination<Gene> genePagination) {
+        this.genePagination = genePagination;
+    }
+
+    public List<List<Object[]>> getOntologyList() {
+        return ontologyList;
+    }
+
+    public void setOntologyList(List<List<Object[]>> ontologyList) {
+        this.ontologyList = ontologyList;
+    }
+
+    public HashMap<String, List<TFSite>> getTfSiteList() {
+        return tfSiteList;
+    }
+
+    public void setTfSiteList(HashMap<String, List<TFSite>> tfSiteList) {
+        this.tfSiteList = tfSiteList;
+    }
+
+    public List<Object[]> getChromosomeList() {
+        return chromosomeList;
+    }
+
+    public void setChromosomeList(List<Object[]> chromosomeList) {
+        this.chromosomeList = chromosomeList;
+    }
+
+    public List<Gene> getChromosomeGeneList() {
+        return chromosomeGeneList;
+    }
+
+    public void setChromosomeGeneList(List<Gene> chromosomeGeneList) {
+        this.chromosomeGeneList = chromosomeGeneList;
+    }
+
+    public Object[] getSubtypeList() {
+        return subtypeList;
+    }
+
+    public void setSubtypeList(Object[] subtypeList) {
+        this.subtypeList = subtypeList;
+    }
+
+    public List<GeneExpressionRecord> getHumanGeneExpressionList() {
+        return humanGeneExpressionList;
+    }
+
+    public List<GeneExpressionRecord> getMouseGeneExpressionList() {
+        return mouseGeneExpressionList;
+    }
+
+    public void setHumanGeneExpressionList(List<GeneExpressionRecord> tissueExpressioList) {
+        this.humanGeneExpressionList = tissueExpressioList;
+    }
+
+    public void setMouseGeneExpressionList(List<GeneExpressionRecord> tissueExpressioList) {
+        this.mouseGeneExpressionList = tissueExpressioList;
     }
 }

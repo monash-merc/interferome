@@ -3,7 +3,7 @@
         "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
         "http://struts.apache.org/dtds/struts-2.1.7.dtd">
 <struts>
-    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.devMode" value="false"/>
     <constant name="struts.configuration.xml.reload" value="false"/>
     <constant name="struts.custom.i18n.resources" value="messageResource"/>
     <constant name="struts.i18n.encoding" value="UTF-8"/>
@@ -439,17 +439,59 @@
         </action>
 
         <!-- show the reporter page -->
-        <action name="showImportRep" class="data.importRepAction" method="showImportRep">
+        <!-- action name="showImportRep" class="data.importRepAction" method="showImportRep">
             <result name="input">/web/data/import_reporter.ftl</result>
             <result name="error">/web/data/import_reporter.ftl</result>
             <result name="success">/web/data/import_reporter.ftl</result>
-        </action>
+        </action-->
 
         <!-- reporter importing -->
-        <action name="importRep" class="data.importRepAction" method="importRep">
+        <!--action name="importRep" class="data.importRepAction" method="importRep">
             <result name="input">/web/data/import_reporter.ftl</result>
             <result name="error">/web/data/import_reporter.ftl</result>
             <result name="success">/web/data/import_reporter_finished.ftl</result>
+        </action-->
+
+        <!-- show the probe page -->
+        <action name="showImportProbes" class="data.importProbeAction" method="showImportProbes">
+            <result name="input">/web/data/import_probes.ftl</result>
+            <result name="error">/web/data/import_probes.ftl</result>
+            <result name="success">/web/data/import_probes.ftl</result>
+        </action>
+
+        <!-- probes importing -->
+        <action name="importProbes" class="data.importProbeAction" method="importProbes">
+            <result name="input">/web/data/import_probes.ftl</result>
+            <result name="error">/web/data/import_probes.ftl</result>
+            <result name="success">/web/data/import_probes_finished.ftl</result>
+        </action>
+
+        <!-- show the TF Site page -->
+        <action name="showImportTFSite" class="data.importTFSiteAction" method="showImportTFSite">
+            <result name="input">/web/data/import_tfsite.ftl</result>
+            <result name="error">/web/data/import_tfsite.ftl</result>
+            <result name="success">/web/data/import_tfsite.ftl</result>
+        </action>
+
+        <!-- tf site importing -->
+        <action name="importTFSite" class="data.importTFSiteAction" method="importTFSite">
+            <result name="input">/web/data/import_tfSite.ftl</result>
+            <result name="error">/web/data/import_tfSite.ftl</result>
+            <result name="success">/web/data/import_tfSite_finished.ftl</result>
+        </action>
+
+        <!-- show the tissue page -->
+        <action name="showImportTissue" class="data.importTissueAction" method="showImportTissue">
+            <result name="input">/web/data/import_tissue.ftl</result>
+            <result name="error">/web/data/import_tissue.ftl</result>
+            <result name="success">/web/data/import_tissue.ftl</result>
+        </action>
+
+        <!-- tissues importing -->
+        <action name="importTissue" class="data.importTissueAction" method="importTissue">
+            <result name="input">/web/data/import_tissue.ftl</result>
+            <result name="error">/web/data/import_tissue.ftl</result>
+            <result name="success">/web/data/import_tissue_finished.ftl</result>
         </action>
 
         <!-- capture the dataset, ajax version for dataset import -->
@@ -584,11 +626,49 @@
             <result name="success">/web/search/search.ftl</result>
         </action>
 
-        <action name="search" class="search.searchAction" method="search">
+        <action name="searchData" class="search.searchAction" method="searchData">
             <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
             <result name="success">/web/search/search.ftl</result>
         </action>
+
+        <action name="searchGene" class="search.searchAction" method="searchGenes">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchChromosome" class="search.searchAction" method="searchChromosome">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchOntology" class="search.searchAction" method="searchOntology">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchTFSite" class="search.searchAction" method="searchTFSite">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchSubtype" class="search.searchAction" method="searchSubtypes">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+        <action name="searchTissueExpression" class="search.searchAction" method="searchTissueExpression">
+            <result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+            <result name="success">/web/search/search.ftl</result>
+        </action>
+
+
 
         <!-- AJAX call to retrieve the subtypes based on which type is selected -->
         <action name="findSubType" class="search.searchAction" method="findSubType">
@@ -609,6 +689,72 @@
 				<param name="bufferSize">${bufferSize}</param>
 			</result>
 		</action>
+        <!-- export the geneSummary -->
+		<action name="exportCsvFileGene" class="search.searchAction" method="exportCsvFileGene">
+			<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+				<param name="inputName">csvInputStream</param>
+				<param name="contentDisposition">${contentDisposition}</param>
+				<param name="bufferSize">${bufferSize}</param>
+			</result>
+        </action>
+        <!-- export the OntologyResult -->
+    	<action name="exportCsvFileOntology" class="search.searchAction" method="exportCsvFileOntology">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
+        <!-- export the TF Anaylsis  -->
+    	<action name="exportCsvFileTFanalysis" class="search.searchAction" method="exportCsvFileTFanalysis">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
+        <!-- export the Chromosome -->
+    	<action name="exportCsvFileChromosome" class="search.searchAction" method="exportCsvFileChromosome">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
+        <!-- export the Subtypes -->
+    	<action name="exportCsvFileSubtypes" class="search.searchAction" method="exportCsvFileSubtypes">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
+        <!-- export the TissueExpression -->
+    	<action name="exportCsvFileTissueExpression" class="search.searchAction" method="exportCsvFileTissueExpression">
+    		<result name="input">/web/search/search.ftl</result>
+            <result name="error">/web/search/search.ftl</result>
+    		<result name="success" type="stream">
+    			<param name="contentType">${contentType}</param>
+    			<param name="inputName">csvInputStream</param>
+    			<param name="contentDisposition">${contentDisposition}</param>
+    			<param name="bufferSize">${bufferSize}</param>
+    		</result>
+    	</action>
     </package>
 
     <!-- Search -->
@@ -647,6 +793,19 @@
             <result name="input">/web/site/contact_us.ftl</result>
             <result name="error">/web/common/action_error.ftl</result>
             <result name="success">/web/site/contact_us.ftl</result>
+        </action>
+
+        <!-- show data submit us -->
+        <action name="showSubmitData" class="site.submitDataAction" method="showSubmitData">
+            <result name="error">/web/common/action_error.ftl</result>
+            <result name="success">/web/site/submit_data.ftl</result>
+        </action>
+
+        <!-- data submit us -->
+        <action name="submitData" class="site.submitDataAction" method="submitData">
+            <result name="input">/web/site/submit_data.ftl</result>
+            <result name="error">/web/common/action_error.ftl</result>
+            <result name="success">/web/site/submit_data.ftl</result>
         </action>
 
     </package>
