@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE struts PUBLIC
-        "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
-        "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
 <struts>
     <constant name="struts.devMode" value="false"/>
     <constant name="struts.configuration.xml.reload" value="false"/>
@@ -12,8 +12,7 @@
     <constant name="struts.serve.static.browserCache" value="false"/>
     <constant name="struts.ui.theme" value="simple"/>
     <constant name="struts.enable.SlashesInActionNames" value="true"/>
-    <bean type="org.apache.struts2.dispatcher.multipart.MultiPartRequest" name="merc"
-          class="edu.monash.merc.struts2.multipart.MonitoredMultiPartRequest" scope="default"/>
+    <bean type="org.apache.struts2.dispatcher.multipart.MultiPartRequest" name="merc" class="edu.monash.merc.struts2.multipart.MonitoredMultiPartRequest" scope="default"/>
     <constant name="struts.multipart.handler" value="merc"/>
     <constant name="struts.multipart.maxSize" value="2048000000"/>
 
@@ -669,7 +668,6 @@
         </action>
 
 
-
         <!-- AJAX call to retrieve the subtypes based on which type is selected -->
         <action name="findSubType" class="search.searchAction" method="findSubType">
             <result name="success" type="json">
@@ -679,82 +677,82 @@
         </action>
 
         <!-- export the dataset -->
-		<action name="exportCsvFile" class="search.searchAction" method="exportCsvFile">
-			<result name="input">/web/search/search.ftl</result>
+        <action name="exportCsvFile" class="search.searchAction" method="exportCsvFile">
+            <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
-			<result name="success" type="stream">
-				<param name="contentType">${contentType}</param>
-				<param name="inputName">csvInputStream</param>
-				<param name="contentDisposition">${contentDisposition}</param>
-				<param name="bufferSize">${bufferSize}</param>
-			</result>
-		</action>
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">csvInputStream</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+                <param name="bufferSize">${bufferSize}</param>
+            </result>
+        </action>
         <!-- export the geneSummary -->
-		<action name="exportCsvFileGene" class="search.searchAction" method="exportCsvFileGene">
-			<result name="input">/web/search/search.ftl</result>
+        <action name="exportCsvFileGene" class="search.searchAction" method="exportCsvFileGene">
+            <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
-			<result name="success" type="stream">
-				<param name="contentType">${contentType}</param>
-				<param name="inputName">csvInputStream</param>
-				<param name="contentDisposition">${contentDisposition}</param>
-				<param name="bufferSize">${bufferSize}</param>
-			</result>
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">csvInputStream</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+                <param name="bufferSize">${bufferSize}</param>
+            </result>
         </action>
         <!-- export the OntologyResult -->
-    	<action name="exportCsvFileOntology" class="search.searchAction" method="exportCsvFileOntology">
-    		<result name="input">/web/search/search.ftl</result>
+        <action name="exportCsvFileOntology" class="search.searchAction" method="exportCsvFileOntology">
+            <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
-    		<result name="success" type="stream">
-    			<param name="contentType">${contentType}</param>
-    			<param name="inputName">csvInputStream</param>
-    			<param name="contentDisposition">${contentDisposition}</param>
-    			<param name="bufferSize">${bufferSize}</param>
-    		</result>
-    	</action>
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">csvInputStream</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+                <param name="bufferSize">${bufferSize}</param>
+            </result>
+        </action>
         <!-- export the TF Anaylsis  -->
-    	<action name="exportCsvFileTFanalysis" class="search.searchAction" method="exportCsvFileTFanalysis">
-    		<result name="input">/web/search/search.ftl</result>
+        <action name="exportCsvFileTFanalysis" class="search.searchAction" method="exportCsvFileTFanalysis">
+            <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
-    		<result name="success" type="stream">
-    			<param name="contentType">${contentType}</param>
-    			<param name="inputName">csvInputStream</param>
-    			<param name="contentDisposition">${contentDisposition}</param>
-    			<param name="bufferSize">${bufferSize}</param>
-    		</result>
-    	</action>
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">csvInputStream</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+                <param name="bufferSize">${bufferSize}</param>
+            </result>
+        </action>
         <!-- export the Chromosome -->
-    	<action name="exportCsvFileChromosome" class="search.searchAction" method="exportCsvFileChromosome">
-    		<result name="input">/web/search/search.ftl</result>
+        <action name="exportCsvFileChromosome" class="search.searchAction" method="exportCsvFileChromosome">
+            <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
-    		<result name="success" type="stream">
-    			<param name="contentType">${contentType}</param>
-    			<param name="inputName">csvInputStream</param>
-    			<param name="contentDisposition">${contentDisposition}</param>
-    			<param name="bufferSize">${bufferSize}</param>
-    		</result>
-    	</action>
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">csvInputStream</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+                <param name="bufferSize">${bufferSize}</param>
+            </result>
+        </action>
         <!-- export the Subtypes -->
-    	<action name="exportCsvFileSubtypes" class="search.searchAction" method="exportCsvFileSubtypes">
-    		<result name="input">/web/search/search.ftl</result>
+        <action name="exportCsvFileSubtypes" class="search.searchAction" method="exportCsvFileSubtypes">
+            <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
-    		<result name="success" type="stream">
-    			<param name="contentType">${contentType}</param>
-    			<param name="inputName">csvInputStream</param>
-    			<param name="contentDisposition">${contentDisposition}</param>
-    			<param name="bufferSize">${bufferSize}</param>
-    		</result>
-    	</action>
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">csvInputStream</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+                <param name="bufferSize">${bufferSize}</param>
+            </result>
+        </action>
         <!-- export the TissueExpression -->
-    	<action name="exportCsvFileTissueExpression" class="search.searchAction" method="exportCsvFileTissueExpression">
-    		<result name="input">/web/search/search.ftl</result>
+        <action name="exportCsvFileTissueExpression" class="search.searchAction" method="exportCsvFileTissueExpression">
+            <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
-    		<result name="success" type="stream">
-    			<param name="contentType">${contentType}</param>
-    			<param name="inputName">csvInputStream</param>
-    			<param name="contentDisposition">${contentDisposition}</param>
-    			<param name="bufferSize">${bufferSize}</param>
-    		</result>
-    	</action>
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">csvInputStream</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+                <param name="bufferSize">${bufferSize}</param>
+            </result>
+        </action>
     </package>
 
     <!-- Search -->
