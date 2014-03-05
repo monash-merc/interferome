@@ -31,7 +31,6 @@ package edu.monash.merc.struts2.action;
 import au.com.bytecode.opencsv.CSVWriter;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.results.SearchResultRow;
-import edu.monash.merc.common.sql.OrderBy;
 import edu.monash.merc.config.AppPropSettings;
 import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.GeneExpressionRecord;
@@ -49,7 +48,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.util.*;
 
 
@@ -2000,7 +2002,7 @@ public class SearchAction extends DMBaseAction {
             //write new empty line
             csvWriter.writeNext(new String[]{""});
 
-            csvWriter.writeNext(new String[]{"GeneName", "Site", "Core Match", "Matrix Match"});
+            csvWriter.writeNext(new String[]{"GeneName", "Site", "Core Match", "Matrix Match", "Start Site", "End Site"});
             Iterator<Map.Entry<String, List<TFSite>>> it = tfSiteList.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, List<TFSite>> mapEntry = it.next();
@@ -2011,7 +2013,9 @@ public class SearchAction extends DMBaseAction {
                     String site = tfSite2.getFactor();
                     double coreMatch = tfSite2.getCoreMatch();
                     double matrixMatch = tfSite2.getMatrixMatch();
-                    csvWriter.writeNext(new String[]{"", site, String.valueOf(coreMatch), String.valueOf(matrixMatch)});
+                    int startSite = tfSite2.getStart();
+                    int endSite = tfSite2.getEnd();
+                    csvWriter.writeNext(new String[]{"", site, String.valueOf(coreMatch), String.valueOf(matrixMatch), String.valueOf(startSite),String.valueOf(endSite)});
                 }
             }
             //flush out
