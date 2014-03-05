@@ -568,7 +568,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             String goCellularTotalHQL = "SELECT o, COUNT(DISTINCT g) FROM  GeneOntology go INNER JOIN go.ontology o INNER JOIN go.gene g GROUP BY o";
             Query goCellularTotalQuery = this.session().createQuery(goCellularTotalHQL);
             List<Object[]> cellResult = goCellularTotalQuery.list();
-
             Iterator<Object[]> totCountItr = cellResult.iterator();
             while (totCountItr.hasNext()) {
                 Object[] ontCountRes = totCountItr.next();
@@ -578,8 +577,6 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             //Search Cellular
             //************************
             //Get the matching genes for each ontology (k)
-
-            //TODO: to fix the exception: java.lang.NumberFormatException: For input string: "?"
             String goCellularHQL = "SELECT o, COUNT(DISTINCT g) FROM GeneOntology go INNER JOIN go.ontology o INNER JOIN o.goDomain gd INNER JOIN go.gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) AND gd.namespace = 'cellular_component' GROUP BY o.id ORDER BY COUNT(DISTINCT g) DESC";
             Query goCellularQuery = this.session().createQuery(goCellularHQL);
             goCellularQuery.setParameterList(("probes"), probes);
@@ -632,12 +629,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         Iterator<Object[]> goItr = goList.iterator();
         while (goItr.hasNext()) {
             Object[] goVal = goItr.next();
-            BigDecimal m = new BigDecimal( goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession()));
+            //System.out.println(((Ontology) (goVal[0])).getGoTermAccession());
+            Long m = goCategoryCounts.get(((Ontology) (goVal[0])).getGoTermAccession());
             Double pvalue = null;
             if (m != null) {
-                Long gvTemp= (Long) goVal[1];
-                BigDecimal gv1 = new BigDecimal(gvTemp);
-                pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, gv1);
+                pvalue = calculateGOEnrichPValue(totalPopulation, geneSearched, m, (Long) goVal[1]);
             } else {
                 pvalue = (double) 1;
             }
@@ -647,44 +643,39 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         return returnVal;
     }
 
-    private Double calculateGOEnrichPValue(long N, long n, BigDecimal m, BigDecimal k) {
 
-        BigDecimal bdN = new BigDecimal(N);
-        BigDecimal bdn = new BigDecimal(n);
-        BigDecimal NsubM = bdN.subtract(m);
-        BigDecimal nsubk = bdn.subtract(k);
+    private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
 
-        BigDecimal mk  = binomialCoefficient(m,k);
-        BigDecimal Nn = binomialCoefficient(bdN,bdn);
-        BigDecimal NMsk = binomialCoefficient(NsubM,nsubk);
-        BigDecimal mkMultNMsk=NMsk.multiply(mk);
-        BigDecimal pval = mkMultNMsk.divide(Nn, 5, RoundingMode.CEILING);
-        Double pvalue = pval.doubleValue();
+        BigDecimal mk = binomialCoefficient(m,k);
+        BigDecimal Nmnk = binomialCoefficient((N-m),(n-k));
+        BigDecimal Nn = binomialCoefficient(N,n);
+        BigDecimal mkXNmnk = mk.multiply(Nmnk);
+        BigDecimal pval = mkXNmnk.divide(Nn, 15, RoundingMode.HALF_UP);
+        Double pvalue =  pval.doubleValue();
         DecimalFormat df = new DecimalFormat("#.##E0");
         return (Double.valueOf(df.format(pvalue)));
     }
 
-    private BigDecimal binomialCoefficient(BigDecimal a, BigDecimal b){
-        int res1 = b.compareTo(new BigDecimal(0));
-        int res2 = b.compareTo(a);
-        int res3 = b.compareTo(a.subtract(b));
-        BigDecimal c = a.subtract((b));
-        if (res1==-1 || res2==1){
-        return null;
+    private BigDecimal binomialCoefficient(long a, long b){
+        if (b < 0 || b > a){
+            return null;
+        }
+        if (b > (a - b))  {       // take advantage of symmetry
+            b = a - b;
         }
 
-        if (res3 ==1)  {       // take advantage of symmetry
-            b = a.subtract(b);
-        }
         BigDecimal coeff = new BigDecimal(1.0);
-        for (BigDecimal i = c.add(new BigDecimal(1)); i.compareTo(a)!=1; i=i.add(BigDecimal.ONE)  )    {
-            coeff = coeff.multiply(i);
+        for (long i = a - b + 1; i <= a; i++) {
+
+            coeff = coeff.multiply(new BigDecimal(i));
         }
-        for (BigDecimal i = new BigDecimal(1); i.compareTo(b)!=1; i=i.add(BigDecimal.ONE) ) {
-            coeff = coeff.divide(i);
+        for (long i = 1; i <= b; i++) {
+            coeff = coeff.divide(new BigDecimal(i));
         }
         return coeff;
     }
+
+
 
 
     @SuppressWarnings("unchecked")
@@ -696,7 +687,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
         if (probes.size() > 0) {
             //Search
-            String goTFHQL = "SELECT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes)";
+            String goTFHQL = "SELECT DISTINCT g, tf FROM TFSite tf INNER JOIN tf.gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes)";
             Query goTFQuery = this.session().createQuery(goTFHQL);
             goTFQuery.setParameterList(("probes"), probes);
             List<Object[]> goTFList = goTFQuery.list();
@@ -1628,3 +1619,5 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         return totalSearchFactors;
     }
 }
+
+
