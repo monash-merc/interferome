@@ -50,20 +50,29 @@ function PromoterImage(){
 
     });
 
-    var xPos = 100;
-
+    var xPos = 30;//100;
+    var yPos=90;
+    var legCount=10; //var to limit legend to 10 per line
     for(var j = 0; j < tfLegendSiteList.length; j++){
+        if(j==legCount){
+            legCount=legCount+10;
+            yPos=yPos+20;
+            xPos=30;//100;
+        }
         if(tfLegendSiteList[j] != null && tfLegendSiteList[j] != ""){
             var color = findColor(tfLegendSiteList[j]);
 
             if(color != null){
-                var site = paper.rect(xPos, (25*rowCount)+90, 10, 10);
+                //var site = paper.rect(xPos, (25*rowCount)+90, 10, 10);
+                var site = paper.rect(xPos, (25*rowCount)+yPos, 10, 10);
                 site.attr({fill: color, stroke: color, title: tfLegendSiteList[j]});
                 xPos = xPos + 30;
-                var lbl = paper.text(xPos, (25*rowCount)+95, tfLegendSiteList[j]);
+                //var lbl = paper.text(xPos, (25*rowCount)+95, tfLegendSiteList[j]);
+                var lbl = paper.text(xPos, (25*rowCount)+yPos+5, tfLegendSiteList[j]);
                 lbl.attr({'text-anchor': 'start'});
                 //yPos = yPos + (tfLegendSiteList[j].toString().length*2);
                 var len = tfLegendSiteList[j].toString().length*10;
+                //var len = tfLegendSiteList[colVar].toString().length*10;
                 xPos = xPos + len;
             }
         }
@@ -133,15 +142,16 @@ function findColor(site){
     }
 
 
-    findColor.colors = new Array("Red","Green","Blue", "Yellow", "Purple", "Pink");
+    findColor.colors = new Array("Red","Green","Blue", "Yellow", "Purple", "Pink", "Cyan", "Orange", "Brown", "lightblue", "lightgreen", "Black", "Gray", "navy", "slateblue", "magenta", "wheat", "cornflowerblue", "goldenrod", "olive");
     if(findColor.factorColors[site] != null){
         return findColor.factorColors[site];
     }
     else{
-        if(findColor.colorPos < findColor.colors.length){
+        if(findColor.colorPos < 20){//< findColor.colors.length){//
             var color = findColor.colors[findColor.colorPos];
             findColor.factorColors[site] = color;
             findColor.colorPos = findColor.colorPos+1;
+            if(findColor.colorPos==20){findColor.colorPos=0;}  // recycle colours for big list ...
             return color;
         }
         else{
