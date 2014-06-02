@@ -109,6 +109,15 @@ public class AppPropSettings {
     // LDAP Configuration
     public static String LDAP_AUTH_SUPPORTED = "ldap.authentication.supported";
 
+    public static String LDAP_AUTH_WS_ENABLED = "ldap.remote.authen.ws.enabled";
+
+    public static String LDAP_AUTH_WS_HOST = "ldap.remote.ws.host.name";
+
+    public static String LDAP_AUTH_WS_PORT = "ldap.remote.ws.host.port";
+
+    public static String LDAP_AUTH_WS_CERT_ERROR_IGNORE = "ldap.remote.ws.cert.error.ignore";
+
+
     public static String LDAP_FACTORY = "ldap.factory";
 
     public static String LDAP_SERVER_URL = "ldap.server.url";

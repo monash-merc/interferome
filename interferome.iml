@@ -90,7 +90,9 @@
       <configuration>
         <datasource-map>
           <unit-entry name="conf:hibernate.cfg.xml" />
+          <unit-entry name="sessionFactory" value="dataSource" />
         </datasource-map>
+        <naming-strategy-map />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/conf/hibernate.cfg.xml" />
       </configuration>
     </facet>

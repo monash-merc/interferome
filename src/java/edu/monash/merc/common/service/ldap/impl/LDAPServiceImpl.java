@@ -30,6 +30,8 @@ package edu.monash.merc.common.service.ldap.impl;
 import javax.annotation.PostConstruct;
 
 import edu.monash.merc.common.service.ldap.LDAPService;
+import edu.monash.merc.wsclient.ldapws.LdapWSClient;
+import edu.monash.merc.wsclient.ldapws.WSConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,10 @@ public class LDAPServiceImpl implements LDAPService {
     @Autowired
     private AppPropSettings appSettings;
 
+    private LdapWSClient ldapWSClient;
+
+    private boolean ldapWsEnabled = false;
+
     public void setLdapUtil(LDAPUtil ldapUtil) {
         this.ldapUtil = ldapUtil;
     }
@@ -66,40 +72,59 @@ public class LDAPServiceImpl implements LDAPService {
 
     @PostConstruct
     public void ldapEnvInit() {
-        LDAPProperty ldapProp = new LDAPProperty();
-        ldapProp.setLdapFactory(appSettings.getPropValue(AppPropSettings.LDAP_FACTORY));
-        ldapProp.setLdapServer(appSettings.getPropValue(AppPropSettings.LDAP_SERVER_URL));
-        ldapProp.setProtocol(appSettings.getPropValue(AppPropSettings.LDAP_SECURITY_PROTOCOL));
-        ldapProp.setAuthentication(appSettings.getPropValue(AppPropSettings.LDAP_AUTHENTICATION));
-        ldapProp.setBaseDN(appSettings.getPropValue(AppPropSettings.LDAP_BASE_DN));
-        ldapProp.setBindBaseDnRequired(Boolean.valueOf(appSettings.getPropValue(AppPropSettings.LDAP_BIND_BASE_DN_REQUIRED)));
-        ldapProp.setAttUID(appSettings.getPropValue(AppPropSettings.LDAP_UID_ATTR_NAME));
-        ldapProp.setAttMail(appSettings.getPropValue(AppPropSettings.LDAP_MAIL_ATTR_NAME));
-        ldapProp.setAttGender(appSettings.getPropValue(AppPropSettings.LDAP_GENDER_ATTR_NAME));
-        ldapProp.setAttCN(appSettings.getPropValue(AppPropSettings.LDAP_CN_ATTR_NAME));
-        ldapProp.setAttSn(appSettings.getPropValue(AppPropSettings.LDAP_SN_ATTR_NAME));
-        ldapProp.setAttGivenname(appSettings.getPropValue(AppPropSettings.LDAP_GIVENNAME_ATTR_NAME));
-        ldapProp.setAttPersonalTitle(appSettings.getPropValue(AppPropSettings.LDAP_PERSONAL_TITLE_ATTR_NAME));
-        this.ldapUtil.initEnv(ldapProp);
-    }
-
-    @Override
-    public String findUserDn(String uid) {
-        return this.ldapUtil.findUserDn(uid);
+        ldapWsEnabled = Boolean.valueOf(appSettings.getPropValue(AppPropSettings.LDAP_AUTH_WS_ENABLED));
+        if (ldapWsEnabled) {
+            String ldapWsHost = appSettings.getPropValue(AppPropSettings.LDAP_AUTH_WS_HOST);
+            int ldapWsPort = Integer.valueOf(appSettings.getPropValue(AppPropSettings.LDAP_AUTH_WS_PORT)).intValue();
+            boolean ignoreCertError = Boolean.valueOf(appSettings.getPropValue(AppPropSettings.LDAP_AUTH_WS_CERT_ERROR_IGNORE));
+            WSConfig ldapWsConfig = new WSConfig();
+            ldapWsConfig.setLdapAuthenServiceHost(ldapWsHost);
+            ldapWsConfig.setLdapAuthenServicePort(ldapWsPort);
+            ldapWsConfig.setIgnoreCertError(ignoreCertError);
+            ldapWSClient = new LdapWSClient(ldapWsConfig);
+        } else {
+            LDAPProperty ldapProp = new LDAPProperty();
+            ldapProp.setLdapFactory(appSettings.getPropValue(AppPropSettings.LDAP_FACTORY));
+            ldapProp.setLdapServer(appSettings.getPropValue(AppPropSettings.LDAP_SERVER_URL));
+            ldapProp.setProtocol(appSettings.getPropValue(AppPropSettings.LDAP_SECURITY_PROTOCOL));
+            ldapProp.setAuthentication(appSettings.getPropValue(AppPropSettings.LDAP_AUTHENTICATION));
+            ldapProp.setBaseDN(appSettings.getPropValue(AppPropSettings.LDAP_BASE_DN));
+            ldapProp.setBindBaseDnRequired(Boolean.valueOf(appSettings.getPropValue(AppPropSettings.LDAP_BIND_BASE_DN_REQUIRED)));
+            ldapProp.setAttUID(appSettings.getPropValue(AppPropSettings.LDAP_UID_ATTR_NAME));
+            ldapProp.setAttMail(appSettings.getPropValue(AppPropSettings.LDAP_MAIL_ATTR_NAME));
+            ldapProp.setAttGender(appSettings.getPropValue(AppPropSettings.LDAP_GENDER_ATTR_NAME));
+            ldapProp.setAttCN(appSettings.getPropValue(AppPropSettings.LDAP_CN_ATTR_NAME));
+            ldapProp.setAttSn(appSettings.getPropValue(AppPropSettings.LDAP_SN_ATTR_NAME));
+            ldapProp.setAttGivenname(appSettings.getPropValue(AppPropSettings.LDAP_GIVENNAME_ATTR_NAME));
+            ldapProp.setAttPersonalTitle(appSettings.getPropValue(AppPropSettings.LDAP_PERSONAL_TITLE_ATTR_NAME));
+            this.ldapUtil.initEnv(ldapProp);
+        }
     }
 
     @Override
     public boolean ldapUserLogin(String uid, String password) {
-        return this.ldapUtil.login(uid, password);
+        if (ldapWsEnabled) {
+            return this.ldapWSClient.login(uid, password);
+        } else {
+            return this.ldapUtil.login(uid, password);
+        }
     }
 
     @Override
     public LDAPUser validateLdapUser(String uid, String password) {
-        return this.ldapUtil.validateLdapUser(uid, password);
+        if (ldapWsEnabled) {
+            return this.ldapWSClient.verifyLdapUser(uid, password);
+        } else {
+            return this.ldapUtil.validateLdapUser(uid, password);
+        }
     }
 
     @Override
     public LDAPUser searchLdapUser(String cnOrEmail) {
-        return this.ldapUtil.findUserInfo(cnOrEmail);
+        if (ldapWsEnabled) {
+            return this.ldapWSClient.lookup(cnOrEmail);
+        } else {
+            return this.ldapUtil.findUserInfo(cnOrEmail);
+        }
     }
 }

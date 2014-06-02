@@ -37,8 +37,6 @@ import edu.monash.merc.dto.LDAPUser;
  */
 public interface LDAPService {
 
-    public String findUserDn(String uid);
-
     public boolean ldapUserLogin(String uid, String password);
 
     public LDAPUser validateLdapUser(String uid, String password);
