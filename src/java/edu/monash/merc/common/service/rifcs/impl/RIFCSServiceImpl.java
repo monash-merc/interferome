@@ -62,7 +62,7 @@ public class RIFCSServiceImpl implements RIFCSService {
 
     private static String XML_HEADER = "<?xml version=\"1.0\"?>";
 
-    private static String SCHEMA_LOCATION = "http://services.ands.org.au/home/orca/schemata/1.2.0/registryObjects.xsd";
+    private static String SCHEMA_LOCATION = "http://services.ands.org.au/documentation/rifcs/1.2.0/schema/registryObjects.xsd";
 
     private String lineSeparator = (String) java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
 
