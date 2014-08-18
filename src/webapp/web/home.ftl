@@ -17,7 +17,7 @@
 <!-- temp -->
 <div class="trans_temp">
     Interferome has recently undergone a major redevelopment. Please select <a
-        href="http://vera093.its.monash.edu.au/interferome" target="_blank">Interferome V1.0</a> to access the previous
+        href="https://interferome-v1.erc.monash.edu.au" target="_blank">Interferome V1.0</a> to access the previous
     version.
 </div>
 
