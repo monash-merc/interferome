@@ -389,9 +389,17 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
         //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
         Integer[] types = {0, 0, 0, 0, 0, 0, 0};
         if (probes.size() > 0) {
+
+            double upValue = searchBean.getUpValue();
+            double downValue = searchBean.getDownValue();
             //Get Type 1 Probes
+            //String tp1 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+            //        "WHERE p.probeId IN (:probes) AND i.typeName = 'I'";
+
+            //Ross code to test for fold change
+
             String tp1 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
-                    "WHERE p.probeId IN (:probes) AND i.typeName = 'I'";
+                            "WHERE p.probeId IN (:probes) AND i.typeName = 'I' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
             Query tp1Query = this.session().createQuery(tp1);
             tp1Query.setParameterList(("probes"), probes);
             List<String> t1ProbeList = tp1Query.list();
@@ -411,8 +419,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             }
 
             //Get Type 2 Probes
+            //String tp2 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+            //        "WHERE p.probeId IN (:probes) AND i.typeName = 'II'";
+
+            //Ross code to test for fold change
             String tp2 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
-                    "WHERE p.probeId IN (:probes) AND i.typeName = 'II'";
+                    "WHERE p.probeId IN (:probes) AND i.typeName = 'II' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
             Query tp2Query = this.session().createQuery(tp2);
             tp2Query.setParameterList(("probes"), probes);
             List<String> t2ProbeList = tp2Query.list();
@@ -432,8 +444,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             }
 
             //Get Type III Probes
+            //String tp3 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+            //        "WHERE p.probeId IN (:probes) AND i.typeName = 'III'";
+
+            //Ross code to test for fold change
             String tp3 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
-                    "WHERE p.probeId IN (:probes) AND i.typeName = 'III'";
+                    "WHERE p.probeId IN (:probes) AND i.typeName = 'III' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
             Query tp3Query = this.session().createQuery(tp3);
             tp3Query.setParameterList(("probes"), probes);
             List<String> t3ProbeList = tp3Query.list();
