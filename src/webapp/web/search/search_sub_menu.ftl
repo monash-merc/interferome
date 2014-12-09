@@ -30,7 +30,7 @@ $(document).ready(function(){$(".search_menu_link a").each(function(index){
         <a href="${base}/search/searchChromosome.jspx">Chromosome</a>
     </div>
     <div class="search_menu_link">
-        <a href="${base}/search/searchSubtype.jspx">IFN Subtype</a>
+        <a href="${base}/search/searchSubtype.jspx">IFN Type</a>
     </div>
     <div class="search_menu_link">
         <a href="${base}/search/searchTissueExpression.jspx">Basal Expression</a>

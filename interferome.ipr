@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AntConfiguration">
-    <buildFile url="file://$PROJECT_DIR$/build.xml" />
+    <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/build.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
   </component>
   <component name="ArtifactManager">
     <artifact name="interferome">
       <output-path>$PROJECT_DIR$/deploy/interferome</output-path>
       <properties id="ant-postprocessing">
-        <options enabled="true" />
+        <options enabled="true">
+          <file>file://$PROJECT_DIR$/build.xml</file>
+          <target>generate-dev-test-deploy-dir</target>
+        </options>
       </properties>
       <root id="root">
         <element id="dir-copy" path="$PROJECT_DIR$/deploy/interferome" />
@@ -32,11 +43,7 @@
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
     </wildcardResourcePatterns>
-    <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-    </annotationProcessing>
+    <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="merc">
     <copyright>
@@ -46,6 +53,7 @@
       <option name="myName" value="merc" />
       <option name="myLocal" value="true" />
     </copyright>
+    <module2copyright />
     <LanguageOptions name="GSP">
       <option name="fileTypeOverride" value="1" />
     </LanguageOptions>
@@ -88,6 +96,9 @@
       </facet-type>
     </autodetection-disabled>
   </component>
+  <component name="GradleSettings">
+    <option name="gradleHome" value="$USER_HOME$/gradle-1.6" />
+  </component>
   <component name="IdProvider" IDEtalkID="EB73C7B2F2FF7B26E64D55E3F76E68E5" />
   <component name="InspectionProjectProfileManager">
     <profiles>
@@ -126,7 +137,10 @@
         <inspection_tool class="JpaDataSourceORMInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JpaQlInspection" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LocalVariableOfConcreteClass" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreInHashCode" value="true" />
+          <option name="ignoreInTestCode" value="false" />
+        </inspection_tool>
         <inspection_tool class="MethodOnlyUsedFromInnerClass" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreMethodsAccessedFromAnonymousClass" value="false" />
           <option name="ignoreStaticMethodsFromNonStaticInnerClass" value="false" />
@@ -146,10 +160,10 @@
         </inspection_tool>
         <inspection_tool class="ParameterOfConcreteClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="PublicMethodNotExposedInInterface" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="onlyWarnIfContainingClassImplementsAnInterface" value="false" />
           <option name="ignorableAnnotations">
             <value />
           </option>
-          <option name="onlyWarnIfContainingClassImplementsAnInterface" value="false" />
         </inspection_tool>
         <inspection_tool class="RedundantSuppression" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SSBasedInspection" enabled="true" level="WARNING" enabled_by_default="true" />

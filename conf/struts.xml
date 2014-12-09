@@ -732,7 +732,7 @@
             </result>
         </action>
         <!-- export the Subtypes -->
-        <action name="exportCsvFileSubtypes" class="search.searchAction" method="exportCsvFileSubtypes">
+        <action name="exportCsvFileTypes" class="search.searchAction" method="exportCsvFileTypes">
             <result name="input">/web/search/search.ftl</result>
             <result name="error">/web/search/search.ftl</result>
             <result name="success" type="stream">

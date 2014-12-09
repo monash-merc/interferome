@@ -50,7 +50,7 @@
         <a href="${base}/search/searchChromosome.jspx"><@s.text name="experiment.search.action.title" /> - Chromosome</a>
     </@s.if>
     <@s.if test="%{searchType == 'subtype'}">
-        <a href="${base}/search/searchSubtype.jspx"><@s.text name="experiment.search.action.title" /> - IFN Subtype</a>
+        <a href="${base}/search/searchSubtype.jspx"><@s.text name="experiment.search.action.title" /> - IFN Type</a>
     </@s.if>
     <@s.if test="%{searchType == 'tissueexp'}">
         <a href="${base}/search/searchTissueExpression.jspx"><@s.text name="experiment.search.action.title" /> - Basal Expression</a>

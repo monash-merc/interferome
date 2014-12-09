@@ -999,7 +999,7 @@ public class SearchAction extends DMBaseAction {
         return SUCCESS;
     }
 
-    public String exportCsvFileSubtypes() {
+    public String exportCsvFileTypes() {
         try {
             //get the logged in user if existed
             user = getCurrentUser();
@@ -1029,7 +1029,7 @@ public class SearchAction extends DMBaseAction {
             this.csvInputStream = createCSVFileSubtypes(searchBean, subtypeList);
             String csvFileName = MercUtil.genCurrentTimestamp();
 
-            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_SubtypesSearchResults.txt" + "\"";
+            this.contentDisposition = "attachment;filename=\"" + csvFileName + "_TypesSearchResults.txt" + "\"";
             this.bufferSize = 20480;
             this.contentType = "application/octet-stream";
 

@@ -13,7 +13,7 @@
 </div>
 <div class="export_div">
     Save as a TXT file<a
-    href="${base}/search/exportCsvFileSubtypes.jspx">
+    href="${base}/search/exportCsvFileTypes.jspx">
     <img src="${base}/images/export.png" class="search_ctip_image" id="export_pic"/></a>
 </div>
 <br>
@@ -23,7 +23,7 @@
 <div id="saveimage" class="export_pic"></div>
 <div class="search_table_div">
 <div id="venn">
-  <span style="color: gray; font-size: 10pt" xmlns="http://www.w3.org/1999/html">The Venn diagram shows the number of genes regulated by one or more IFN type (Type I, II or III).  It should be noted that there are far more  datasets for genes regulated by type I than for types II or III, this imbalance introduces the risk of false nagatives and bias for the under-represented types II and III; caution is therefore encouraged in interpreting low or negative results from these subtypes.</span>
+  <span style="color: gray; font-size: 10pt" xmlns="http://www.w3.org/1999/html">The Venn diagram shows the number of genes regulated by one or more IFN type (Type I, II or III).  It should be noted that there are far more  datasets for genes regulated by type I than for types II or III, this imbalance introduces the risk of false nagatives and bias for the under-represented types II and III; caution is therefore encouraged in interpreting low or negative results from these types.</span>
 <div id="hiddenlist">
 <ul>
 <li id="t1" value="<@s.property value="subtypeList[0]"/>">Type I: &nbsp; <@s.property value="subtypeList[0]" /></li>
