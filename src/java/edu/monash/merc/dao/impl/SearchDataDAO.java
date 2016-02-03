@@ -50,7 +50,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.*;
+import java.io.*;
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
  *
@@ -63,7 +64,6 @@ import java.util.List;
 @Scope("prototype")
 @Repository
 public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchDataRepository {
-
     @SuppressWarnings("unchecked")
     private List<Long> queryDatasets(SearchBean searchBean) {
         String baseDatasetHql = "SELECT DISTINCT(ds.id) FROM Dataset ds";
@@ -662,8 +662,8 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
 
-        BigDecimal mk = binomialCoefficient(m,k);
-        BigDecimal Nmnk = binomialCoefficient((N-m),(n-k));
+        BigDecimal mk = binomialCoefficient(m, k);
+        BigDecimal Nmnk = binomialCoefficient((N - m), (n - k));
         BigDecimal Nn = binomialCoefficient(N,n);
         BigDecimal mkXNmnk = mk.multiply(Nmnk);
         BigDecimal pval = mkXNmnk.divide(Nn, 15, RoundingMode.HALF_UP);
@@ -692,11 +692,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     }
 
 
-
+    public static String path = "/Users/ciiid/IdeaProjects/enrich/";
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
+    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy, String uid) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
         List<Probe> probes = uniqueProbesPages.getPageResults();
@@ -707,12 +707,141 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query goTFQuery = this.session().createQuery(goTFHQL);
             goTFQuery.setParameterList(("probes"), probes);
             List<Object[]> goTFList = goTFQuery.list();
+
+
+
+            try {
+                // uid stands for userId to provide path for user temp file of running CiiiDER to get result of TF Analysis
+                String uidPath = path + uid + "/";
+                File userFolder = new File(uidPath);
+                userFolder.mkdirs();
+
+                BufferedWriter HsEnrichConfig = new BufferedWriter(new FileWriter(new File(uidPath + "HsConfig.ini")));
+                BufferedWriter MmEnrichConfig = new BufferedWriter(new FileWriter(new File(uidPath + "MmConfig.ini")));
+
+                ArrayList<String> HsQueryEnsgsList = new ArrayList<String>();
+                ArrayList<String> MmQueryEnsgsList = new ArrayList<String>();
+
+                for (Object[]row :goTFList) {
+                    String geneName = ((Gene)row[0]).getGeneName();
+                    String ensgAccession = ((Gene)row[0]).getEnsgAccession();
+                    // Get information for bsl
+                    Long id = ((TFSite)row[1]).getId();
+                    String factor = ((TFSite)row[1]).getFactor();
+                    Double core_match = ((TFSite)row[1]).getCoreMatch();
+                    Double matr_match = ((TFSite)row[1]).getMatrixMatch();
+                    int start = ((TFSite)row[1]).getStart();
+                    int end = ((TFSite)row[1]).getEnd();
+
+
+                    if(!HsQueryEnsgsList.contains(ensgAccession) && ensgAccession.startsWith("ENSG")) {
+                        HsQueryEnsgsList.add(ensgAccession);
+                    }
+                    else {
+                        MmQueryEnsgsList.add(ensgAccession);
+                    }
+
+                }
+
+                getGeneListPromoter(HsQueryEnsgsList, "HsGeneList", "HsPromoterSeq", uidPath); getGeneListPromoter(MmQueryEnsgsList, "MmGeneList", "MmPromoterSeq", uidPath);
+
+                // BufferWriter for MmConfig.ini
+                String MmConfigString = "STARTPOINT=1 \n"
+                        + "ENDPOINT=2 \n"
+                        + "GENELISTFILENAME=" + uidPath + "MmGeneList.fa \n"
+                        + "BGGENELISTFILENAME=" + path + "getPromoter/MmPCG_2500.fa \n"
+                        + "MATRIXFILE=" + path + "mediumTestMatrices.dat \n"
+                        // + "REFERENCEFASTA=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Mus_musculus.GRCm38.77.dna.toplevel.fa \n"
+                        // + "GENELOOKUPMANAGER=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Mus_musculus.GRCm38.77.glm \n"
+                        + "GENESCANRESULTS=" + path + "Outputs/getPromoter/Mm/MmBSL_IRGsFromPCGs_mediumMatrices_2500.txt \n"
+                        + "BGBINDSITEFILENAME=" + path + "Outputs/getPromoter/Mm/MmCSL_IRGsFromPCGs_mediumMatrices_2500.csl \n"
+                        + "COVERAGEPVALUE=1.0 \n"
+                        + "ENRICHMENTPVALUE=1.0 \n"
+                        + "DEFICIT=0.15 \n"
+                        + "ENRICHMENTOUTPUTFILE=" + uidPath + "Outputs/Mm/MmEnrichment_DownTwoFold_AveExprBackground_2500.txt \n"
+                        + "PROJECTOUTPUTFILE=" + uidPath + "Outputs/Mm/MmProject_2500.pen";
+
+                MmEnrichConfig.write(MmConfigString);
+                MmEnrichConfig.close();
+
+                // BufferWriter for HsConfig.ini
+                String HsConfigString = "STARTPOINT=1 \n"
+                        + "ENDPOINT=2 \n"
+                        + "GENELISTFILENAME=" + uidPath + "HsGeneList.fa \n"
+                        + "BGGENELISTFILENAME=" + path + "getPromoter/HsPCG_2500.fa\n"
+                        // default file XxBackgroundList.fa in base dir
+                        + "MATRIXFILE=" + path + "mediumTestMatrices.dat \n"
+                        // + "REFERENCEFASTA=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Homo_sapiens.GRCh38.77.dna.toplevel.fa \n"
+                        // + "GENELOOKUPMANAGER=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Homo_sapiens.GRCh38.77.glm \n"
+                        + "GENESCANRESULTS=" + path + "Outputs/getPromoter/Hs/HsBSL_IRGsFromPCGs_mediumMatrices_2500.txt \n"
+                        + "BGBINDSITEFILENAME=" + path + "Outputs/getPromoter/Hs/HsCSL_IRGsFromPCGs_mediumMatrices_2500.csl \n"
+                        + "COVERAGEPVALUE=1.0 \n"
+                        + "ENRICHMENTPVALUE=1.0 \n"
+                        + "DEFICIT=0.15 \n"
+                        + "ENRICHMENTOUTPUTFILE=" + uidPath + "Outputs/Hs/HsEnrichment_DownTwoFold_AveExprBackground_2500.txt \n"
+                        + "PROJECTOUTPUTFILE=" + uidPath + "Outputs/Hs/HsProject_2500.pen";
+
+                HsEnrichConfig.write(HsConfigString);
+                HsEnrichConfig.close();
+                // Params for Runtime
+                String EnrichRuntimeParamsHs = "java -jar " + path + "Enrichment110815.jar" + " -n " + uidPath + "HsConfig.ini";
+                String EnrichRuntimeParamsMm = "java -jar " + path + "Enrichment110815.jar" + " -n " + uidPath + "MmConfig.ini";
+                Process EnrichProcessHs = Runtime.getRuntime().exec(EnrichRuntimeParamsHs);
+                EnrichProcessHs.waitFor();
+                Process EnrichProcessMm = Runtime.getRuntime().exec(EnrichRuntimeParamsMm);
+                EnrichProcessMm.waitFor();
+            } catch (IOException e) {
+                e.printStackTrace();}
+            catch (InterruptedException e) {
+                e.printStackTrace();}
+
             return goTFList;
         } else {
             return new ArrayList<Object[]>();
         }
     }
 
+    public HashMap<String, String> getPromoterSeqHashMap(String promoterSeqInFilename) throws IOException {
+        BufferedReader promoterReference = new BufferedReader(new FileReader(new File(path + promoterSeqInFilename + ".fa")));
+        HashMap<String, String> promoterHashMap = new HashMap<String, String>();
+        String key = "";
+        String promoterLine = "";
+
+        while ((promoterLine = promoterReference.readLine()) != null){
+            if (promoterLine.startsWith(">")){
+                // ensgID = promoterLine.split("\\|")[0];
+                // key = ensgID.replace(">", "");
+                key = promoterLine;
+            }
+            else {
+                String value = promoterLine;
+                promoterHashMap.put(key, value);}
+        }return promoterHashMap;
+    }
+
+    public void getGeneListPromoter (ArrayList<String> QueryEnsgsList, String GeneListFaFilename, String promoterSeqInFilename, String uidPath) throws IOException {
+        HashMap<String, String> promoterHashMap = getPromoterSeqHashMap(promoterSeqInFilename);
+        String toWrite = "";
+
+        String QueryEnsg;
+        Iterator<String> iterator = QueryEnsgsList.iterator();
+        while (iterator.hasNext()) {
+            QueryEnsg = iterator.next();
+            for (Map.Entry<String, String> entry : promoterHashMap.entrySet()) {
+                String key = entry.getKey();
+                String valueSeq = entry.getValue();
+                if (key.contains(QueryEnsg)){
+                    String[] splitKey = key.split("\\|");
+                    String newKey = splitKey[1];
+                    toWrite += (">" + newKey + "\n" + valueSeq + "\n");}
+                else {continue;}
+            }
+        }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File (uidPath + GeneListFaFilename + ".fa")));
+        writer.write(toWrite);
+        writer.close();
+    }
 
     @Override
     public Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {

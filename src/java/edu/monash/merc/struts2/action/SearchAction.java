@@ -32,6 +32,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import edu.monash.merc.common.page.Pagination;
 import edu.monash.merc.common.results.SearchResultRow;
 import edu.monash.merc.config.AppPropSettings;
+import edu.monash.merc.dao.impl.SearchDataDAO;
 import edu.monash.merc.domain.*;
 import edu.monash.merc.dto.GeneExpressionRecord;
 import edu.monash.merc.dto.RangeCondition;
@@ -41,6 +42,7 @@ import edu.monash.merc.exception.DCConfigException;
 import edu.monash.merc.exception.DCException;
 import edu.monash.merc.service.SearchDataService;
 import edu.monash.merc.util.MercUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.*;
-
+import java.io.*;
 
 /**
  * SearchAction Action class
@@ -64,6 +66,8 @@ import java.util.*;
 @Scope("prototype")
 @Controller("search.searchAction")
 public class SearchAction extends DMBaseAction {
+    // Generate random number for user-specifc Enrich run analysis file
+    public final String userIDEnrich = Long.toHexString(Double.doubleToLongBits(Math.random())).toString();
 
     @Autowired
     private SearchDataService searchDataService;
@@ -224,6 +228,7 @@ public class SearchAction extends DMBaseAction {
      */
 
     private HashMap<String, List<TFSite>> tfSiteList;
+
 
     /**
      *
@@ -556,6 +561,10 @@ public class SearchAction extends DMBaseAction {
         }
         return SUCCESS;
     }
+
+    public void searchTFSiteCaller() {
+
+    }
     @SuppressWarnings("unchecked")
     public String searchTFSite() {
         try {
@@ -571,27 +580,37 @@ public class SearchAction extends DMBaseAction {
                 return ERROR;
             }
 
-            //query the data
-            List<Object[]> results = this.searchDataService.searchTFSite(searchBean, pageNo, pageSize, orderBy, orderByType);
-
+            //query the data (data is from return goTFList in SearchDataDAO)
+            List<Object[]> results = this.searchDataService.searchTFSite(searchBean, pageNo, pageSize, orderBy, orderByType, userIDEnrich);
             //Convert results into Hash of object[x][4] with gene as hash and
             //start, end, core match, matrix match ad
 
-            tfSiteList = new HashMap<String, List<TFSite>>();
+            tfSiteList = new LinkedHashMap<String, List<TFSite>>();
 
-            for (Object[] row : results) {
-                String geneName = ((Gene) row[0]).getGeneName();
-                if (tfSiteList.containsKey(geneName)) {
-                    List<TFSite> existingResults = tfSiteList.get(geneName);
-                    existingResults.add((TFSite) row[1]);
-                } else {
-                    List<TFSite> newTFSiteList = new ArrayList<TFSite>();
-                    newTFSiteList.add((TFSite) row[1]);
-                    tfSiteList.put(geneName, newTFSiteList);
-                }
+            try {
+                // Put HashMap
+
+
+                // Original code
+                /*
+                HashMap<String, Double> hashMapMm = filterSigBSFromTfSiteList("/home/mimr/dyin/enrich/Outputs/Mm/MmEnrichment_DownTwoFold_AveExprBackground_MostSigDeficit.txt");
+                convertBSLToTfSiteList("/home/mimr/dyin/enrich/Outputs/Mm/MmBSLQuery.txt", hashMapMm);
+
+                HashMap<String, Double> hashMapHs = filterSigBSFromTfSiteList("/home/mimr/dyin/enrich/Outputs/Hs/HsEnrichment_DownTwoFold_AveExprBackground_MostSigDeficit.txt");
+                convertBSLToTfSiteList("/home/mimr/dyin/enrich/Outputs/Hs/HsBSLQuery.txt", hashMapHs);
+                */
+
+                // Testing code
+                HashMap<String, Double> hashMapMm = filterSigBSFromTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Mm/MmEnrichment_IRGsFromPCGs_mediumMatrices_2500_MostSigDeficit.txt");
+                convertBSLToTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Mm/MmBSL_IRGsFromPCGs_mediumMatrices_2500.txt", hashMapMm);
+                HashMap<String, Double> hashMapHs = filterSigBSFromTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Hs/HsEnrichment_IRGsFromPCGs_mediumMatrices_2500_MostSigDeficit.txt");
+                convertBSLToTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Hs/HsBSL_IRGsFromPCGs_mediumMatrices_2500.txt", hashMapHs);
+
+            } catch(IOException e) {
+                e.printStackTrace();
             }
 
-            // System.out.println("TF Site Size: " + tfSiteList.size());
+
 
             //set the searched flag as true
             searched = true;
@@ -600,13 +619,103 @@ public class SearchAction extends DMBaseAction {
 
             storeInSession(ActionConts.SEARCH_CON_KEY, searchBean);
 
+
         } catch (Exception ex) {
             logger.error(ex);
             addActionError(getText("data.search.tf.analysis.failed"));
             return ERROR;
         }
+
+        FileUtils.deleteQuietly(new File("/home/mimr/dyin/enrich/" + userIDEnrich));
+
         return SUCCESS;
     }
+
+    private HashMap<String, Double> filterSigBSFromTfSiteList(String filename) throws IOException{
+        HashMap<String, Double> significantTF = new HashMap<String, Double>();
+        BufferedReader generalMostSigDeficit = new BufferedReader(new FileReader(new File(filename)));
+        String line = "";
+
+        boolean header = true;
+        int nameIndex = 0;
+        int deficitIndex = 0;
+        int genePValueIndex = 0;
+
+
+        for (line = generalMostSigDeficit.readLine(); line != null; line = generalMostSigDeficit.readLine()){
+            String[] delimitedLine = line.split(",");
+
+            if(header) {
+                for (int j = 0; j < delimitedLine.length; j++) {
+                    if (delimitedLine[j].equals("Transcription Factor Name")) nameIndex = j;
+                    else if (delimitedLine[j].equals("Gene Deficit")) deficitIndex = j;
+                    else if (delimitedLine[j].equals("Gene P-Value (P<1.0)")) genePValueIndex = j;
+                }
+                header = false;
+            }
+            else {
+                String tfName = delimitedLine[nameIndex];
+                Double tfDeficit = Double.valueOf(delimitedLine[deficitIndex]);
+                Double tfPValue = Double.valueOf(delimitedLine[genePValueIndex]);
+                if(tfPValue < 0.4) significantTF.put(tfName, tfDeficit);
+
+            }
+        }
+
+
+        return significantTF;
+    }
+
+    private void convertBSLToTfSiteList(String filename, HashMap<String, Double> significantTF) throws IOException{
+        BufferedReader generalBSL = new BufferedReader(new FileReader(new File(filename)));
+
+        String line = "";
+
+
+        for (line = generalBSL.readLine(); line != null; line = generalBSL.readLine()){
+            String[] detabLine = line.split("\\t");
+            // String[] geneNameDetab = detabLine[0].split("\\|");
+
+
+            TFSite tfNew = new TFSite();
+            //tfNew.setId(1);//change
+            // tfNew.setEnsemblID(geneNameDetab[0]);
+            //Gene geneNew; geneNew.setGeneName(geneNameDetab[1]); tfNew.setGene(geneNew);
+            tfNew.setFactor(detabLine[1]);
+            tfNew.setCoreMatch(Double.valueOf(detabLine[5]));
+            tfNew.setMatrixMatch(Double.valueOf(detabLine[6]));
+            tfNew.setStart(Integer.valueOf(detabLine[2]));
+            tfNew.setEnd(Integer.valueOf(detabLine[3]));
+
+            // System.out.println(tfNew.getId() + " " + tfNew.getCoreMatch());
+
+            String geneName = detabLine[0]; //geneNew.getGeneName();
+            if (significantTF.containsKey(tfNew.getFactor())) {
+                // Set Cut-off for Deficit
+                Double deficit = significantTF.get(tfNew.getFactor());
+                Double deficitCutOff = 1 - deficit;
+                Double scoreToCompare = java.lang.Math.min(tfNew.getCoreMatch(), tfNew.getMatrixMatch());
+
+                if (scoreToCompare >= deficitCutOff) {
+
+                     if (tfSiteList.containsKey(geneName)) {
+                        List<TFSite> existingResults = tfSiteList.get(geneName);
+                        existingResults.add(tfNew);
+                    } else {
+                        List<TFSite> newTFSiteList = new ArrayList<TFSite>();
+                        newTFSiteList.add(tfNew);
+                        tfSiteList.put(geneName, newTFSiteList);
+                    }
+                } else {
+                    continue;
+                }
+
+            }
+        }
+
+
+    }
+
 
     @SuppressWarnings("unchecked")
     public String searchChromosome() {
@@ -914,23 +1023,24 @@ public class SearchAction extends DMBaseAction {
             }
 
             //query the data by pagination
-            List<Object[]> results = this.searchDataService.searchTFSite(searchBean, 1, maxRecords, orderBy, orderByType);
+
+            List<Object[]> results = this.searchDataService.searchTFSite(searchBean, 1, maxRecords, orderBy, orderByType, userIDEnrich);
             //Convert results into Hash of object[x][4] with gene as hash and
             //start, end, core match, matrix match ad
 
-            tfSiteList = new HashMap<String, List<TFSite>>();
+            tfSiteList = new LinkedHashMap<String, List<TFSite>>();
 
-            for (Object[] row : results) {
-                String geneName = ((Gene) row[0]).getGeneName();
-                if (tfSiteList.containsKey(geneName)) {
-                    List<TFSite> existingResults = tfSiteList.get(geneName);
-                    existingResults.add((TFSite) row[1]);
-                } else {
-                    List<TFSite> newTFSiteList = new ArrayList<TFSite>();
-                    newTFSiteList.add((TFSite) row[1]);
-                    tfSiteList.put(geneName, newTFSiteList);
-                }
-            }
+            try {
+           // Put HashMap
+
+            HashMap<String, Double> hashMapMm = filterSigBSFromTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Mm/MmEnrichment_IRGsFromPCGs_mediumMatrices_2500_MostSigDeficit.txt");
+            convertBSLToTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Mm/MmBSL_IRGsFromPCGs_mediumMatrices_2500.txt", hashMapMm);
+            HashMap<String, Double> hashMapHs = filterSigBSFromTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Hs/HsEnrichment_IRGsFromPCGs_mediumMatrices_2500_MostSigDeficit.txt");
+            convertBSLToTfSiteList(SearchDataDAO.path + "Outputs/getPromoter/Hs/HsBSL_IRGsFromPCGs_mediumMatrices_2500.txt", hashMapHs);
+
+
+            } catch(IOException e) {
+            e.printStackTrace();}
 
 
             this.csvInputStream = createCSVFileTFanalysis(searchBean, tfSiteList);
@@ -949,6 +1059,9 @@ public class SearchAction extends DMBaseAction {
             addActionError(getText("data.search.export.tf.analysis.csv.file.failed"));
             return ERROR;
         }
+
+        FileUtils.deleteQuietly(new File("/home/mimr/dyin/enrich/" + userIDEnrich));
+
         return SUCCESS;
     }
 
@@ -3113,13 +3226,17 @@ public class SearchAction extends DMBaseAction {
         this.ontologyList = ontologyList;
     }
 
+    // Separate for two species, make orginal _Hs
     public HashMap<String, List<TFSite>> getTfSiteList() {
         return tfSiteList;
     }
 
+
+
     public void setTfSiteList(HashMap<String, List<TFSite>> tfSiteList) {
         this.tfSiteList = tfSiteList;
     }
+
 
     public List<Object[]> getChromosomeList() {
         return chromosomeList;
@@ -3160,4 +3277,6 @@ public class SearchAction extends DMBaseAction {
     public void setMouseGeneExpressionList(List<GeneExpressionRecord> tissueExpressioList) {
         this.mouseGeneExpressionList = tissueExpressioList;
     }
+
+
 }
