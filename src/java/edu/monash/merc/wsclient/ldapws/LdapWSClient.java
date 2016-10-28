@@ -38,6 +38,7 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
@@ -49,12 +50,7 @@ import java.io.InputStreamReader;
 public class LdapWSClient {
     private WSConfig wsConfig;
 
-    private static String DEFAULT_RESPONSE_TYPE = "post";
-
-    private static String GET_RESPONSE_TYPE = "get";
-
     public LdapWSClient() {
-
     }
 
     public LdapWSClient(WSConfig wsConfig) {
@@ -66,11 +62,14 @@ public class LdapWSClient {
     }
 
     public boolean login(String userName, String password) {
-        LDAPUser ldapUser = verifyLdapUser(userName, password);
-        if (ldapUser == null) {
-            return false;
-        }
-        return true;
+        this.validateWSConfig();
+        this.validateLoginParameters(userName, password);
+        StringBuilder wsURL = new StringBuilder();
+        wsURL.append(this.wsConfig.getLdapAuthenServiceHost()).append(":");
+        wsURL.append(this.wsConfig.getLdapAuthenServicePort()).append("/");
+        wsURL.append("login/");
+        NameValuePair[] postParams = {new NameValuePair("username", userName), new NameValuePair("password", password)};
+        return executeLdapUserLogin(wsURL.toString(), postParams);
     }
 
     public LDAPUser verifyLdapUser(String userName, String password) {
@@ -79,17 +78,9 @@ public class LdapWSClient {
         StringBuilder wsURL = new StringBuilder();
         wsURL.append(this.wsConfig.getLdapAuthenServiceHost()).append(":");
         wsURL.append(this.wsConfig.getLdapAuthenServicePort()).append("/");
-
-        String wsPath = this.wsConfig.getLdapAuthenServicePath();
-        String wsMethod = this.wsConfig.getLdapAuthenServiceMethod();
-        if (StringUtils.isNotBlank(wsPath)) {
-            wsURL.append(wsPath).append("/");
-        }
-        if (StringUtils.isNotBlank(wsMethod)) {
-            wsURL.append(wsMethod).append("/");
-        }
+        wsURL.append("verify/");
         NameValuePair[] postParams = {new NameValuePair("username", userName), new NameValuePair("password", password)};
-        return executePostMethod(wsURL.toString(), postParams);
+        return executeVerifyLdapUser(wsURL.toString(), postParams);
     }
 
     public LDAPUser lookup(String cnOrEmail) {
@@ -102,19 +93,17 @@ public class LdapWSClient {
         getURL.append(this.wsConfig.getLdapAuthenServicePort()).append("/");
         //if lookup based on email
         if (StringUtils.contains(cnOrEmail, "@")) {
-            getURL.append("email/?email=").append(cnOrEmail);
+            getURL.append("email/").append(cnOrEmail);
         } else {
-            String firstname = "";
-            String lastname = "";
-            String[] names = StringUtils.split(cnOrEmail, " ");
-            //set the look up parameters
-            if (cnOrEmail != null && names.length == 2) {
-                firstname = names[0];
-                lastname = names[1];
-            }
-            getURL.append("cn/?firstname=").append(firstname).append("&lastname=").append(lastname);
+            getURL.append("cn/").append(cnOrEmail);
         }
-        return executeGetMethod(getURL.toString());
+        String encodedGetUrl = null;
+        try {
+            encodedGetUrl = URIUtil.encodePath(getURL.toString());
+        } catch (Exception ex) {
+            throw new WSException(ex);
+        }
+        return executeGetMethod(encodedGetUrl);
     }
 
     public LDAPUser executeGetMethod(String getMethodUrl) {
@@ -123,6 +112,7 @@ public class LdapWSClient {
             Protocol easyhttps = new Protocol("https", new EasyIgnoreSSLProtocolSocketFactory(), 443);
             Protocol.registerProtocol("https", easyhttps);
         }
+
         GetMethod getMethod = new GetMethod(getMethodUrl);
         BufferedReader br = null;
         StringBuffer strBuf = new StringBuffer();
@@ -134,7 +124,7 @@ public class LdapWSClient {
                 while (((readLine = br.readLine()) != null)) {
                     strBuf.append(readLine);
                 }
-                return populateResponse(strBuf.toString(), GET_RESPONSE_TYPE);
+                return populateLdapUserResponse(strBuf.toString());
             } else {
                 return null;
             }
@@ -152,8 +142,7 @@ public class LdapWSClient {
         }
     }
 
-    public LDAPUser executePostMethod(String postMethodURL, NameValuePair[] params) {
-
+    public boolean executeLdapUserLogin(String postMethodURL, NameValuePair[] params) {
         HttpClient client = new HttpClient();
 
         if (this.wsConfig.isIgnoreCertError() && this.wsConfig.getLdapAuthenServiceHost().startsWith("https://")) {
@@ -162,11 +151,9 @@ public class LdapWSClient {
         }
 
         PostMethod method = new PostMethod(postMethodURL);
-
         BufferedReader br = null;
         StringBuffer strBuf = new StringBuffer();
         try {
-
             //set the post params
             method.setRequestBody(params);
             //execute the post method
@@ -179,7 +166,50 @@ public class LdapWSClient {
                     strBuf.append(readLine);
                 }
                 //populate the response json values
-                return populateResponse(strBuf.toString(), DEFAULT_RESPONSE_TYPE);
+                return populateLoginResponse(strBuf.toString());
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            throw new WSException(e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (Exception be) {
+                    // ignore whatever
+                }
+            }
+            method.releaseConnection();
+        }
+    }
+
+    public LDAPUser executeVerifyLdapUser(String postMethodURL, NameValuePair[] params) {
+
+        HttpClient client = new HttpClient();
+
+        if (this.wsConfig.isIgnoreCertError() && this.wsConfig.getLdapAuthenServiceHost().startsWith("https://")) {
+            Protocol easyhttps = new Protocol("https", new EasyIgnoreSSLProtocolSocketFactory(), 443);
+            Protocol.registerProtocol("https", easyhttps);
+        }
+
+        PostMethod method = new PostMethod(postMethodURL);
+        BufferedReader br = null;
+        StringBuffer strBuf = new StringBuffer();
+        try {
+            //set the post params
+            method.setRequestBody(params);
+            //execute the post method
+            int statusCode = client.executeMethod(method);
+            //check the response code
+            if (statusCode == HttpStatus.SC_OK) {
+                br = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream()));
+                String readLine;
+                while (((readLine = br.readLine()) != null)) {
+                    strBuf.append(readLine);
+                }
+                //populate the response json values
+                return populateLdapUserResponse(strBuf.toString());
             } else {
                 return null;
             }
@@ -197,27 +227,28 @@ public class LdapWSClient {
         }
     }
 
-    private LDAPUser populateResponse(String jsonStr, String reponseType) {
+    private boolean populateLoginResponse(String jsonStr) {
+        JSONObject obj = new JSONObject();
+        JSONObject jsonObject = obj.fromObject(jsonStr);
+        return jsonObject.getBoolean("success");
+    }
+
+    private LDAPUser populateLdapUserResponse(String jsonStr) {
         JSONObject obj = new JSONObject();
 
         JSONObject jsonObject = obj.fromObject(jsonStr);
         String uid = jsonObject.getString("id");
-
+        String title = jsonObject.getString("title");
+        String firstName = jsonObject.getString("firstName");
         String surname = jsonObject.getString("surname");
-        String email = jsonObject.getString("email");
-        String firstName;
-        if (reponseType.equals(DEFAULT_RESPONSE_TYPE)) {
-            firstName = jsonObject.getString("firstname");
-        } else {
-            firstName = jsonObject.getString("display");
-        }
-
-        //System.out.println("response: uid: " + uid + " | first name: " + firstName + " | surname: " + surname + " | email: " + email);
+        String displayName = jsonObject.getString("displayName");
+        String email = jsonObject.getString("mail");
         LDAPUser ldapRemoteUser = new LDAPUser();
         ldapRemoteUser.setUid(uid);
+        ldapRemoteUser.setTitle(title);
         ldapRemoteUser.setFirstName(firstName);
         ldapRemoteUser.setLastName(surname);
-        ldapRemoteUser.setDisplayName(firstName + " " + surname);
+        ldapRemoteUser.setDisplayName(displayName);
         ldapRemoteUser.setMail(email);
         return ldapRemoteUser;
     }
@@ -265,17 +296,20 @@ public class LdapWSClient {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         WSConfig wsConfig = new WSConfig();
         wsConfig.setIgnoreCertError(true);
-        wsConfig.setLdapAuthenServiceHost("https://vera094.its.monash.edu.au");
-        wsConfig.setLdapAuthenServicePort(443);
+        wsConfig.setLdapAuthenServiceHost("http://118.138.234.124");
+        wsConfig.setLdapAuthenServicePort(80);
+
         LdapWSClient wsClient = new LdapWSClient(wsConfig);
-        boolean success = wsClient.login("xiyu", "ppp!");
-        System.out.println(" --- login succeed : " + success);
+        LDAPUser ldapUser = wsClient.verifyLdapUser("xiyu", "qqq");
+        if (ldapUser != null)
+            System.out.println(" --- verify  ldap user : " + ldapUser.getDisplayName() + " email: " + ldapUser.getMail());
+        System.out.println("login: " + wsClient.login("xiyu", "qqqq"));
         //for email
-        System.out.println(wsClient.lookup("xiaoming.yu@monash.edu"));
+        System.out.println(wsClient.lookup("xiaoming.yu@monash.edu").getDisplayName());
         //for user name
-        System.out.println(wsClient.lookup("Simon Yu"));
+        System.out.println(wsClient.lookup("Simon Yu").getMail());
     }
 }
