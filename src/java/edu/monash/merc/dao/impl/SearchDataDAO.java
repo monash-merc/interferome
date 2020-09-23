@@ -50,8 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.*;
-import java.io.*;
+
 /**
  * SearchDataDAO class which provides searching functionality for Data domain object
  *
@@ -64,6 +63,7 @@ import java.io.*;
 @Scope("prototype")
 @Repository
 public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchDataRepository {
+
     @SuppressWarnings("unchecked")
     private List<Long> queryDatasets(SearchBean searchBean) {
         String baseDatasetHql = "SELECT DISTINCT(ds.id) FROM Dataset ds";
@@ -304,6 +304,10 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 return new Pagination<Gene>(startPageNo, recordPerPage, total, searchCount);
             }
 
+            if(recordPerPage==-2){
+                recordPerPage=total;
+            }
+
             String geneHQL = "SELECT  DISTINCT g  FROM Gene g INNER JOIN g.probe pbs WHERE pbs.probeId IN (:probes) ORDER BY g." + orderBy + " " + sortBy;
             Query geneQuery = this.session().createQuery(geneHQL);
             geneQuery.setParameterList(("probes"), probes);
@@ -386,6 +390,20 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     public Integer[] searchSubtypes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
         List<Probe> probes = uniqueProbesPages.getPageResults();
+
+        //Ross: get genes
+        //use gene lsit from result set ...
+        Pagination<Gene>uniqueGenePages = searchGenes(searchBean, startPageNo, -2, "geneName", "ASC");
+        List<Gene> genes = uniqueGenePages.getPageResults();
+        List<String> genesENSG  =  new ArrayList<String>();
+
+        Iterator<Gene> geneIter=genes.iterator();
+        while(geneIter.hasNext()){
+            Gene gx = geneIter.next();
+            //System.out.println("GENE " + gx.getEnsgAccession());
+            genesENSG.add(gx.getEnsgAccession());
+        }
+
         //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
         Integer[] types = {0, 0, 0, 0, 0, 0, 0};
         if (probes.size() > 0) {
@@ -398,7 +416,7 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
             //Ross code to test for fold change
 
-            String tp1 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+            /*String tp1 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
                             "WHERE p.probeId IN (:probes) AND i.typeName = 'I' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
             Query tp1Query = this.session().createQuery(tp1);
             tp1Query.setParameterList(("probes"), probes);
@@ -416,14 +434,23 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 Query tg1Query = this.session().createQuery(tg1);
                 tg1Query.setParameterList("t1ProbeList", t1ProbeList);
                 t1GeneList = tg1Query.list();
-            }
+            }*/
+
+
+            //Ross version to retrieve genes by gene ensg, avoiding probes.
+            List<Gene> te1GeneList = new ArrayList<Gene>();
+            String tge1 ="SELECT distinct g from Gene g INNER JOIN g.probe p INNER JOIN p.data d INNER JOIN  d.dataset ds INNER JOIN ds.ifnType i "+
+                    "WHERE g.ensgAccession IN (:genesENSG) AND i.typeName = 'I' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
+            Query tge1Query = this.session().createQuery(tge1);
+            tge1Query.setParameterList(("genesENSG"), genesENSG);
+            te1GeneList = tge1Query.list();
 
             //Get Type 2 Probes
             //String tp2 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
             //        "WHERE p.probeId IN (:probes) AND i.typeName = 'II'";
 
             //Ross code to test for fold change
-            String tp2 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+            /*String tp2 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
                     "WHERE p.probeId IN (:probes) AND i.typeName = 'II' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
             Query tp2Query = this.session().createQuery(tp2);
             tp2Query.setParameterList(("probes"), probes);
@@ -441,14 +468,23 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 Query tg2Query = this.session().createQuery(tg2);
                 tg2Query.setParameterList("t2ProbeList", t2ProbeList);
                 t2GeneList = tg2Query.list();
-            }
+            }*/
+
+
+            //Ross version to retrieve genes by gene ensg, avoiding probes.
+            List<Gene> te2GeneList = new ArrayList<Gene>();
+            String tge2 ="SELECT distinct g from Gene g INNER JOIN g.probe p INNER JOIN p.data d INNER JOIN  d.dataset ds INNER JOIN ds.ifnType i "+
+                    "WHERE g.ensgAccession IN (:genesENSG) AND i.typeName = 'II' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
+            Query tge2Query = this.session().createQuery(tge2);
+            tge2Query.setParameterList(("genesENSG"), genesENSG);
+            te2GeneList = tge2Query.list();
 
             //Get Type III Probes
             //String tp3 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
             //        "WHERE p.probeId IN (:probes) AND i.typeName = 'III'";
 
             //Ross code to test for fold change
-            String tp3 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
+            /*String tp3 = "SELECT distinct p.probeId  FROM Data d INNER JOIN d.probe p INNER JOIN d.dataset ds INNER JOIN ds.ifnType i " +
                     "WHERE p.probeId IN (:probes) AND i.typeName = 'III' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
             Query tp3Query = this.session().createQuery(tp3);
             tp3Query.setParameterList(("probes"), probes);
@@ -466,35 +502,43 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
                 Query tg3Query = this.session().createQuery(tg3);
                 tg3Query.setParameterList(("t3ProbeList"), t3ProbeList);
                 t3GeneList = tg3Query.list();
-            }
+            }*/
+
+            //Ross version to retrieve genes by gene ensg, avoiding probes.
+            List<Gene> te3GeneList = new ArrayList<Gene>();
+            String tge3 ="SELECT distinct g from Gene g INNER JOIN g.probe p INNER JOIN p.data d INNER JOIN  d.dataset ds INNER JOIN ds.ifnType i "+
+                    "WHERE g.ensgAccession IN (:genesENSG) AND i.typeName = 'III' and (d.value >= " + upValue + " or d.value <= -" + downValue + ")";
+            Query tge3Query = this.session().createQuery(tge3);
+            tge3Query.setParameterList(("genesENSG"), genesENSG);
+            te3GeneList = tge3Query.list();
 
             //Count Unique members of each list
             //T1, T2, T3, T1T2, T1T3, T2T3, T1T2T3
             //T1T2T3
-            types[6] = findOverlapGenes(findOverlapGenes(t1GeneList, t2GeneList), t3GeneList).size();
+            types[6] = findOverlapGenes(findOverlapGenes(te1GeneList, te2GeneList), te3GeneList).size();
             //T2T3
-            types[5] = findOverlapGenes(t2GeneList, t3GeneList).size() - types[6];
+            types[5] = findOverlapGenes(te2GeneList, te3GeneList).size() - types[6];
             //T1T3
-            types[4] = findOverlapGenes(t1GeneList, t3GeneList).size() - types[6];
+            types[4] = findOverlapGenes(te1GeneList, te3GeneList).size() - types[6];
             //T1T2
-            types[3] = findOverlapGenes(t1GeneList, t2GeneList).size() - types[6];
+            types[3] = findOverlapGenes(te1GeneList, te2GeneList).size() - types[6];
             //T3   -> - T123 - T13 - T23
-            if (t3GeneList.size() == 0) {
+            if (te3GeneList.size() == 0) {
                 types[2] = 0;
             } else {
-                types[2] = t3GeneList.size() - types[6] - types[4] - types[5];
+                types[2] = te3GeneList.size() - types[6] - types[4] - types[5];
             }
             //T2  -> - T123 - T12 - T23
-            if (t2GeneList.size() == 0) {
+            if (te2GeneList.size() == 0) {
                 types[1] = 0;
             } else {
-                types[1] = t2GeneList.size() - types[6] - types[3] - types[5];
+                types[1] = te2GeneList.size() - types[6] - types[3] - types[5];
             }
             //T1  -> - T123 - T12 - T13
-            if (t1GeneList.size() == 0) {
+            if (te1GeneList.size() == 0) {
                 types[0] = 0;
             } else {
-                types[0] = t1GeneList.size() - types[6] - types[3] - types[4];
+                types[0] = te1GeneList.size() - types[6] - types[3] - types[4];
             }
         }
         return types;
@@ -662,8 +706,8 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
 
     private Double calculateGOEnrichPValue(long N, long n, long m, long k) {
 
-        BigDecimal mk = binomialCoefficient(m, k);
-        BigDecimal Nmnk = binomialCoefficient((N - m), (n - k));
+        BigDecimal mk = binomialCoefficient(m,k);
+        BigDecimal Nmnk = binomialCoefficient((N-m),(n-k));
         BigDecimal Nn = binomialCoefficient(N,n);
         BigDecimal mkXNmnk = mk.multiply(Nmnk);
         BigDecimal pval = mkXNmnk.divide(Nn, 15, RoundingMode.HALF_UP);
@@ -692,11 +736,11 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
     }
 
 
-    public static String path = "/Users/ciiid/IdeaProjects/enrich/";
+
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy, String uid) {
+    public List<Object[]> searchTFSite(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {
         Pagination<Probe> uniqueProbesPages = searchProbes(searchBean, startPageNo, -1, orderBy, sortBy);
 
         List<Probe> probes = uniqueProbesPages.getPageResults();
@@ -707,141 +751,12 @@ public class SearchDataDAO extends HibernateGenericDAO<Data> implements ISearchD
             Query goTFQuery = this.session().createQuery(goTFHQL);
             goTFQuery.setParameterList(("probes"), probes);
             List<Object[]> goTFList = goTFQuery.list();
-
-
-
-            try {
-                // uid stands for userId to provide path for user temp file of running CiiiDER to get result of TF Analysis
-                String uidPath = path + uid + "/";
-                File userFolder = new File(uidPath);
-                userFolder.mkdirs();
-
-                BufferedWriter HsEnrichConfig = new BufferedWriter(new FileWriter(new File(uidPath + "HsConfig.ini")));
-                BufferedWriter MmEnrichConfig = new BufferedWriter(new FileWriter(new File(uidPath + "MmConfig.ini")));
-
-                ArrayList<String> HsQueryEnsgsList = new ArrayList<String>();
-                ArrayList<String> MmQueryEnsgsList = new ArrayList<String>();
-
-                for (Object[]row :goTFList) {
-                    String geneName = ((Gene)row[0]).getGeneName();
-                    String ensgAccession = ((Gene)row[0]).getEnsgAccession();
-                    // Get information for bsl
-                    Long id = ((TFSite)row[1]).getId();
-                    String factor = ((TFSite)row[1]).getFactor();
-                    Double core_match = ((TFSite)row[1]).getCoreMatch();
-                    Double matr_match = ((TFSite)row[1]).getMatrixMatch();
-                    int start = ((TFSite)row[1]).getStart();
-                    int end = ((TFSite)row[1]).getEnd();
-
-
-                    if(!HsQueryEnsgsList.contains(ensgAccession) && ensgAccession.startsWith("ENSG")) {
-                        HsQueryEnsgsList.add(ensgAccession);
-                    }
-                    else {
-                        MmQueryEnsgsList.add(ensgAccession);
-                    }
-
-                }
-
-                getGeneListPromoter(HsQueryEnsgsList, "HsGeneList", "HsPromoterSeq", uidPath); getGeneListPromoter(MmQueryEnsgsList, "MmGeneList", "MmPromoterSeq", uidPath);
-
-                // BufferWriter for MmConfig.ini
-                String MmConfigString = "STARTPOINT=1 \n"
-                        + "ENDPOINT=2 \n"
-                        + "GENELISTFILENAME=" + uidPath + "MmGeneList.fa \n"
-                        + "BGGENELISTFILENAME=" + path + "getPromoter/MmPCG_2500.fa \n"
-                        + "MATRIXFILE=" + path + "mediumTestMatrices.dat \n"
-                        // + "REFERENCEFASTA=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Mus_musculus.GRCm38.77.dna.toplevel.fa \n"
-                        // + "GENELOOKUPMANAGER=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Mus_musculus.GRCm38.77.glm \n"
-                        + "GENESCANRESULTS=" + path + "Outputs/getPromoter/Mm/MmBSL_IRGsFromPCGs_mediumMatrices_2500.txt \n"
-                        + "BGBINDSITEFILENAME=" + path + "Outputs/getPromoter/Mm/MmCSL_IRGsFromPCGs_mediumMatrices_2500.csl \n"
-                        + "COVERAGEPVALUE=1.0 \n"
-                        + "ENRICHMENTPVALUE=1.0 \n"
-                        + "DEFICIT=0.15 \n"
-                        + "ENRICHMENTOUTPUTFILE=" + uidPath + "Outputs/Mm/MmEnrichment_DownTwoFold_AveExprBackground_2500.txt \n"
-                        + "PROJECTOUTPUTFILE=" + uidPath + "Outputs/Mm/MmProject_2500.pen";
-
-                MmEnrichConfig.write(MmConfigString);
-                MmEnrichConfig.close();
-
-                // BufferWriter for HsConfig.ini
-                String HsConfigString = "STARTPOINT=1 \n"
-                        + "ENDPOINT=2 \n"
-                        + "GENELISTFILENAME=" + uidPath + "HsGeneList.fa \n"
-                        + "BGGENELISTFILENAME=" + path + "getPromoter/HsPCG_2500.fa\n"
-                        // default file XxBackgroundList.fa in base dir
-                        + "MATRIXFILE=" + path + "mediumTestMatrices.dat \n"
-                        // + "REFERENCEFASTA=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Homo_sapiens.GRCh38.77.dna.toplevel.fa \n"
-                        // + "GENELOOKUPMANAGER=/home/mimr/projects/enrich/data/testdata/geneImport/DownloadGLM/Homo_sapiens.GRCh38.77.glm \n"
-                        + "GENESCANRESULTS=" + path + "Outputs/getPromoter/Hs/HsBSL_IRGsFromPCGs_mediumMatrices_2500.txt \n"
-                        + "BGBINDSITEFILENAME=" + path + "Outputs/getPromoter/Hs/HsCSL_IRGsFromPCGs_mediumMatrices_2500.csl \n"
-                        + "COVERAGEPVALUE=1.0 \n"
-                        + "ENRICHMENTPVALUE=1.0 \n"
-                        + "DEFICIT=0.15 \n"
-                        + "ENRICHMENTOUTPUTFILE=" + uidPath + "Outputs/Hs/HsEnrichment_DownTwoFold_AveExprBackground_2500.txt \n"
-                        + "PROJECTOUTPUTFILE=" + uidPath + "Outputs/Hs/HsProject_2500.pen";
-
-                HsEnrichConfig.write(HsConfigString);
-                HsEnrichConfig.close();
-                // Params for Runtime
-                String EnrichRuntimeParamsHs = "java -jar " + path + "Enrichment110815.jar" + " -n " + uidPath + "HsConfig.ini";
-                String EnrichRuntimeParamsMm = "java -jar " + path + "Enrichment110815.jar" + " -n " + uidPath + "MmConfig.ini";
-                Process EnrichProcessHs = Runtime.getRuntime().exec(EnrichRuntimeParamsHs);
-                EnrichProcessHs.waitFor();
-                Process EnrichProcessMm = Runtime.getRuntime().exec(EnrichRuntimeParamsMm);
-                EnrichProcessMm.waitFor();
-            } catch (IOException e) {
-                e.printStackTrace();}
-            catch (InterruptedException e) {
-                e.printStackTrace();}
-
             return goTFList;
         } else {
             return new ArrayList<Object[]>();
         }
     }
 
-    public HashMap<String, String> getPromoterSeqHashMap(String promoterSeqInFilename) throws IOException {
-        BufferedReader promoterReference = new BufferedReader(new FileReader(new File(path + promoterSeqInFilename + ".fa")));
-        HashMap<String, String> promoterHashMap = new HashMap<String, String>();
-        String key = "";
-        String promoterLine = "";
-
-        while ((promoterLine = promoterReference.readLine()) != null){
-            if (promoterLine.startsWith(">")){
-                // ensgID = promoterLine.split("\\|")[0];
-                // key = ensgID.replace(">", "");
-                key = promoterLine;
-            }
-            else {
-                String value = promoterLine;
-                promoterHashMap.put(key, value);}
-        }return promoterHashMap;
-    }
-
-    public void getGeneListPromoter (ArrayList<String> QueryEnsgsList, String GeneListFaFilename, String promoterSeqInFilename, String uidPath) throws IOException {
-        HashMap<String, String> promoterHashMap = getPromoterSeqHashMap(promoterSeqInFilename);
-        String toWrite = "";
-
-        String QueryEnsg;
-        Iterator<String> iterator = QueryEnsgsList.iterator();
-        while (iterator.hasNext()) {
-            QueryEnsg = iterator.next();
-            for (Map.Entry<String, String> entry : promoterHashMap.entrySet()) {
-                String key = entry.getKey();
-                String valueSeq = entry.getValue();
-                if (key.contains(QueryEnsg)){
-                    String[] splitKey = key.split("\\|");
-                    String newKey = splitKey[1];
-                    toWrite += (">" + newKey + "\n" + valueSeq + "\n");}
-                else {continue;}
-            }
-        }
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File (uidPath + GeneListFaFilename + ".fa")));
-        writer.write(toWrite);
-        writer.close();
-    }
 
     @Override
     public Pagination<Probe> searchProbes(SearchBean searchBean, int startPageNo, int recordPerPage, String orderBy, String sortBy) {

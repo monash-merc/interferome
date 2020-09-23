@@ -28,66 +28,22 @@
 
 package edu.monash.merc.system.scheduling.impl;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
-import com.thoughtworks.xstream.mapper.AnnotationConfiguration;
-import edu.monash.merc.common.results.DBStats;
 import edu.monash.merc.config.AppPropSettings;
-import edu.monash.merc.dao.HibernateGenericDAO;
-import edu.monash.merc.dao.impl.GeneDAO;
-import edu.monash.merc.dao.impl.SearchDataDAO;
-import edu.monash.merc.domain.Data;
 import edu.monash.merc.domain.Gene;
 import edu.monash.merc.domain.Probe;
-import edu.monash.merc.domain.Promoter;
 import edu.monash.merc.dto.GeneOntologyBean;
-
 import edu.monash.merc.dto.ProbeGeneBean;
-import edu.monash.merc.service.DBStatisticsService;
-import edu.monash.merc.service.GeneService;
 import edu.monash.merc.system.scheduling.DataProcessor;
 import edu.monash.merc.service.DMService;
 import edu.monash.merc.wsclient.biomart.BioMartClient;
-import edu.monash.merc.wsclient.biomart.CSVGeneCreator;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.*;
-
-import org.hibernate.cache.ehcache.internal.util.HibernateUtil;
-import org.hibernate.cfg.Configuration;
-
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.SQLWarningException;
-import org.springframework.stereotype.Repository;
-
-import java.io.*;
-import java.lang.reflect.ParameterizedType;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.*;
 import java.util.*;
-
-// SearchDAO impl
-
-
-import java.util.ArrayList;
-
-import java.util.List;
-import java.util.logging.Level;
-
 
 /**
  * @author Simon Yu
@@ -100,8 +56,7 @@ import java.util.logging.Level;
  */
 @Service
 @Qualifier("infDataProcessor")
-@Transactional
-public class INFDataProcessor extends HibernateGenericDAO<Data> implements DataProcessor {
+public class INFDataProcessor implements DataProcessor {
 
     @Autowired
     protected DMService dmService;
@@ -118,10 +73,6 @@ public class INFDataProcessor extends HibernateGenericDAO<Data> implements DataP
 
     private static String PROBE_MOUSE_TYPE = "Mouse";
 
-    private static String SPECIES_HUMAN_ID = "Homo sapiens";
-
-    private static String SPECIES_MOUSE_ID = "Mus musculus";
-
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public void setDmService(DMService dmService) {
@@ -132,10 +83,6 @@ public class INFDataProcessor extends HibernateGenericDAO<Data> implements DataP
         this.appSetting = appSetting;
     }
 
-    @Autowired
-    private DBStatisticsService dbStatisticsService;
-    private DBStats stats;
-
     @Override
     public void process() {
         long startTime = System.currentTimeMillis();
@@ -144,32 +91,18 @@ public class INFDataProcessor extends HibernateGenericDAO<Data> implements DataP
         Date importedTime = GregorianCalendar.getInstance().getTime();
 
         //Gene for HUMAN
-        //importEnsemblGenes(HUMAN, importedTime);
-
-        // 9/9/15 Update promoter sequence code goes here (Hibernate read in file)
+        importEnsemblGenes(HUMAN, importedTime);
 
         //Gene for MOUSE
-        //importEnsemblGenes(MOUSE, importedTime);
+       importEnsemblGenes(MOUSE, importedTime);
         long endTime = System.currentTimeMillis();
 
-
-        importCiiiDERPromoter(SPECIES_HUMAN_ID);
-
-
-        //importCiiiDERPromoter(SPECIES_MOUSE_ID);
-
-
-        System.out.println("I am updating the CiiiDER data ...");
-
-        // importTFSite
-
-
         //import human and mouse probes
-        //importProbes();
+        importProbes();
 
         //GeneOntology for HUMAN
         long goStartTime = System.currentTimeMillis();
-        //importGeneOntology(HUMAN);
+        importGeneOntology(HUMAN);
 
         //import the geneontology for mouse
         importGeneOntology(MOUSE);
@@ -180,125 +113,6 @@ public class INFDataProcessor extends HibernateGenericDAO<Data> implements DataP
         logger.info("=====> The total process time for GeneOntology: " + (goEndTime - goStartTime) / 1000 + "seconds");
 
         logger.info("=====> The total process time for gene and genontology: " + (goEndTime - startTime) / 1000 + "seconds");
-    }
-
-
-    // String gnQuery = "SELECT count(g) FROM Gene g";
-        // Query gnHQL = this.session().createQuery(gnQuery);
-        // System.out.println("Results:   " + gnHQL.toString());
-
-
-
-
-
-    private void importCiiiDERPromoter(String speciesId)  {
-        // String path = "/home/mimr/dyin/enrich/";
-        // Getting all list of genes
-
-        // List<String> genes = new ArrayList<String>();
-
-//        Session gnSess = session().getSessionFactory().openSession();
-//        Transaction gnTx = null;
-//
-//        try {
-//
-//            // Session geneSession = session().getSessionFactory().getCurrentSession();
-//            gnTx = gnSess.beginTransaction();
-//            List<Gene> genes = gnSess.createQuery("SELECT DISTINCT g.ensgAccession FROM Data d INNER JOIN d.probe p INNER JOIN p.genes g").list();
-//
-//            // "SELECT g FROM Gene g"
-//
-//            gnTx.commit();
-//
-//
-//            //String gnQuery = "SELECT g FROM Gene g";
-//            // Session gnSession = session().getSessionFactory().openSession();
-//            // Transaction gnTrans = gnSession.beginTransaction();
-//            //gnSession = this.session();
-//            //Query gnHQL = gnSession.createQuery(gnQuery);
-//            // gnHQL.setParameterList(("genes"), genes);
-//            // List<Gene> genes = gnHQL.list();
-//
-//
-//            // JDBC connection to get gene ensgs
-//        /*
-//        try {
-//            Connection geneConnection = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/inter", "mimr", "");
-//            Statement geneStmt = (Statement) geneConnection.createStatement();
-//            ResultSet geneResult = geneStmt.executeQuery("SELECT ensg_accession FROM gene");
-//
-//            while (geneResult.next()) {
-//                String geneEnsg = geneResult.getString("ensg_accession");
-//                genes.add(geneEnsg);
-//                }
-//
-//
-//
-//        }catch (SQLException e) {
-//        e.printStackTrace();
-//        }
-//        */
-//
-//
-//            List<String> geneEnsgList = new ArrayList<String>();
-//            for (Gene gene : genes) {
-//                String geneEnsg = gene.getEnsgAccession();
-//                if (speciesId == SPECIES_HUMAN_ID && geneEnsg.startsWith("ENSG")) {
-//                    geneEnsgList.add(geneEnsg);}
-//                else if (speciesId == SPECIES_MOUSE_ID && geneEnsg.startsWith("ENSMUSG")) {
-//                    geneEnsgList.add(geneEnsg);
-//                }
-//            }
-//
-//            String speciesName = speciesId.toString().replaceAll("\\s", "");
-//            // Writing gene names into file (.txt) and reading promoter found
-//            // BufferedWriter geneWriter = new BufferedWriter(new FileWriter(new File(path + "genes" + speciesName + ".txt")));
-//            // for (String geneEnsg : geneEnsgList) {
-//            // geneWriter.write(geneEnsg + "\n");
-//            // }
-//            // geneWriter.close();
-//
-//            File geneEnsgs = new File(SearchDataDAO.path + "genes" + speciesName + ".txt");
-//            FileUtils.writeLines(geneEnsgs, geneEnsgList, "\n");
-//
-//
-//            // convert speciesId to prefix for Config file e.g. Homo sapiens -> Homosapiens
-//            String runCiiiDER = "java -jar " + SearchDataDAO.path + "Enrichment.jar" + " -n " + SearchDataDAO.path + "findPromoter/" + speciesName + "Config.ini";
-//            Process processCiiiDER = Runtime.getRuntime().exec(runCiiiDER);
-//
-//            // processCiiiDER.waitFor();
-//            //File promoterFile = new File(path + "findPromoter/" + speciesName + "Promoter.fa");
-//            // Scanner promoterScanner = new Scanner(promoterFile);
-//
-//            // List<Promoter> promoters = new ArrayList<Promoter>();
-//            List<Promoter> promoters = new ArrayList<Promoter>();
-//            Promoter promoter = new Promoter();
-//            // while (promoterScanner.hasNextLine()) {
-//                // String line = promoterScanner.nextLine();
-//            BufferedReader brGeneEnsgs = new BufferedReader(new FileReader(new File(SearchDataDAO.path + "findPromoter/" + speciesName + "Promoter.fa")));
-//
-//            String line = null;
-//            while ((line = brGeneEnsgs.readLine()) != null) {
-//                if (line.startsWith(">")) {
-//                    String[] identifier = line.split("\\|");
-//                    String geneName = identifier[0].replaceFirst(">","");
-//                    String ensgAccession = identifier[1];
-//                    promoter = new Promoter();
-//                    promoter.setGeneName(geneName);
-//                    promoter.setEnsgAccession(ensgAccession);
-//                } else if (!line.equals("")) {
-//                    promoter.setSequence(line);
-//                    if(!promoters.contains(promoter)) promoters.add(promoter);
-//                }
-//            }
-//            this.dmService.importPromoter(promoters);
-//
-//        } catch (IOException e) {
-//                e.printStackTrace();
-//        } catch (HibernateException ex) {
-//            ex.getCause();
-//        }
-
     }
 
     private void importEnsemblGenes(String species, Date importedTime) {

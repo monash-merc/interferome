@@ -152,7 +152,7 @@
     <div class="search_field_row">
         <div class="search_field_title">GenBank Accession List:</div>
         <div class="search_field_list">
-            <@s.textarea  name="searchBean.genBanks" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/> (eg: L13852,X55005 &nbsp; Separated by Comma or Tab or NewLine)
+            <@s.textarea  name="searchBean.genBanks" cols="80" rows="5" cssClass="input_textarea" /> &nbsp; &nbsp; <br/> (eg: AAA59191, AAY14802 &nbsp; Separated by Comma or Tab or NewLine)
         </div>
         <div style="clear:both"></div>
     </div>

@@ -323,36 +323,38 @@ public class MonitoredMultiPartRequest implements MultiPartRequest {
         return filename;
     }
 
+
     /**
      * Creates a RequestContext needed by Jakarta Commons Upload.
      *
      * @param req the request.
      * @return a new request context.
      */
-    private RequestContext createRequestContext(final HttpServletRequest req) {
+    protected RequestContext createRequestContext(final HttpServletRequest req) {
         return new RequestContext() {
-            @Override
             public String getCharacterEncoding() {
                 return req.getCharacterEncoding();
             }
 
-            @Override
             public String getContentType() {
                 return req.getContentType();
             }
 
-            @Override
             public int getContentLength() {
                 return req.getContentLength();
             }
 
-            @Override
             public InputStream getInputStream() throws IOException {
+                InputStream in = req.getInputStream();
+                if (in == null) {
+                    throw new IOException("Missing content in the request");
+                }
                 return req.getInputStream();
             }
         };
     }
-   @Override
+
+    @Override
     public void cleanUp() {
         //do nothing
     }

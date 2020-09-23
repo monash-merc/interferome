@@ -55,4 +55,5 @@ public class DBStatisticsServiceImpl implements DBStatisticsService {
     public DBStats getDBStatistics() {
         return this.dbStatisticsDAO.getDBStatistics();  //To change body of implemented methods use File | Settings | File Templates.
     }
+
 }

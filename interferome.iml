@@ -92,7 +92,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6">
     <output url="file://$MODULE_DIR$/build/classes" />
     <output-test url="file://$MODULE_DIR$/build/utest/classes" />
     <exclude-output />
@@ -229,9 +229,7 @@
           <root url="jar://$MODULE_DIR$/lib/axis_lib/axis2-saaj-api-1.4.1.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.ideaLibSources/commons-httpclient-3.1-sources.jar!/" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -246,5 +244,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="core-lib" level="project" />
   </component>
 </module>
